@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "structured-acceptance-0101",
+  "cause_id": "pilot.product-listing-analysis",
+  "objective": "Analyze a public product-listing record and return a structured assessment: a category enum, a confidence score in [0, 1], at least one cited source URL, and a one-line rationale. This benign pilot exercises a non-trivial machine-checkable acceptance contract; it carries no sensitive content.",
+  "inputs": {
+    "inline": {
+      "listing_title": "Refurbished USB-C Hub, 7-in-1",
+      "listing_url": "https://example-marketplace.test/items/usb-c-hub-7in1",
+      "description": "Aluminum 7-port hub, HDMI 4K, 100W PD passthrough."
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["category", "confidence", "citations", "rationale"],
+    "properties": {
+      "category": { "type": "string", "enum": ["electronics", "apparel", "home", "other"] },
+      "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+      "citations": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+      "rationale": { "type": "string" }
+    }
+  },
+  "acceptance_contract": {
+    "predicates": [
+      { "kind": "required_fields", "fields": ["category", "confidence", "citations", "rationale"] },
+      { "kind": "enum", "field": "category", "allowed": ["electronics", "apparel", "home", "other"] },
+      { "kind": "field_type", "field": "confidence", "json_type": "number" },
+      { "kind": "value_range", "field": "confidence", "min": 0, "max": 1 },
+      { "kind": "min_items", "field": "citations", "count": 1 },
+      { "kind": "non_empty", "field": "rationale" },
+      { "kind": "regex_match", "field": "citations.0", "pattern": "^https?://" }
+    ]
+  },
+  "capability_floor": {
+    "context_window": 8192,
+    "tools": ["web_fetch"],
+    "modalities": ["text"]
+  },
+  "redundancy_policy": {
+    "target_nresults": 3,
+    "min_quorum": 2,
+    "model_diversity": 2
+  },
+  "provenance_requirements": {
+    "model_family": true,
+    "signed_result": true,
+    "trace": true
+  }
+}

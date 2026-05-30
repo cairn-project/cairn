@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cairn.example/spec/work_unit/v1.json",
+  "title": "Work Unit",
+  "description": "The model-agnostic work-unit + acceptance-contract spec (PLAN.md §3.3, research 02 A.1). The single stable interface between Layer A (engine) and Layer B (a cause). The portable payload is objective + inputs + output_schema + acceptance_contract; everything model-specific is synthesized locally by an adapter (not in scope for wave 1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "cause_id",
+    "objective",
+    "inputs",
+    "output_schema",
+    "acceptance_contract",
+    "capability_floor",
+    "redundancy_policy",
+    "provenance_requirements"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Semver of the work-unit spec this unit was authored against. validate_work_unit accepts a unit whose MAJOR equals the spec's MAJOR. See SPEC.md versioning rule.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Stable unique id; ties a result back to its unit; dedup / sybil anchor.",
+      "minLength": 1
+    },
+    "cause_id": {
+      "type": "string",
+      "description": "First-class cause binding (PLAN §2). Which coordinated effort this unit serves; each cause owns its own ledger / partner-bindings / trust-core.",
+      "minLength": 1
+    },
+    "objective": {
+      "type": "string",
+      "description": "Natural-language statement of the task outcome. Model-agnostic; the adapter renders this into a runtime-native call.",
+      "minLength": 1
+    },
+    "inputs": {
+      "description": "The data to operate on: EITHER inline data OR a content-addressed pointer + hash (research 02 A.1). Exactly one form.",
+      "type": "object",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["inline"],
+          "properties": {
+            "inline": {
+              "description": "Inline input data of any JSON-representable shape."
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["pointer", "hash"],
+          "properties": {
+            "pointer": {
+              "type": "string",
+              "description": "Content-addressed pointer to the input blob (e.g. a CID or ledger path). Resolution is a later-wave concern; the spec only carries the reference.",
+              "minLength": 1
+            },
+            "hash": {
+              "type": "string",
+              "description": "Cryptographic hash of the referenced content, for content-addressed integrity.",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "output_schema": {
+      "type": "object",
+      "description": "JSON Schema describing the required result structure. The runtime-agnostic contract; the more structured, the cheaper objective verification becomes (research 02). Carried as an embedded schema document; not itself validated against draft meta-schema in wave 1."
+    },
+    "acceptance_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["predicates"],
+      "description": "Machine-checkable predicates a valid result must satisfy (format, required fields, value ranges, citations-required, refusal-handling). The validator hook (BOINC-analog). evaluate_acceptance runs these client-side; the deferred verify-layer quorum sits above it.",
+      "properties": {
+        "predicates": {
+          "type": "array",
+          "description": "Conjunctive: ALL predicates must pass for the contract to pass.",
+          "items": { "$ref": "#/$defs/predicate" }
+        }
+      }
+    },
+    "capability_floor": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Minimum capability the unit needs. Lets the dispatcher route units away from runtimes that can't do them. Model-agnostic WITHIN a capability tier, not uniformly (F2, research 02 A.2). Self-declared capability is itself untrusted (calibration probe is a later wave).",
+      "properties": {
+        "context_window": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum context window in tokens."
+        },
+        "tools": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tool capabilities the runtime must have (e.g. \"web_fetch\", \"code_exec\")."
+        },
+        "modalities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Required input/output modalities (e.g. \"text\", \"image\")."
+        }
+      }
+    },
+    "redundancy_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_nresults", "min_quorum"],
+      "description": "Redundancy + quorum config the (deferred) verify layer consumes (PLAN §3.5, research 02 Part B). Wave 1 ships the fields; no quorum logic.",
+      "properties": {
+        "target_nresults": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of independent result instances to request."
+        },
+        "min_quorum": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimum agreeing results required to accept a canonical result."
+        },
+        "model_diversity": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum number of DISTINCT model families that must contribute (the anti-collusion primitive). 0 = no diversity requirement."
+        }
+      }
+    },
+    "provenance_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "What the runtime must attest per result (research 02 A.1). Feeds the deferred audit-trail / transparency ledger (PLAN §3.6).",
+      "properties": {
+        "model_family": {
+          "type": "boolean",
+          "description": "Must the result declare its model family?"
+        },
+        "signed_result": {
+          "type": "boolean",
+          "description": "Must the result be cryptographically signed (A2A agent card)?"
+        },
+        "trace": {
+          "type": "boolean",
+          "description": "Must the result include an execution trace?"
+        }
+      }
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional absolute ISO-8601 deadline for the unit."
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duration_seconds"],
+      "description": "Optional claim lease; reclaim-and-reissue on expiry (BOINC-style). Claim/CAS logic is a later wave (ledger, PLAN §3.1).",
+      "properties": {
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "How long a claim is held before the unit can be reissued."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "predicate": {
+      "type": "object",
+      "description": "A single machine-checkable acceptance predicate. Pure function over a result dict; no LLM, no network.",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "required_fields",
+            "field_type",
+            "value_range",
+            "enum",
+            "non_empty",
+            "min_items",
+            "regex_match"
+          ],
+          "description": "Which predicate checker to run. Each kind has its own required params (see SPEC.md)."
+        }
+      }
+    }
+  }
+}

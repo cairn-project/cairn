@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "cause-threaded-0042",
+  "cause_id": "pilot.foia-document-triage",
+  "objective": "Read the referenced public document and produce a structured triage summary: the document type, the issuing agency, and up to five named topics it covers. Use only the provided document content.",
+  "inputs": {
+    "pointer": "ledger://causes/pilot.foia-document-triage/blobs/doc-7f3a",
+    "hash": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["document_type", "issuing_agency", "topics"],
+    "properties": {
+      "document_type": { "type": "string" },
+      "issuing_agency": { "type": "string" },
+      "topics": { "type": "array", "items": { "type": "string" }, "maxItems": 5 }
+    }
+  },
+  "acceptance_contract": {
+    "predicates": [
+      { "kind": "required_fields", "fields": ["document_type", "issuing_agency", "topics"] },
+      { "kind": "non_empty", "field": "issuing_agency" },
+      { "kind": "field_type", "field": "topics", "json_type": "array" }
+    ]
+  },
+  "capability_floor": {
+    "context_window": 32768,
+    "tools": ["document_read"],
+    "modalities": ["text"]
+  },
+  "redundancy_policy": {
+    "target_nresults": 3,
+    "min_quorum": 2,
+    "model_diversity": 2
+  },
+  "provenance_requirements": {
+    "model_family": true,
+    "signed_result": true,
+    "trace": false
+  },
+  "deadline": "2026-06-15T00:00:00Z",
+  "lease": {
+    "duration_seconds": 3600
+  }
+}

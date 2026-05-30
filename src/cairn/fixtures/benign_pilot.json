@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "benign-pilot-0001",
+  "cause_id": "pilot.open-data-quality",
+  "objective": "Given a public CSV row describing an open-data dataset listing, classify whether the listing's stated license is an OSI-approved open license, and extract the license identifier.",
+  "inputs": {
+    "inline": {
+      "dataset_title": "City Bicycle Counts 2024",
+      "license_text": "Released under the MIT License.",
+      "source_url": "https://example.org/open-data/bike-counts-2024"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["is_open_license", "license_id"],
+    "properties": {
+      "is_open_license": { "type": "boolean" },
+      "license_id": { "type": "string" }
+    }
+  },
+  "acceptance_contract": {
+    "predicates": [
+      { "kind": "required_fields", "fields": ["is_open_license", "license_id"] },
+      { "kind": "field_type", "field": "is_open_license", "json_type": "boolean" },
+      { "kind": "non_empty", "field": "license_id" }
+    ]
+  },
+  "capability_floor": {
+    "context_window": 4096,
+    "tools": [],
+    "modalities": ["text"]
+  },
+  "redundancy_policy": {
+    "target_nresults": 2,
+    "min_quorum": 2,
+    "model_diversity": 0
+  },
+  "provenance_requirements": {
+    "model_family": true,
+    "signed_result": false,
+    "trace": false
+  }
+}
