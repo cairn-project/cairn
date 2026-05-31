@@ -35,6 +35,7 @@ packages = ["src/cairn"]
 "src/cairn/fixtures/cause_threaded.json" = "cairn/fixtures/cause_threaded.json"
 "src/cairn/fixtures/structured_acceptance.json" = "cairn/fixtures/structured_acceptance.json"
 "src/cairn/fixtures/pilot_license_snippets.json" = "cairn/fixtures/pilot_license_snippets.json"
+"src/cairn/fixtures/cause_draft_benign.json" = "cairn/fixtures/cause_draft_benign.json"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -27,6 +27,22 @@ The ``pilot`` / ``verify-log`` / ``inspect`` commands are offline, stdlib-only
 (argparse); ``live-smoke`` additionally spawns the isolated ``claude`` subprocess. ``FixedClock`` is used for the pilot so output is
 reproducible; the HMAC signing key is a fixed non-secret CLI parameter (never a
 checked-in production secret).
+
+The cause-layer commands (CAUSE LAYER WAVE, PLAN §3.9) compose on the same CLI:
+
+  cairn causes [--ledger DIR] [--status S] [--json]
+      List the PUBLIC cause list (approved/live only) — or, with --status, the
+      request/decision history view for that status. Exit 0.
+
+  cairn cause-request FILE [--ledger DIR] [--by WHO] [--json]
+      Submit a cause draft (JSON file). Records a CAUSE_REQUEST on the
+      transparency log; the cause is NOT publicly listable yet. Exit 0.
+
+  cairn cause-decide ID --approve|--reject --reason TEXT --by WHO [--frame-pass K]
+                     [--ledger DIR] [--json]
+      Record a reasoned CAUSE_DECISION via a COMPLETE five-frame gate-check.
+      Only --approve flips the cause listable. Exit 0 on a recorded decision;
+      nonzero on an empty reason or an incomplete gate (no silent decision).
 """
 
 from __future__ import annotations
@@ -38,6 +54,8 @@ import tempfile
 from pathlib import Path
 from typing import Optional, Sequence
 
+from .cause import CauseError, CauseRegistry, CauseStatus, five_frame_gate_check
+from .cause.model import FRAME_KEYS
 from .ledger import FixedClock, Ledger, verify_log
 from .ledger.translog import KIND_RESULT_RECORDED, KIND_VERDICT_RECORDED, TransparencyLog
 from .pilot import live_smoke, run_pilot
@@ -85,6 +103,97 @@ def _cmd_live_smoke(args: argparse.Namespace) -> int:
         print("LIVE SMOKE — one node is a real Claude via isolated `claude -p`\n")
         print(summary.pretty())
         print(f"ledger dir: {ledger_dir}")
+    return 0
+
+
+def _open_registry(ledger_arg: Optional[str]) -> CauseRegistry:
+    """Open a CauseRegistry over a real ledger (offline, FixedClock, demo key)."""
+    ledger_dir = (
+        Path(ledger_arg)
+        if ledger_arg
+        else Path(tempfile.mkdtemp(prefix="cairn-cause-"))
+    )
+    ledger = Ledger(ledger_dir, FixedClock(start=0.0), signing_key=_DEMO_KEY)
+    return CauseRegistry(ledger)
+
+
+def _cmd_causes(args: argparse.Namespace) -> int:
+    registry = _open_registry(args.ledger)
+    status = CauseStatus(args.status) if args.status else None
+    causes = registry.list_causes(status_filter=status)
+    rows = [
+        {
+            "cause_id": c.cause_id,
+            "name": c.name,
+            "status": c.status.value,
+            "listable": c.is_publicly_listable,
+        }
+        for c in causes
+    ]
+    if args.json:
+        print(json.dumps(rows, indent=2, sort_keys=True))
+    else:
+        label = "public causes" if status is None else f"causes [{status.value}]"
+        print(f"{label}: {len(rows)}")
+        for r in rows:
+            print(f"  {r['status']:9} {r['cause_id'][:12]}  {r['name']}")
+    return 0
+
+
+def _cmd_cause_request(args: argparse.Namespace) -> int:
+    draft = json.loads(Path(args.file).read_text(encoding="utf-8"))
+    if args.by:
+        draft["created_by"] = args.by
+    registry = _open_registry(args.ledger)
+    cause = registry.submit_cause_request(draft)
+    if args.json:
+        print(json.dumps({"cause_id": cause.cause_id, "status": cause.status.value,
+                          "listable": cause.is_publicly_listable}, indent=2,
+                         sort_keys=True))
+    else:
+        print(f"REQUESTED cause_id={cause.cause_id}")
+        print(f"  name: {cause.name}")
+        print("  not publicly listable until approved")
+    return 0
+
+
+def _cmd_cause_decide(args: argparse.Namespace) -> int:
+    # The decider's per-frame verdicts: every frame defaults to fail unless named
+    # in --frame-pass, so the gate is COMPLETE only when all five are supplied.
+    passed = set(args.frame_pass or [])
+    unknown = passed - set(FRAME_KEYS)
+    if unknown:
+        print(f"unknown frame(s): {sorted(unknown)}; valid: {list(FRAME_KEYS)}")
+        return 2
+    verdicts = {k: (k in passed) for k in FRAME_KEYS}
+    gate = five_frame_gate_check(verdicts)
+
+    registry = _open_registry(args.ledger)
+    try:
+        cause = registry.decide_cause(
+            args.cause_id,
+            approve=args.approve,
+            reason=args.reason,
+            decider=args.by,
+            gate_result=gate,
+        )
+    except CauseError as exc:
+        print(f"DECISION REJECTED: {exc}")
+        return 1
+
+    if args.json:
+        print(json.dumps(
+            {"cause_id": cause.cause_id, "status": cause.status.value,
+             "listable": cause.is_publicly_listable,
+             "decision_reason": cause.decision_reason,
+             "frames_passed": gate.frames_passed,
+             "frames_failed": gate.frames_failed},
+            indent=2, sort_keys=True))
+    else:
+        verb = "APPROVED" if args.approve else "REJECTED"
+        print(f"{verb} cause_id={cause.cause_id}")
+        print(f"  reason: {cause.decision_reason}")
+        print(f"  now publicly listable: {cause.is_publicly_listable}")
     return 0
 
 
@@ -185,6 +294,54 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_live.add_argument("--json", action="store_true", help="emit JSON summary")
     p_live.set_defaults(func=_cmd_live_smoke)
+
+    # --- cause-layer commands (PLAN §3.9) ---
+    p_causes = sub.add_parser(
+        "causes", help="list public causes (approved/live), or a status history view"
+    )
+    p_causes.add_argument("--ledger", default=None, help="ledger directory")
+    p_causes.add_argument(
+        "--status",
+        default=None,
+        choices=[s.value for s in CauseStatus],
+        help="filter to a status history view (default: public list only)",
+    )
+    p_causes.add_argument("--json", action="store_true", help="emit JSON rows")
+    p_causes.set_defaults(func=_cmd_causes)
+
+    p_creq = sub.add_parser(
+        "cause-request", help="submit a cause draft (records a CAUSE_REQUEST)"
+    )
+    p_creq.add_argument("file", help="path to the cause draft JSON file")
+    p_creq.add_argument("--ledger", default=None, help="ledger directory")
+    p_creq.add_argument("--by", default=None, help="requester id (created_by)")
+    p_creq.add_argument("--json", action="store_true", help="emit JSON summary")
+    p_creq.set_defaults(func=_cmd_cause_request)
+
+    p_cdec = sub.add_parser(
+        "cause-decide",
+        help="record a reasoned approve/reject decision via the five-frame gate",
+    )
+    p_cdec.add_argument("cause_id", help="the cause_id to decide")
+    grp = p_cdec.add_mutually_exclusive_group(required=True)
+    grp.add_argument("--approve", action="store_true", help="approve (→ listable)")
+    grp.add_argument("--reject", action="store_true", help="reject (stays unlistable)")
+    p_cdec.add_argument(
+        "--reason", required=True, help="the recorded decision reason (no silent decision)"
+    )
+    p_cdec.add_argument("--by", required=True, help="the decider id")
+    p_cdec.add_argument(
+        "--frame-pass",
+        dest="frame_pass",
+        action="append",
+        default=[],
+        metavar="FRAME",
+        help=f"a frame the decider passes (repeatable); all of {list(FRAME_KEYS)} "
+        "must be addressed for a complete gate-check",
+    )
+    p_cdec.add_argument("--ledger", default=None, help="ledger directory")
+    p_cdec.add_argument("--json", action="store_true", help="emit JSON summary")
+    p_cdec.set_defaults(func=_cmd_cause_decide)
 
     p_verify = sub.add_parser(
         "verify-log", help="independently re-verify a transparency log"

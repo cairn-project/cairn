@@ -23,6 +23,14 @@ detection-and-analysis core.
   Certificate-Transparency-style log with independent `verify_log` verification.
 - **Runnable benign pilot** + the `cairn` CLI (`pilot`, `live-smoke`, `verify-log`,
   `inspect`).
+- **Cause layer** (PLAN §2 / §3.9 / §6) — a mission-neutral `Cause` first-class
+  object (id, status, 5-frame self-assessment, target-conduct + protected-boundary,
+  partner-of-record posture), a `CauseRegistry` composing on the existing ledger +
+  transparency log, request intake (`CAUSE_REQUEST`), a gated reasoned decision
+  (`CAUSE_DECISION`, approval OR rejection WITH reason — no silent rejection), a
+  five-frame gate-check structure enforcer, a gated public `list_causes`
+  (approved/live only), and CLI commands `causes` / `cause-request` /
+  `cause-decide`.
 
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.
