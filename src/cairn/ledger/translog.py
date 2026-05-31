@@ -43,6 +43,9 @@ KIND_VERDICT_RECORDED = "VERDICT_RECORDED"
 # Cause-governance transparency (§3.9 — no silent rejection):
 KIND_CAUSE_REQUEST = "CAUSE_REQUEST"
 KIND_CAUSE_DECISION = "CAUSE_DECISION"
+# Contributor consent (§3.9b — explicit opt-in, never silent enlistment):
+KIND_CONSENT_RECORDED = "CONSENT_RECORDED"
+KIND_CONSENT_REVOKED = "CONSENT_REVOKED"
 
 
 def _entry_hash(

@@ -31,6 +31,15 @@ detection-and-analysis core.
   five-frame gate-check structure enforcer, a gated public `list_causes`
   (approved/live only), and CLI commands `causes` / `cause-request` /
   `cause-decide`.
+- **Cause-bound execution + contributor opt-in** (PLAN §2 / §3.3 / §3.8 / §3.9b) —
+  a cause ⇄ work-units binding (`WorkUnitProvider` + `WorkUnitRegistry`, with a
+  mission-neutral `PilotWorkUnitProvider` re-stamping the benign pilot units onto
+  a bound cause); an explicit, gated, revocable contributor opt-in
+  (`OptInRegistry` / `ConsentRecord` — opt-in to a non-listable cause is REFUSED;
+  `CONSENT_RECORDED` / `CONSENT_REVOKED` on the same transparency log); a
+  cause-scoped run loop (`run_cause` — verifies listable + opted-in, then drives
+  the cause's units through the existing execute → verify → ledger/translog path);
+  and the `cairn contribute <cause_id> [--adapter mock]` CLI command.
 
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.
