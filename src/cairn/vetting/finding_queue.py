@@ -227,6 +227,18 @@ class FindingVetQueue:
             it for it in self._all() if it.status != ReviewStatus.VERDICT_RECORDED
         ]
 
+    def list_reviewed(self) -> list[PendingFindingReview]:
+        """Findings with a recorded human verdict (the inverse of ``list_pending``).
+
+        A pure READ (no mutation) mirroring ``list_pending``: returns every queue
+        item that has reached VERDICT_RECORDED — i.e. has a human-verified
+        ROUTABLE/REJECTED outcome. Consumed by the public read-only vetted-outcomes
+        projection (``cairn.public``); the queue itself records nothing here.
+        """
+        return [
+            it for it in self._all() if it.status == ReviewStatus.VERDICT_RECORDED
+        ]
+
     def get(self, finding_hash: str) -> Optional[PendingFindingReview]:
         return self._load(finding_hash)
 

@@ -76,6 +76,7 @@ from .contribute import CauseRunRefused, OptInRefused, OptInRegistry, run_cause
 from .ledger import FixedClock, Ledger, verify_log
 from .ledger.translog import KIND_RESULT_RECORDED, KIND_VERDICT_RECORDED, TransparencyLog
 from .pilot import live_smoke, run_pilot
+from .public import PublicTransparency
 
 # Fixed, NON-SECRET signing key for the offline pilot/CLI demo. This is NOT a
 # production secret — it is a public demo key so the attestation seam is exercised.
@@ -272,6 +273,88 @@ def _cmd_contribute(args: argparse.Namespace) -> int:
     return 0
 
 
+def _open_public(ledger_arg: Optional[str]) -> Optional[PublicTransparency]:
+    """Open a read-only PublicTransparency over an EXISTING ledger dir.
+
+    The public surfaces project over already-recorded state; a missing ledger dir
+    has nothing to project, so we report it rather than fabricate an empty temp one.
+    """
+    if not ledger_arg:
+        return None
+    root = Path(ledger_arg)
+    if not root.exists():
+        return None
+    ledger = Ledger(root, FixedClock(start=0.0), signing_key=_DEMO_KEY)
+    return PublicTransparency(ledger)
+
+
+def _cmd_public_causes(args: argparse.Namespace) -> int:
+    public = _open_public(args.ledger)
+    if public is None:
+        print(f"no ledger at {args.ledger!r}")
+        return 1
+    rows = [v.to_dict() for v in public.list_published_causes()]
+    if args.json:
+        print(json.dumps(rows, indent=2, sort_keys=True))
+    else:
+        print(f"published causes (approved/live only): {len(rows)}")
+        for r in rows:
+            print(
+                f"  {r['status']:9} {r['cause_id'][:12]}  {r['name']}  "
+                f"[self-frames {r['frames_self_passed']}/{r['frames_self_total']}]"
+            )
+    return 0
+
+
+def _cmd_public_outcomes(args: argparse.Namespace) -> int:
+    public = _open_public(args.ledger)
+    if public is None:
+        print(f"no ledger at {args.ledger!r}")
+        return 1
+    rows = [v.to_dict() for v in public.list_vetted_outcomes()]
+    if args.json:
+        print(json.dumps(rows, indent=2, sort_keys=True))
+    else:
+        print(f"vetted outcomes (human-verified, redacted metadata only): {len(rows)}")
+        for r in rows:
+            print(
+                f"  {r['verdict']:8} packet={r['packet_hash'][:12]}  "
+                f"flag={r['flag_label']!r}  reviewer={r['reviewer_of_record']}"
+            )
+    return 0
+
+
+def _cmd_public_verify_log(args: argparse.Namespace) -> int:
+    public = _open_public(args.ledger)
+    if public is None:
+        print(f"no ledger at {args.ledger!r}")
+        return 1
+    result = public.public_verify_log()
+    if result.ok:
+        print(f"OK length={result.length} head={result.head_hash}")
+        return 0
+    print(
+        f"FAIL failed_index={result.failed_index} reason={result.reason!r} "
+        f"(verified {result.length} entries before failure)"
+    )
+    return 1
+
+
+def _cmd_public_log(args: argparse.Namespace) -> int:
+    public = _open_public(args.ledger)
+    if public is None:
+        print(f"no ledger at {args.ledger!r}")
+        return 1
+    rows = [v.to_dict() for v in public.list_public_log()]
+    if args.json:
+        print(json.dumps(rows, indent=2, sort_keys=True))
+    else:
+        print(f"public transparency log (redacted skeleton, no payloads): {len(rows)}")
+        for r in rows:
+            print(f"  {r['index']:4} {r['kind']:22} hash={r['entry_hash'][:12]}")
+    return 0
+
+
 def _cmd_verify_log(args: argparse.Namespace) -> int:
     result = verify_log(args.path)
     if result.ok:
@@ -440,6 +523,43 @@ def _build_parser() -> argparse.ArgumentParser:
     p_contrib.add_argument("--ledger", default=None, help="ledger directory")
     p_contrib.add_argument("--json", action="store_true", help="emit JSON summary")
     p_contrib.set_defaults(func=_cmd_contribute)
+
+    # --- public transparency read-surfaces (READ-ONLY projection) ---
+    p_public = sub.add_parser(
+        "public",
+        help="public read-only transparency surfaces (no privileged access)",
+    )
+    pub_sub = p_public.add_subparsers(dest="public_command", required=True)
+
+    pub_causes = pub_sub.add_parser(
+        "causes", help="list PUBLISHED causes (approved/live only — the listing gate)"
+    )
+    pub_causes.add_argument("--ledger", required=True, help="ledger directory to read")
+    pub_causes.add_argument("--json", action="store_true", help="emit JSON rows")
+    pub_causes.set_defaults(func=_cmd_public_causes)
+
+    pub_out = pub_sub.add_parser(
+        "outcomes",
+        help="list human-verified vetted outcomes (REDACTED metadata only)",
+    )
+    pub_out.add_argument("--ledger", required=True, help="ledger directory to read")
+    pub_out.add_argument("--json", action="store_true", help="emit JSON rows")
+    pub_out.set_defaults(func=_cmd_public_outcomes)
+
+    pub_vl = pub_sub.add_parser(
+        "verify-log",
+        help="public independent transparency-log verify (reuses verify_log)",
+    )
+    pub_vl.add_argument("--ledger", required=True, help="ledger directory to read")
+    pub_vl.set_defaults(func=_cmd_public_verify_log)
+
+    pub_log = pub_sub.add_parser(
+        "log",
+        help="redacted public transparency-log skeleton view (no payloads)",
+    )
+    pub_log.add_argument("--ledger", required=True, help="ledger directory to read")
+    pub_log.add_argument("--json", action="store_true", help="emit JSON rows")
+    pub_log.set_defaults(func=_cmd_public_log)
 
     p_verify = sub.add_parser(
         "verify-log", help="independently re-verify a transparency log"
