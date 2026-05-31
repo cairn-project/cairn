@@ -46,6 +46,13 @@ KIND_CAUSE_DECISION = "CAUSE_DECISION"
 # Contributor consent (§3.9b — explicit opt-in, never silent enlistment):
 KIND_CONSENT_RECORDED = "CONSENT_RECORDED"
 KIND_CONSENT_REVOKED = "CONSENT_REVOKED"
+# Inert evidence-bundle capture (trust-gated CAPTURE role; analysis is open):
+#   PACKET_CAPTURED records that a gated operator froze a live target into a
+#   static, content-addressed examination packet; the role grant/revoke entries
+#   record who is permitted to capture (a privileged, auditable operation).
+KIND_PACKET_CAPTURED = "PACKET_CAPTURED"
+KIND_CAPTURE_ROLE_GRANTED = "CAPTURE_ROLE_GRANTED"
+KIND_CAPTURE_ROLE_REVOKED = "CAPTURE_ROLE_REVOKED"
 
 
 def _entry_hash(
