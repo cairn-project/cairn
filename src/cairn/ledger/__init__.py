@@ -48,10 +48,12 @@ from .translog import (
     KIND_CAUSE_VET_ENQUEUED,
     KIND_CAUSE_VET_VERDICT,
     KIND_FINDING_FLAGGED,
+    KIND_FINDING_ROUTED,
     KIND_FINDING_VET_ASSIGNED,
     KIND_FINDING_VET_VERDICT,
     KIND_PACKET_CAPTURED,
     KIND_RESULT_RECORDED,
+    KIND_ROUTE_ACK_RECORDED,
     KIND_VERDICT_RECORDED,
     LogEntry,
     LogVerification,
@@ -97,6 +99,8 @@ __all__ = [
     "KIND_FINDING_FLAGGED",
     "KIND_FINDING_VET_ASSIGNED",
     "KIND_FINDING_VET_VERDICT",
+    "KIND_FINDING_ROUTED",
+    "KIND_ROUTE_ACK_RECORDED",
     # reputation persistence
     "LedgerReputation",
     # the thin coordinator

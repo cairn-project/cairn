@@ -102,5 +102,31 @@ detection-and-analysis core.
   `public outcomes` / `public verify-log` / `public log`. A served web/HTTP read
   API + HTML rendering of these surfaces is a deliberately deferred later wave.
 
+- **Routing / action spine** (the prime-directive keystone — "practical help =
+  action taken") — the path that turns a human-verified ROUTABLE finding into a
+  RECORDED ACTION dispatched to the recipient best fit to act on it, closing the
+  detect → verify → human-vet → ACT loop. Three composed pieces (`cairn.routing`):
+  (1) a **`RecipientChannel` delivery seam** — the interface a routed finding reaches
+  a recipient through, with ONLY a deterministic, OFFLINE `InMemoryRecipientChannel`
+  shipped (records the dispatch + returns a synthetic `DispatchAck` whose `ack_ref`
+  is derived from the dispatch material — no network, no real recipient, no
+  randomness); (2) a **routing policy** (`RoutingPolicy.route`) selecting the best-fit
+  recipient from a `RecipientRegistry` by mission-neutral locality + domain tags
+  (most-specific match wins; ties broken deterministically by recipient id), with
+  **locality-aware escalation** — on NO match it escalates to the registry's EXPLICIT
+  fallback recipient and records `ESCALATED_TO_FALLBACK`, and a misconfigured registry
+  (no recipients AND no fallback) RAISES rather than dropping, so a routable finding
+  is NEVER silently dropped; and (3) a **fail-closed dispatch driver**
+  (`dispatch_routable_finding`) that reuses `FindingVetQueue.is_routable` —
+  refusing (`RoutingRefused`) any finding that is not human-verified ROUTABLE (a
+  PENDING or REJECTED finding is never routed/delivered/recorded) — then selects,
+  delivers, and records the action on the SAME append-only transparency log
+  (`FINDING_ROUTED` + `ROUTE_ACK_RECORDED`, covered by the unchanged `verify_log`).
+  The recorded routing event + recipient acknowledgement ARE the "action taken" the
+  prime directive measures. Real external-recipient integration / network egress
+  (Safe Browsing / abuse.ch / registrars / partner endpoints) is a deliberately
+  deferred, separately-security-reviewed later wave — the `RecipientChannel` seam is
+  where it will plug in.
+
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.
