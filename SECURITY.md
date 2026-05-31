@@ -37,6 +37,18 @@ flow. Note that the only capture port shipped today is the deterministic, OFFLIN
 real headless-browser / network-egress capture port is a deferred, separately
 security-reviewed wave and is NOT yet in this repository.
 
+It also includes the **human-in-the-loop two-gate vetting queue** (`cairn.vetting`):
+the two fail-closed human-review gates (the cause-vetting gate `CauseVetQueue` whose
+`apply_cause_verdict` is the only path feeding the existing cause decision, and the
+finding-vetting gate `FindingVetQueue` whose `is_routable` is true only after a
+recorded human verdict). The load-bearing trust property here is the *absence of an
+advance-path*: a report of any way to make a cause publicly listable, or a finding
+routable, WITHOUT a recorded human verdict (or any way to record a silent rejection
+with no reason) is in scope. Note that onward routing of a routable finding to real
+external recipients is NOT in this repository — it is a deferred, network-touching,
+separately security-reviewed wave; this gate only produces the human-verified
+ROUTABLE/REJECTED state.
+
 Out of scope here: third-party runtimes a contributor chooses to run, and the
 operational deployment of any specific cause (those carry their own policies).
 
