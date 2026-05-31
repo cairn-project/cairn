@@ -1,0 +1,36 @@
+{
+  "name": "Open-data link-rot audit",
+  "description": "A benign, mission-neutral cause: distributed enumeration of dead/redirected links in a public open-data catalogue, so the catalogue maintainer can repair them. No persons targeted; public URLs only.",
+  "target_conduct": "Catalogue entries whose advertised public URL returns a 404 / permanent redirect / parked-domain response.",
+  "protected_boundary": "No individuals are profiled, surveilled, stored, or reported. Only public catalogue URLs are checked; private or login-gated resources are out of scope by construction.",
+  "output_schema_ref": "link_audit_result_v0",
+  "partner_of_record_posture": "The open-data catalogue maintainer is the actor-of-record; the swarm only packages the dead-link report for them to repair.",
+  "created_by": "pilot-requester",
+  "five_frame": {
+    "works": {
+      "frame": "works",
+      "claim": "A repaired catalogue link is a concrete action taken; the maintainer has an established repair workflow.",
+      "passes": true
+    },
+    "doesnt_target_good_people": {
+      "frame": "doesnt_target_good_people",
+      "claim": "Targets URLs, never people; no person can be a subject of this cause by construction.",
+      "passes": true
+    },
+    "legal": {
+      "frame": "legal",
+      "claim": "Public-surface-only HEAD/GET requests to public catalogue URLs; no login, no ToS-evading collection.",
+      "passes": true
+    },
+    "court_grade_auditable": {
+      "frame": "court_grade_auditable",
+      "claim": "Every link-check result is content-addressed and recorded on the tamper-evident transparency log.",
+      "passes": true
+    },
+    "human_verified": {
+      "frame": "human_verified",
+      "claim": "The maintainer human confirms each dead-link report before repairing; nothing acts on the AI's word alone.",
+      "passes": true
+    }
+  }
+}
