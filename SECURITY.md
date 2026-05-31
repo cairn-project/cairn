@@ -27,7 +27,15 @@ component/version, and impact.
 ## Scope
 
 In scope: the Cairn engine code in this repository (work-unit spec, execute/adapter,
-verify, ledger/transparency-log, CLI, pilot).
+verify, ledger/transparency-log, CLI, pilot, cause/contribute layers). This includes
+the **inert evidence-bundle capture seam** (`cairn.capture`): the trust-gated CAPTURE
+role (fail-closed `CaptureGate`), the inert `ExaminationPacket` / `AnalysisView`
+boundary (the guarantee that an analyst only ever sees the frozen bundle and cannot
+re-visit the live target), and the `capture_packet` / `load_packet_for_analysis`
+flow. Note that the only capture port shipped today is the deterministic, OFFLINE
+`StaticDocumentCapturePort` (synthetic local fixture; no real browser/network); the
+real headless-browser / network-egress capture port is a deferred, separately
+security-reviewed wave and is NOT yet in this repository.
 
 Out of scope here: third-party runtimes a contributor chooses to run, and the
 operational deployment of any specific cause (those carry their own policies).

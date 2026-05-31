@@ -40,8 +40,11 @@ from .ledger import Ledger
 from .reputation_store import LedgerReputation
 from .translog import (
     GENESIS_PREV,
+    KIND_CAPTURE_ROLE_GRANTED,
+    KIND_CAPTURE_ROLE_REVOKED,
     KIND_CAUSE_DECISION,
     KIND_CAUSE_REQUEST,
+    KIND_PACKET_CAPTURED,
     KIND_RESULT_RECORDED,
     KIND_VERDICT_RECORDED,
     LogEntry,
@@ -79,6 +82,9 @@ __all__ = [
     "KIND_VERDICT_RECORDED",
     "KIND_CAUSE_REQUEST",
     "KIND_CAUSE_DECISION",
+    "KIND_PACKET_CAPTURED",
+    "KIND_CAPTURE_ROLE_GRANTED",
+    "KIND_CAPTURE_ROLE_REVOKED",
     # reputation persistence
     "LedgerReputation",
     # the thin coordinator

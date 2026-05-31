@@ -40,6 +40,21 @@ detection-and-analysis core.
   cause-scoped run loop (`run_cause` — verifies listable + opted-in, then drives
   the cause's units through the existing execute → verify → ledger/translog path);
   and the `cairn contribute <cause_id> [--adapter mock]` CLI command.
+- **Inert evidence-bundle (examination-packet) capture abstraction** (PLAN §3.5 /
+  §3.6 / §3.9b) — the seam by which a trust-gated CAPTURE operator freezes a live
+  target into a STATIC, INERT, content-addressed `ExaminationPacket` that the open
+  analysis layer judges WITHOUT anyone re-visiting the live target. Comprises the
+  inert artifact (`Observation` + `ExaminationPacket` + a read-only `AnalysisView`
+  with no live-locator / fetch surface — "re-visit the live target" is not
+  expressible on the analysis path), a `CapturePort` seam with a deterministic,
+  OFFLINE `StaticDocumentCapturePort` (reads a synthetic LOCAL document fixture; no
+  real browser, no real URL fetched, no network egress), a fail-closed trust-gated
+  CAPTURE role (`CaptureGate` / `CaptureGrant` — producing a packet is privileged,
+  analyzing is open; `CAPTURE_ROLE_GRANTED` / `CAPTURE_ROLE_REVOKED` on the same
+  transparency log), and the `capture_packet` (gated produce → content-address in
+  the ledger blob store → `PACKET_CAPTURED` log entry) + `load_packet_for_analysis`
+  (open load → `AnalysisView`) flow. The real headless-browser / IP-masked capture
+  port is a deliberately deferred, separately-security-reviewed later wave.
 
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.

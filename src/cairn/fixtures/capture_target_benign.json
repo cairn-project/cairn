@@ -1,0 +1,15 @@
+{
+  "target_ref": "synthetic-doc/open-data-catalogue-entry-0001",
+  "rendered_text": "Open Data Catalogue Entry\n\nTitle: Municipal Bike-Count Sensors (2019-2023)\nMaintainer: City Open Data Office\nDescription: Hourly bicycle counts from fixed roadside sensors. Published as CSV under an open licence for public reuse.\nLicence: Creative Commons Attribution 4.0 (CC-BY-4.0)\nStatus: This catalogue page is a synthetic, local test fixture. It does not correspond to any live resource and is not fetched over a network.",
+  "dom_text": "<h1>Open Data Catalogue Entry</h1><p>Title: Municipal Bike-Count Sensors (2019-2023)</p><p>Licence: CC-BY-4.0</p><p>Status: synthetic local fixture; not live.</p>",
+  "response_headers": {
+    "content-type": "text/html; charset=utf-8",
+    "x-synthetic-fixture": "true",
+    "x-note": "synthetic header map; no live response was received"
+  },
+  "registration_metadata": {
+    "record_kind": "synthetic-catalogue-entry",
+    "registrar": "n/a (synthetic fixture)",
+    "created": "synthetic; no live registration was queried"
+  }
+}
