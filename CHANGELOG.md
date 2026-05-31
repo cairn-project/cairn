@@ -77,5 +77,30 @@ detection-and-analysis core.
   routing of a routable finding to real external recipients is a deliberately
   deferred, network-touching, separately-security-reviewed later wave.
 
+- **Public transparency read-surfaces** (REQUIREMENTS Frame 4 / PLAN §3.6 / §3.9) —
+  the "court-grade / auditable / maximally transparent" frame made concrete as a
+  READ-ONLY projection (`cairn.public` + a `cairn public ...` CLI surface) that lets
+  anyone independently verify Cairn's integrity WITHOUT privileged access. It adds
+  NO write path, NO mutation, and NO new trust surface; it composes on existing
+  state and reimplements nothing. Three surfaces: (1) **published causes**
+  (`list_published_causes` → `PublicCauseView`) reusing the EXISTING listing gate
+  `CauseRegistry.list_causes` (approved/live only — a requested/rejected/paused
+  cause never appears), exposing only the public summary (id, name, description,
+  status, the 5-frame self-assessment, partner-of-record posture, non-sensitive
+  self-frame counts) and OMITTING internal decision/requester provenance; (2)
+  **vetted outcomes** (`list_vetted_outcomes` → `PublicVettedOutcomeView`) reusing
+  the finding-vetting verdict state (`FindingVetQueue.list_reviewed` — a new
+  read-only inverse of `list_pending`), exposed as REDACTED metadata ONLY
+  (packet-hash reference, opaque generic flag label, verdict, reviewer-of-record id,
+  timestamp); and (3) **public log verification** (`public_verify_log` reusing the
+  EXISTING independent `verify_log` verbatim) plus a redacted append-only log view
+  (`list_public_log` → `PublicLogEntryView`: index / kind / entry_hash / prev_hash /
+  recorded_at — the hash-chain skeleton, NO payload). **Redaction is by
+  construction**: the public view dataclasses have NO FIELD that could carry raw
+  captured content, observation bytes, analysis text, or PII — the safety is the
+  projection's shape, not a call-time filter. CLI: `cairn public causes` /
+  `public outcomes` / `public verify-log` / `public log`. A served web/HTTP read
+  API + HTML rendering of these surfaces is a deliberately deferred later wave.
+
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.

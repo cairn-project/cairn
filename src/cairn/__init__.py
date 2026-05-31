@@ -30,6 +30,16 @@ from .execute import (
     run_work_unit,
 )
 from .fixtures import list_fixtures, load_fixture
+from .public import (
+    PublicCauseView,
+    PublicLogEntryView,
+    PublicTransparency,
+    PublicVettedOutcomeView,
+    list_published_causes,
+    list_public_log,
+    list_vetted_outcomes,
+    public_verify_log,
+)
 from .types import (
     AcceptanceContract,
     AcceptancePredicate,
@@ -116,4 +126,13 @@ __all__ = [
     "ReputationDelta",
     "decide_tiebreak",
     "TiebreakDecision",
+    # public transparency read-surfaces (read-only projection)
+    "PublicTransparency",
+    "PublicCauseView",
+    "PublicVettedOutcomeView",
+    "PublicLogEntryView",
+    "list_published_causes",
+    "list_vetted_outcomes",
+    "public_verify_log",
+    "list_public_log",
 ]
