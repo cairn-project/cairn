@@ -55,6 +55,27 @@ detection-and-analysis core.
   the ledger blob store → `PACKET_CAPTURED` log entry) + `load_packet_for_analysis`
   (open load → `AnalysisView`) flow. The real headless-browser / IP-masked capture
   port is a deliberately deferred, separately-security-reviewed later wave.
+- **Human-in-the-loop two-gate vetting queue** (REQUIREMENTS Frame 5 / PLAN §3.9) —
+  the "human-verified" safety frame made concrete and STRUCTURAL: two distinct
+  fail-closed review gates, each enforcing that nothing advances without a recorded
+  human verdict (the guarantee is the ABSENCE of an advance-path, not policy).
+  (1) A **cause-vetting gate** (`CauseVetQueue`) queues a REQUESTED cause for human
+  review, supports reviewer assignment, and records a human verdict; its
+  `apply_cause_verdict` is the ONLY path from the queue into the EXISTING
+  `CauseRegistry.decide_cause` and refuses unless a human verdict was recorded, so
+  no cause becomes publicly listable without a recorded human cause-vetter verdict.
+  (2) A **finding-vetting gate** (`FindingVetQueue`) flags a mission-neutral
+  `Finding` (a `packet_hash` reference + a generic `AutomatedVerdict`
+  {flag_label, confidence} — no domain detection logic), supports reviewer
+  assignment, and records a human verdict; a finding is `is_routable` ONLY after a
+  recorded human ROUTABLE verdict (fail-closed PENDING by default; no setter marks
+  a finding routable without a verdict). A rejection at either gate REQUIRES a
+  reason (no silent rejection). Every queue event + verdict is recorded on the SAME
+  append-only transparency log (`CAUSE_VET_ENQUEUED` / `CAUSE_VET_ASSIGNED` /
+  `CAUSE_VET_VERDICT` / `FINDING_FLAGGED` / `FINDING_VET_ASSIGNED` /
+  `FINDING_VET_VERDICT`), covered by the unchanged `verify_log`. The actual onward
+  routing of a routable finding to real external recipients is a deliberately
+  deferred, network-touching, separately-security-reviewed later wave.
 
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.

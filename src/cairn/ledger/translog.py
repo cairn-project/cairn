@@ -53,6 +53,22 @@ KIND_CONSENT_REVOKED = "CONSENT_REVOKED"
 KIND_PACKET_CAPTURED = "PACKET_CAPTURED"
 KIND_CAPTURE_ROLE_GRANTED = "CAPTURE_ROLE_GRANTED"
 KIND_CAPTURE_ROLE_REVOKED = "CAPTURE_ROLE_REVOKED"
+# Human-in-the-loop two-gate vetting queue (the "human-verified" frame made
+# structural — REQUIREMENTS Frame 5). TWO distinct fail-closed gates, each
+# recording its queue events + the human verdict on this SAME chain (no item
+# advances without a recorded human verdict):
+#   * Cause-vetting gate — a human cause-vetter reviews a REQUESTED cause before it
+#     can become approved/listed; the verdict feeds the existing gated cause
+#     decision (CAUSE_DECISION). ENQUEUED / ASSIGNED / VERDICT entries record it.
+#   * Finding-vetting gate — a human finding-vetter reviews a flagged FINDING (a
+#     mission-neutral packet-hash reference + automated verdict) before it may be
+#     marked ROUTABLE. FLAGGED / ASSIGNED / VERDICT entries record it.
+KIND_CAUSE_VET_ENQUEUED = "CAUSE_VET_ENQUEUED"
+KIND_CAUSE_VET_ASSIGNED = "CAUSE_VET_ASSIGNED"
+KIND_CAUSE_VET_VERDICT = "CAUSE_VET_VERDICT"
+KIND_FINDING_FLAGGED = "FINDING_FLAGGED"
+KIND_FINDING_VET_ASSIGNED = "FINDING_VET_ASSIGNED"
+KIND_FINDING_VET_VERDICT = "FINDING_VET_VERDICT"
 
 
 def _entry_hash(
