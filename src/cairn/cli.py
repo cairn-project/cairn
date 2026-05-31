@@ -43,6 +43,16 @@ The cause-layer commands (CAUSE LAYER WAVE, PLAN §3.9) compose on the same CLI:
       Record a reasoned CAUSE_DECISION via a COMPLETE five-frame gate-check.
       Only --approve flips the cause listable. Exit 0 on a recorded decision;
       nonzero on an empty reason or an incomplete gate (no silent decision).
+
+The contribute command (CAUSE-EXECUTION WAVE, PLAN §3.9b) binds the cause layer
+to the engine + adds the explicit, gated, recorded contributor opt-in:
+
+  cairn contribute CAUSE_ID [--adapter mock] [--node ID] [--ledger DIR] [--json]
+      Opt a node into an APPROVED cause (REFUSED if the cause is not publicly
+      listable — the §3.9 gate, no silent enlistment) and run that cause's bound
+      benign work units end-to-end (define→claim→run→verify→record) offline via
+      the mock pilot adapter. Exit 0 on a clean run; nonzero if the cause is not
+      found / not listable / the node could not opt in.
 """
 
 from __future__ import annotations
@@ -54,8 +64,15 @@ import tempfile
 from pathlib import Path
 from typing import Optional, Sequence
 
-from .cause import CauseError, CauseRegistry, CauseStatus, five_frame_gate_check
+from .cause import (
+    CauseError,
+    CauseRegistry,
+    CauseStatus,
+    WorkUnitRegistry,
+    five_frame_gate_check,
+)
 from .cause.model import FRAME_KEYS
+from .contribute import CauseRunRefused, OptInRefused, OptInRegistry, run_cause
 from .ledger import FixedClock, Ledger, verify_log
 from .ledger.translog import KIND_RESULT_RECORDED, KIND_VERDICT_RECORDED, TransparencyLog
 from .pilot import live_smoke, run_pilot
@@ -194,6 +211,64 @@ def _cmd_cause_decide(args: argparse.Namespace) -> int:
         print(f"{verb} cause_id={cause.cause_id}")
         print(f"  reason: {cause.decision_reason}")
         print(f"  now publicly listable: {cause.is_publicly_listable}")
+    return 0
+
+
+def _cmd_contribute(args: argparse.Namespace) -> int:
+    # Offline only in this PR: the mock pilot adapter (real-model contribute is a
+    # later wave; `live-smoke` already covers the one real spawn for the pilot).
+    if args.adapter != "mock":
+        print(
+            f"unsupported adapter {args.adapter!r}: only 'mock' is supported "
+            "(offline). Real-model contribute is a later wave."
+        )
+        return 2
+
+    ledger_dir = (
+        Path(args.ledger)
+        if args.ledger
+        else Path(tempfile.mkdtemp(prefix="cairn-contribute-"))
+    )
+    ledger = Ledger(ledger_dir, FixedClock(start=0.0), signing_key=_DEMO_KEY)
+    cause_registry = CauseRegistry(ledger)
+    optin_registry = OptInRegistry(ledger, cause_registry)
+
+    # Bind the benign pilot units to this cause (mission-neutral worked example).
+    work_units = WorkUnitRegistry()
+    work_units.bind_pilot(args.cause_id)
+
+    agreed = (
+        f"Run the bound benign work units for cause {args.cause_id} on the local "
+        "mock adapter (offline; no network, no PII)."
+    )
+    # Opt in (REFUSED if the cause is not publicly listable — the §3.9 gate).
+    try:
+        optin_registry.opt_in(args.node, args.cause_id, agreed)
+    except (OptInRefused, CauseError) as exc:
+        print(f"OPT-IN REFUSED: {exc}")
+        return 1
+
+    try:
+        summary = run_cause(
+            args.cause_id,
+            cause_registry=cause_registry,
+            optin_registry=optin_registry,
+            work_unit_registry=work_units,
+            ledger=ledger,
+            node_id=args.node,
+            bad_family=args.bad_family,
+        )
+    except CauseRunRefused as exc:
+        print(f"RUN REFUSED: {exc}")
+        return 1
+
+    if args.json:
+        out = summary.to_dict()
+        out["ledger_dir"] = str(ledger_dir)
+        print(json.dumps(out, indent=2, sort_keys=True))
+    else:
+        print(summary.pretty())
+        print(f"ledger dir: {ledger_dir}")
     return 0
 
 
@@ -342,6 +417,29 @@ def _build_parser() -> argparse.ArgumentParser:
     p_cdec.add_argument("--ledger", default=None, help="ledger directory")
     p_cdec.add_argument("--json", action="store_true", help="emit JSON summary")
     p_cdec.set_defaults(func=_cmd_cause_decide)
+
+    p_contrib = sub.add_parser(
+        "contribute",
+        help="opt a node into an APPROVED cause and run its available units (offline)",
+    )
+    p_contrib.add_argument("cause_id", help="the approved cause_id to contribute to")
+    p_contrib.add_argument(
+        "--adapter",
+        default="mock",
+        help="execution adapter (only 'mock' supported in this wave; offline)",
+    )
+    p_contrib.add_argument(
+        "--node", default="contributor", help="the contributor node id"
+    )
+    p_contrib.add_argument(
+        "--bad-family",
+        dest="bad_family",
+        default=None,
+        help="run this model family as a faulty node on the honeypot unit",
+    )
+    p_contrib.add_argument("--ledger", default=None, help="ledger directory")
+    p_contrib.add_argument("--json", action="store_true", help="emit JSON summary")
+    p_contrib.set_defaults(func=_cmd_contribute)
 
     p_verify = sub.add_parser(
         "verify-log", help="independently re-verify a transparency log"

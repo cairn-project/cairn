@@ -10,10 +10,17 @@ logic, vetting UI, distribution ramps, and action engine are LATER waves.
   gate.py      the five-frame gate-check STRUCTURE enforcer
   registry.py  CauseRegistry — intake (CAUSE_REQUEST) + gated decision
                (CAUSE_DECISION, approval OR rejection WITH reason) + public list
+  binding.py   cause ⇄ work-units binding (WorkUnitProvider + WorkUnitRegistry),
+               the seam that gives a *listable* cause a source of work units
 """
 
 from __future__ import annotations
 
+from .binding import (
+    PilotWorkUnitProvider,
+    WorkUnitProvider,
+    WorkUnitRegistry,
+)
 from .gate import GateCheckResult, five_frame_gate_check
 from .model import (
     FRAME_KEYS,
@@ -37,4 +44,8 @@ __all__ = [
     # registry
     "CauseRegistry",
     "CauseError",
+    # binding
+    "WorkUnitProvider",
+    "WorkUnitRegistry",
+    "PilotWorkUnitProvider",
 ]
