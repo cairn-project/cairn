@@ -49,6 +49,23 @@ external recipients is NOT in this repository — it is a deferred, network-touc
 separately security-reviewed wave; this gate only produces the human-verified
 ROUTABLE/REJECTED state.
 
+It also includes the **routing / action spine** (`cairn.routing`): the
+`RecipientChannel` delivery seam, the locality-aware routing policy, and the
+fail-closed dispatch driver (`dispatch_routable_finding`). The load-bearing trust
+properties here are (1) **fail-closed routable-only dispatch** — only a finding that
+is human-verified ROUTABLE (reusing `FindingVetQueue.is_routable`) may be dispatched;
+a report of any way to route/deliver/record an action for a PENDING or REJECTED
+finding is in scope; and (2) **no silent drop** — every routable finding routes to a
+matched recipient OR an explicitly-recorded fallback escalation, never nowhere; a
+report of any way to make a routable finding vanish without a recorded routing event
+(or a misconfigured registry that drops rather than raising) is in scope. The
+`RecipientChannel` seam is the place where, in a later wave, real network egress will
+live — and is therefore a deliberately scoped trust boundary worth naming: the ONLY
+channel shipped today is the deterministic, OFFLINE `InMemoryRecipientChannel` (no
+network, no real recipient, no randomness). Real external-recipient integration /
+network egress (Safe Browsing / abuse.ch / registrars / partner endpoints) is a
+deferred, separately security-reviewed wave and is NOT yet in this repository.
+
 Out of scope here: third-party runtimes a contributor chooses to run, and the
 operational deployment of any specific cause (those carry their own policies).
 

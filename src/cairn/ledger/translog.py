@@ -69,6 +69,20 @@ KIND_CAUSE_VET_VERDICT = "CAUSE_VET_VERDICT"
 KIND_FINDING_FLAGGED = "FINDING_FLAGGED"
 KIND_FINDING_VET_ASSIGNED = "FINDING_VET_ASSIGNED"
 KIND_FINDING_VET_VERDICT = "FINDING_VET_VERDICT"
+# Routing / action spine — the keystone that turns a human-verified ROUTABLE
+# finding into a RECORDED ACTION (the prime directive's "action taken"). A
+# routable finding is routed to a best-fit recipient (locality-aware escalation
+# to an explicit fallback on no match — never a silent drop), delivered over the
+# RecipientChannel seam, and recorded on this SAME chain:
+#   * FINDING_ROUTED records the routing event (which recipient, MATCHED vs
+#     ESCALATED_TO_FALLBACK, which channel).
+#   * ROUTE_ACK_RECORDED records the recipient's acknowledgement/outcome.
+# Only a human-verified ROUTABLE finding reaches these entries (fail-closed on
+# FindingVetQueue.is_routable); a PENDING/REJECTED finding is refused, never logged.
+# Real external-recipient egress is a deferred, separately-security-reviewed wave;
+# this wave ships only a deterministic offline channel.
+KIND_FINDING_ROUTED = "FINDING_ROUTED"
+KIND_ROUTE_ACK_RECORDED = "ROUTE_ACK_RECORDED"
 
 
 def _entry_hash(
