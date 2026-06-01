@@ -9,7 +9,7 @@ coordinated disclosure.
 
 - Preferred: use GitHub's **private security advisories** ("Report a vulnerability"
   on the Security tab) once the repository is public.
-- Or email: `[SECURITY CONTACT — owner to fill]`.
+- Or use GitHub's private vulnerability reporting: the repository's **Security** tab → **Report a vulnerability**.
 
 Please include: a description of the issue, steps to reproduce, the affected
 component/version, and impact.
