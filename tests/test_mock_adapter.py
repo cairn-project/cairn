@@ -1,8 +1,8 @@
-"""MockAdapter tests (BUILD-PLAN §12.3).
+"""MockAdapter tests.
 
-The deterministic offline adapter must, for each wave-1 fixture, produce output
+The deterministic offline adapter must, for each fixture, produce output
 that (a) validates against the fixture's output_schema and (b) passes the
-fixture's acceptance_contract via the wave-1 evaluator. No network.
+fixture's acceptance_contract via the evaluator. No network.
 """
 
 from __future__ import annotations

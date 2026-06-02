@@ -1,4 +1,4 @@
-"""Example work-unit fixtures (wave 1).
+"""Example work-unit fixtures.
 
 Three units exercising the spec: a trivial benign-pilot unit, a cause-threaded
 unit with a capability_floor, and a unit with a non-trivial acceptance_contract.

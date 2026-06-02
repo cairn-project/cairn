@@ -7,7 +7,7 @@ attributes (``locality`` + ``domain`` tags). The escalation rule in one line:
     match on (locality ∩ domain); on no match, escalate to the registry's explicit
     fallback recipient and record ESCALATED_TO_FALLBACK; never return nothing.
 
-No silent drops (AC.ROUTE.3): every call yields a recipient — a MATCHED one or the
+No silent drops: every call yields a recipient — a MATCHED one or the
 explicit fallback. The ONLY non-return is a RAISE on a misconfigured registry (no
 recipients AND no fallback) — a named, loud error, never a drop. The attributes are
 mission-neutral generic tags, NOT detection logic.

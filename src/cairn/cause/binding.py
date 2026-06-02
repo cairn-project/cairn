@@ -1,13 +1,13 @@
-"""Cause ⇄ work-units binding (PLAN §2 + §3.3 + §3.8).
+"""Cause ⇄ work-units binding.
 
-PLAN §2: "a cause owns its ... work-units". This module gives a *listable* cause a
+A cause owns its work-units. This module gives a *listable* cause a
 SOURCE of work units without baking that source into the cause's identity.
 
 Design note — why a registry, not a method on ``Cause``: ``Cause`` is a frozen,
-content-addressed record (its id derives from immutable fields, §3.6). A
+content-addressed record (its id derives from immutable fields). A
 units-provider is RUNTIME behaviour, not part of the cause's identity, so it stays
 OUT of the content hash. ``WorkUnitProvider`` is the seam; ``WorkUnitRegistry``
-maps ``cause_id -> provider`` at runtime. The general engine runs N causes (§3.8),
+maps ``cause_id -> provider`` at runtime. The general engine runs N causes,
 each with its own provider.
 
 MISSION-NEUTRAL: the only provider shipped here is ``PilotWorkUnitProvider`` —
@@ -30,7 +30,7 @@ from ..pilot.cause import (
 
 @runtime_checkable
 class WorkUnitProvider(Protocol):
-    """A source of wave-1 work-unit dicts for a single bound cause.
+    """A source of work-unit dicts for a single bound cause.
 
     A provider yields RAW work-unit dicts (the same shape the engine's
     ``validate_work_unit`` / ``run_work_unit`` consume). Every yielded unit's
@@ -60,7 +60,7 @@ def _restamp(unit: dict, cause_id: str) -> dict:
     The pilot's ``task_id`` is ``"<PILOT_CAUSE_ID>::<snippet_id>"``; we rewrite the
     namespace prefix to the bound cause so results/verdicts record against the
     APPROVED cause, not the hard-coded pilot literal. A dict copy — no new spec,
-    the unit still validates against the wave-1 schema.
+    the unit still validates against the schema.
     """
     out = dict(unit)
     snippet_part = unit["task_id"].split("::", 1)[-1]
@@ -92,7 +92,7 @@ class PilotWorkUnitProvider:
 
 
 class WorkUnitRegistry:
-    """Runtime map of ``cause_id -> WorkUnitProvider`` (PLAN §3.8 multi-cause)."""
+    """Runtime map of ``cause_id -> WorkUnitProvider``."""
 
     def __init__(self) -> None:
         self._providers: dict[str, WorkUnitProvider] = {}

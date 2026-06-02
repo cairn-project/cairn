@@ -1,4 +1,4 @@
-"""OUTCOME-ALTITUDE e2e (AC.VET.9) — both gates, real entry points, fresh ledger.
+"""OUTCOME-ALTITUDE e2e — both gates, real entry points, fresh ledger.
 
 Drives the REAL production entry points end to end on a fresh ledger with NO
 pre-arranged state, proving BOTH fail-closed human gates operationally:

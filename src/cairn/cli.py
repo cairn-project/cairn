@@ -1,4 +1,4 @@
-"""cairn CLI — the thin command surface over the library (wave 5, BUILD-PLAN §34).
+"""cairn CLI — the thin command surface over the library.
 
 Three commands, no business logic of their own — each parses args, calls a library
 function, prints, and maps to an exit code:
@@ -18,17 +18,17 @@ function, prints, and maps to an exit code:
 
   cairn live-smoke [--ledger DIR] [--json] [--timeout S] [--model M]
       Run the benign pilot with ONE node driven by a real Claude model via the
-      isolated subscription ``claude -p`` CLI (wave 6). This is the ONLY command
+      isolated ``claude -p`` CLI. This is the ONLY command
       that touches a real model — every other command stays fully offline. The
       spawn is isolated (``--strict-mcp-config`` + empty ``--mcp-config``) so it
-      never loads plugins / steals the Telegram bot slot. Exit 0 on a clean run.
+      loads no MCP servers or plugins from the caller's environment. Exit 0 on a clean run.
 
 The ``pilot`` / ``verify-log`` / ``inspect`` commands are offline, stdlib-only
 (argparse); ``live-smoke`` additionally spawns the isolated ``claude`` subprocess. ``FixedClock`` is used for the pilot so output is
 reproducible; the HMAC signing key is a fixed non-secret CLI parameter (never a
 checked-in production secret).
 
-The cause-layer commands (CAUSE LAYER WAVE, PLAN §3.9) compose on the same CLI:
+The cause-layer commands compose on the same CLI:
 
   cairn causes [--ledger DIR] [--status S] [--json]
       List the PUBLIC cause list (approved/live only) — or, with --status, the
@@ -44,12 +44,12 @@ The cause-layer commands (CAUSE LAYER WAVE, PLAN §3.9) compose on the same CLI:
       Only --approve flips the cause listable. Exit 0 on a recorded decision;
       nonzero on an empty reason or an incomplete gate (no silent decision).
 
-The contribute command (CAUSE-EXECUTION WAVE, PLAN §3.9b) binds the cause layer
+The contribute command binds the cause layer
 to the engine + adds the explicit, gated, recorded contributor opt-in:
 
   cairn contribute CAUSE_ID [--adapter mock] [--node ID] [--ledger DIR] [--json]
       Opt a node into an APPROVED cause (REFUSED if the cause is not publicly
-      listable — the §3.9 gate, no silent enlistment) and run that cause's bound
+      listable — the gate, no silent enlistment) and run that cause's bound
       benign work units end-to-end (define→claim→run→verify→record) offline via
       the mock pilot adapter. Exit 0 on a clean run; nonzero if the cause is not
       found / not listable / the node could not opt in.
@@ -216,12 +216,12 @@ def _cmd_cause_decide(args: argparse.Namespace) -> int:
 
 
 def _cmd_contribute(args: argparse.Namespace) -> int:
-    # Offline only in this PR: the mock pilot adapter (real-model contribute is a
-    # later wave; `live-smoke` already covers the one real spawn for the pilot).
+    # Offline only for now: the mock pilot adapter (real-model contribute is a
+    # later phase; `live-smoke` already covers the one real spawn for the pilot).
     if args.adapter != "mock":
         print(
             f"unsupported adapter {args.adapter!r}: only 'mock' is supported "
-            "(offline). Real-model contribute is a later wave."
+            "(offline). Real-model contribute is a later phase."
         )
         return 2
 
@@ -242,7 +242,7 @@ def _cmd_contribute(args: argparse.Namespace) -> int:
         f"Run the bound benign work units for cause {args.cause_id} on the local "
         "mock adapter (offline; no network, no PII)."
     )
-    # Opt in (REFUSED if the cause is not publicly listable — the §3.9 gate).
+    # Opt in (REFUSED if the cause is not publicly listable — the gate).
     try:
         optin_registry.opt_in(args.node, args.cause_id, agreed)
     except (OptInRefused, CauseError) as exc:
@@ -442,7 +442,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--ledger", default=None, help="ledger directory (default: a temp dir)"
     )
     p_live.add_argument(
-        "--model", default="sonnet", help="subscription model tier (default: sonnet)"
+        "--model", default="sonnet", help="model tier (default: sonnet)"
     )
     p_live.add_argument(
         "--timeout",
@@ -453,7 +453,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_live.add_argument("--json", action="store_true", help="emit JSON summary")
     p_live.set_defaults(func=_cmd_live_smoke)
 
-    # --- cause-layer commands (PLAN §3.9) ---
+    # --- cause-layer commands ---
     p_causes = sub.add_parser(
         "causes", help="list public causes (approved/live), or a status history view"
     )
@@ -509,7 +509,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_contrib.add_argument(
         "--adapter",
         default="mock",
-        help="execution adapter (only 'mock' supported in this wave; offline)",
+        help="execution adapter (only 'mock' supported in this release; offline)",
     )
     p_contrib.add_argument(
         "--node", default="contributor", help="the contributor node id"

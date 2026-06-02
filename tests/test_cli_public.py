@@ -1,4 +1,4 @@
-"""CLI wiring for the `cairn public ...` read-surfaces (AC.PUB.7).
+"""CLI wiring for the `cairn public...` read-surfaces.
 
 Drives the real ``cairn.cli.main`` over a populated ledger dir. Read-only: every
 subcommand returns exit 0 on a clean read; the public verify-log returns exit 1 on

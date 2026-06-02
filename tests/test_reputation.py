@@ -1,4 +1,4 @@
-"""Reputation accumulator tests (BUILD-PLAN §18.5, PLAN §3.5 L3).
+"""Reputation accumulator tests.
 
 Earned, never self-asserted: rises on AGREE + HONEYPOT_PASS, falls on DISAGREE,
 falls hardest on HONEYPOT_FAIL. Per-node and per-family tracked independently;

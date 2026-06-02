@@ -1,6 +1,6 @@
 """Public transparency read-surfaces — the externally-legible, read-only projection.
 
-The "court-grade / auditable / maximally transparent" frame (REQUIREMENTS Frame 4)
+The court-grade / auditable / maximally transparent design goal
 made concrete: anyone (a recruit, journalist, partner institution, skeptic) can see
 what Cairn is doing and independently verify its integrity WITHOUT privileged
 access. This module is a pure PROJECTION over already-public state — it adds NO
@@ -20,7 +20,7 @@ REDACTION BY CONSTRUCTION (safety-load-bearing): the public projection dataclass
 HAVE NO FIELD that can carry raw captured content, observation bytes, analysis
 text, or PII. The safety comes from the projection's SHAPE — a view simply cannot
 be constructed with such data because no parameter accepts it — not from a
-filtering step that could be bypassed. See BUILD-PLAN-public-transparency.md §3.
+filtering step that could be bypassed.
 """
 
 from __future__ import annotations
@@ -176,7 +176,7 @@ class PublicTransparency:
         self._causes = CauseRegistry(ledger)
         self._findings = FindingVetQueue(ledger)
 
-    # --- 1. published causes (AC.PUB.1 / AC.PUB.2) ---------------------------
+    # --- 1. published causes ---------------------------
 
     def list_published_causes(self) -> list[PublicCauseView]:
         """Public cause list — reuse the EXISTING listing gate (approved/live only).
@@ -205,7 +205,7 @@ class PublicTransparency:
             )
         return out
 
-    # --- 2. vetted outcomes (AC.PUB.3 / AC.PUB.4) ----------------------------
+    # --- 2. vetted outcomes ----------------------------
 
     def list_vetted_outcomes(self) -> list[PublicVettedOutcomeView]:
         """Public vetted-outcome list — reuse the finding-vetting verdict state.
@@ -234,7 +234,7 @@ class PublicTransparency:
             )
         return out
 
-    # --- 3. public log verification (AC.PUB.5 / AC.PUB.6) --------------------
+    # --- 3. public log verification --------------------
 
     def public_verify_log(self) -> LogVerification:
         """Public independent log verify — reuse the EXISTING ``verify_log`` verbatim.

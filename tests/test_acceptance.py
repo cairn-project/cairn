@@ -1,4 +1,4 @@
-"""Acceptance-evaluation tests (BUILD-PLAN §6.2): one pass + one fail per kind."""
+"""Acceptance-evaluation tests: one pass + one fail per kind."""
 
 from __future__ import annotations
 

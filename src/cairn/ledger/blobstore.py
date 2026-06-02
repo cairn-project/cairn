@@ -1,10 +1,10 @@
-"""Content-addressed blob store (PLAN §3.6 — content-addressed task+result blobs).
+"""Content-addressed blob store (content-addressed task+result blobs).
 
 A commodity, write-once object store keyed by the sha256 of the content. Same
 content always yields the same key (dedup for free), which is exactly the
-git/IPFS content-addressing property PLAN §3.1/§3.6 leans on. Stored as plain
+git/IPFS content-addressing property leans on. Stored as plain
 files under ``<root>/objects/<2-char-prefix>/<rest-of-hash>`` so the whole store
-is a directory tree that is trivially mirrorable (copy = mirror, PLAN §3.1).
+is a directory tree that is trivially mirrorable (copy = mirror).
 
 No truth-deciding here — this only stores + addresses bytes.
 """

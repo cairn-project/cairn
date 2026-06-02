@@ -1,6 +1,6 @@
 """cairn.public — the public transparency READ-surfaces (READ-ONLY projection).
 
-The "court-grade / auditable / maximally transparent" frame (REQUIREMENTS Frame 4)
+The "court-grade / auditable / maximally transparent" frame
 made concrete: anyone can see what Cairn is doing and independently verify its
 integrity WITHOUT privileged access. A pure projection over already-public state —
 NO write path, NO mutation, NO new trust surface. Composes on the existing listing

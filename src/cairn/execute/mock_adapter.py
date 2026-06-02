@@ -1,12 +1,12 @@
 """MockAdapter — a deterministic, offline reference adapter.
 
-The wave-2 reference implementation of the ``Adapter`` seam. It makes NO network
+The reference implementation of the ``Adapter`` seam. It makes NO network
 call and uses no model: it synthesizes a result by walking the unit's
 ``output_schema`` and emitting a typed, deterministic canned value per property,
 honoring ``enum`` / ``minItems`` / numeric-bound constraints so the produced
-output satisfies the unit's own ``acceptance_contract`` for the wave-1 fixtures.
+output satisfies the unit's own ``acceptance_contract`` for the fixtures.
 
-This keeps the entire execute flow testable offline (research 02 A.2 step 4 — the
+This keeps the entire execute flow testable offline (the
 cheap client-side acceptance filter — exercised end to end without a live model).
 Live adapters (Claude Code / OpenAI-compatible / ollama) are a follow-on
 increment; they override ``produce`` with a real runtime call but reuse the same
@@ -33,7 +33,7 @@ class MockAdapter(Adapter):
     """Deterministic schema-shaped echo adapter (no network, no model).
 
     Pass ``capabilities`` to simulate a node of a given tier (defaults to a
-    generously-capable node so it qualifies for the wave-1 fixtures). Pass
+    generously-capable node so it qualifies for the fixtures). Pass
     ``corrupt=True`` to deliberately emit acceptance-failing output (for the
     acceptance-fail test path) — it then returns an empty object.
     """
@@ -149,7 +149,7 @@ class MockAdapter(Adapter):
     def _mock_signature(task_id: str, output: Any) -> str:
         """A placeholder 'signature' — a hash, NOT a real cryptographic sig.
 
-        Real signing is the ledger wave (PLAN §3.6). This only demonstrates the
+        Real signing is the ledger layer. This only demonstrates the
         provenance field is populated for the future verify layer.
         """
         import json

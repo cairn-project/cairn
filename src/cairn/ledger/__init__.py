@@ -1,25 +1,25 @@
-"""cairn.ledger — the LEDGER + TRANSPARENCY layer (wave 4, PLAN §3.1 + §3.6).
+"""cairn.ledger — the LEDGER + TRANSPARENCY layer.
 
-The THIN coordinator (PLAN §3.1, top-pick topology) + the tamper-evident
-transparency log (PLAN §3.6, REQUIREMENTS Frame 4 + cause-vetting governance),
+The THIN coordinator (top-pick topology) + the tamper-evident
+transparency log (detection audit + cause-vetting governance),
 fully OFFLINE on the local filesystem. It ORDERS claims + STORES blobs; it does
-NOT decide truth — the wave-3 verify layer (``verify_unit``) does.
+NOT decide truth — the verify layer (``verify_unit``) does.
 
-  blobstore.py   content-addressed sha256 blob store        (PLAN §3.6)
-  claim.py       atomic O_EXCL exclusive claim + leases      (PLAN §3.1)
-  clock.py       injected Clock seam (deterministic leases)  (PLAN §3.1)
-  attestation.py provenance attestation + HMAC signing seam  (PLAN §3.6)
-  translog.py    hash-chained append-only CT-style log       (PLAN §3.6, Frame 4)
-  reputation_store.py  ledger-persisted wave-3 reputation    (PLAN §3.5 L3)
-  ledger.py      the thin coordinator facade                 (PLAN §3.1)
+  blobstore.py         content-addressed sha256 blob store
+  claim.py             atomic O_EXCL exclusive claim + leases
+  clock.py             injected Clock seam (deterministic leases)
+  attestation.py       provenance attestation + HMAC signing seam
+  translog.py          hash-chained append-only CT-style log
+  reputation_store.py  ledger-persisted reputation
+  ledger.py            the thin coordinator facade
 
-DUAL-USE (one log, two uses — PLAN §3.6): the SAME transparency log serves both
+DUAL-USE (one log, two uses): the SAME transparency log serves both
 detection auditability (RESULT_RECORDED / VERDICT_RECORDED) AND cause-governance
 no-silent-rejection (CAUSE_REQUEST / CAUSE_DECISION). ``verify_log`` independently
 detects any retroactive edit/removal/reorder for both.
 
-DEFERRED (later waves): live-model adapters, distribution storefronts,
-cause-discovery/vetting GOVERNANCE workflow (this wave ships the LOG it writes to,
+DEFERRED (later phases): live-model adapters, distribution storefronts,
+cause-discovery/vetting GOVERNANCE workflow (this release ships the LOG it writes to,
 not the approval engine), the escalation/action engine, real asymmetric keypair
 mgmt (HMAC seam ships), network mirroring/transport (filesystem-local only).
 """

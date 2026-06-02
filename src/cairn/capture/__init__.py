@@ -22,7 +22,7 @@ Composes on the engine (ledger blob store + transparency log) + the cause layer
 nothing.
 
 DEFERRED (later, separately-security-reviewed waves): the real headless-browser /
-IP-masked capture port (this wave ships only the deterministic offline fixture
+IP-masked capture port (this release ships only the deterministic offline fixture
 port behind the same CapturePort seam), a ``cairn capture`` CLI, real rendered-pixel
 screenshots, retention/redaction policy, and any sensitive capture target.
 """

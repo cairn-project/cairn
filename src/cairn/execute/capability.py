@@ -1,13 +1,13 @@
 """Node capability model + Contract-Net self-selection floor check.
 
-PLAN §3.3 F2 (capability-tier non-uniformity): a model-agnostic unit can only
+Capability-tier non-uniformity: a model-agnostic unit can only
 *require* capabilities the weakest enrolled runtime has; ``capability_floor``
 makes the tiering explicit. A node declares its ``Capabilities`` and runs a unit
 only if it ``meets_floor`` — Contract-Net self-selection. Self-declared
 capability is an untrusted claim validated by a calibration probe on join
-(``calibration.py``, research 01 §5.4).
+(``calibration.py``).
 
-Wave 2 scope: the declaration + the floor check. No probing execution here.
+ scope: the declaration + the floor check. No probing execution here.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ class Capabilities:
     """What a node's runtime offers (self-declared; untrusted until probed).
 
     ``model_family_tier`` is a coarse capability tier (0 = unknown / local-small);
-    it is informational this wave — the wave-1 ``CapabilityFloor`` carries no tier
+    it is informational this release — the ``CapabilityFloor`` carries no tier
     field, so the floor check does not gate on it yet.
     """
 
@@ -65,7 +65,7 @@ def meets_floor(
       * ``tools`` — node must expose every tool the floor requires (superset).
       * ``modalities`` — node must support every modality the floor requires.
 
-    ``model_family_tier`` is not gated this wave (wave-1 floor has no tier field).
+    ``model_family_tier`` is not gated this release (floor has no tier field).
     Returns a ``CapabilityCheck`` naming each failed dimension; never raises.
     """
     reasons: list[str] = []

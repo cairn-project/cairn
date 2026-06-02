@@ -1,6 +1,6 @@
-"""Capability self-selection floor tests (BUILD-PLAN §12.2).
+"""Capability self-selection floor tests.
 
-PLAN §3.3 F2 — a node runs a unit only if it meets every floor dimension.
+A node runs a unit only if it meets every floor dimension.
 """
 
 from __future__ import annotations

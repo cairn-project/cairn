@@ -1,7 +1,7 @@
-"""Ledger-backed reputation persistence tests (BUILD-PLAN §25.6, PLAN §3.5 L3).
+"""Ledger-backed reputation persistence tests.
 
-LedgerReputation persists wave-3 deltas and replays them to identical scores;
-its math matches the wave-3 in-memory store on the same delta sequence.
+LedgerReputation persists deltas and replays them to identical scores;
+its math matches the in-memory store on the same delta sequence.
 """
 
 from __future__ import annotations

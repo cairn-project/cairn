@@ -2,9 +2,9 @@
 
 ``evaluate_acceptance(result, acceptance_contract)`` runs every predicate in a
 contract against a result dict and returns a conjunctive verdict. Each predicate
-is a pure function over the result — no LLM, no network (research 02 A.1 step 4,
-the cheap client-side filter). The semantic / quorum verify layer (PLAN §3.5)
-sits ABOVE this and is a later wave.
+is a pure function over the result — no LLM, no network
+the cheap client-side filter). The semantic / quorum verify layer
+sits ABOVE this and is a later phase.
 
 Predicate kinds (SPEC.md): required_fields, field_type, value_range, enum,
 non_empty, min_items, regex_match. An unknown kind fails closed (raises).

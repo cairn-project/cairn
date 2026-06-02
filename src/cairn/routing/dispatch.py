@@ -4,7 +4,7 @@
 ("practical help = action taken"): it turns a human-verified ROUTABLE finding into a
 recorded action delivered to the best-fit recipient. It:
 
-1. **Fail-closed gates on the human-verified ROUTABLE state** (AC.ROUTE.5): it reuses
+1. **Fail-closed gates on the human-verified ROUTABLE state**: it reuses
    ``FindingVetQueue.is_routable`` / ``finding_state`` — it does NOT re-derive
    routability — and RAISES ``RoutingRefused`` for any finding that is not ROUTABLE
    (PENDING or REJECTED). A non-routable finding is REFUSED before any selection,
@@ -12,7 +12,7 @@ recorded action delivered to the best-fit recipient. It:
 2. **Selects the recipient** via ``RoutingPolicy.route`` (best-fit, else explicit
    locality-aware escalation to the fallback — never a silent drop).
 3. **Delivers** over the recipient's ``RecipientChannel`` (the deterministic offline
-   ``InMemoryRecipientChannel`` this wave).
+   ``InMemoryRecipientChannel`` this release).
 4. **Records the action** on the SAME append-only transparency log: a
    ``KIND_FINDING_ROUTED`` entry (the routing event) AND a ``KIND_ROUTE_ACK_RECORDED``
    entry (the recipient acknowledgement/outcome). These two entries ARE the "action
@@ -105,7 +105,7 @@ def dispatch_routable_finding(
     decision = (policy or RoutingPolicy()).route(attributes, registry)
     recipient = decision.recipient
 
-    # 3. Deliver over the recipient's channel (deterministic offline this wave).
+    # 3. Deliver over the recipient's channel (deterministic offline this release).
     dispatch = RoutingDispatch(
         finding_hash=finding.finding_hash,
         packet_hash=finding.packet_hash,

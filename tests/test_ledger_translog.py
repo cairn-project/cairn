@@ -1,6 +1,6 @@
-"""Transparency-log tests (BUILD-PLAN §25.4, PLAN §3.6 + REQUIREMENTS Frame 4).
+"""Transparency-log tests.
 
-THE LOAD-BEARING TEST OF THE WAVE: the transparency guarantee is only real if an
+THE LOAD-BEARING TEST: the transparency guarantee is only real if an
 independent monitor (verify_log) DETECTS tampering — a flipped byte, a removed
 entry, or a reordered entry must all break verification. Also covers the dual-use
 property (one chain carries both detection-audit and cause-governance entries).
@@ -38,7 +38,7 @@ def test_append_and_independent_verify_ok(tmp_path):
 
 
 def test_dual_use_entries_both_verify(tmp_path):
-    """One chain carries detection-audit AND cause-governance entries (PLAN §3.6)."""
+    """One chain carries detection-audit AND cause-governance entries."""
     path = tmp_path / "translog.jsonl"
     log = _seed_log(path, FixedClock())
     kinds = {e.kind for e in log.entries()}

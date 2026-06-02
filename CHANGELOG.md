@@ -23,7 +23,7 @@ detection-and-analysis core.
   Certificate-Transparency-style log with independent `verify_log` verification.
 - **Runnable benign pilot** + the `cairn` CLI (`pilot`, `live-smoke`, `verify-log`,
   `inspect`).
-- **Cause layer** (PLAN §2 / §3.9 / §6) — a mission-neutral `Cause` first-class
+- **Cause layer** — a mission-neutral `Cause` first-class
   object (id, status, 5-frame self-assessment, target-conduct + protected-boundary,
   partner-of-record posture), a `CauseRegistry` composing on the existing ledger +
   transparency log, request intake (`CAUSE_REQUEST`), a gated reasoned decision
@@ -31,7 +31,7 @@ detection-and-analysis core.
   five-frame gate-check structure enforcer, a gated public `list_causes`
   (approved/live only), and CLI commands `causes` / `cause-request` /
   `cause-decide`.
-- **Cause-bound execution + contributor opt-in** (PLAN §2 / §3.3 / §3.8 / §3.9b) —
+- **Cause-bound execution + contributor opt-in** —
   a cause ⇄ work-units binding (`WorkUnitProvider` + `WorkUnitRegistry`, with a
   mission-neutral `PilotWorkUnitProvider` re-stamping the benign pilot units onto
   a bound cause); an explicit, gated, revocable contributor opt-in
@@ -40,8 +40,8 @@ detection-and-analysis core.
   cause-scoped run loop (`run_cause` — verifies listable + opted-in, then drives
   the cause's units through the existing execute → verify → ledger/translog path);
   and the `cairn contribute <cause_id> [--adapter mock]` CLI command.
-- **Inert evidence-bundle (examination-packet) capture abstraction** (PLAN §3.5 /
-  §3.6 / §3.9b) — the seam by which a trust-gated CAPTURE operator freezes a live
+- **Inert evidence-bundle (examination-packet) capture abstraction** — the seam
+  by which a trust-gated CAPTURE operator freezes a live
   target into a STATIC, INERT, content-addressed `ExaminationPacket` that the open
   analysis layer judges WITHOUT anyone re-visiting the live target. Comprises the
   inert artifact (`Observation` + `ExaminationPacket` + a read-only `AnalysisView`
@@ -54,8 +54,8 @@ detection-and-analysis core.
   transparency log), and the `capture_packet` (gated produce → content-address in
   the ledger blob store → `PACKET_CAPTURED` log entry) + `load_packet_for_analysis`
   (open load → `AnalysisView`) flow. The real headless-browser / IP-masked capture
-  port is a deliberately deferred, separately-security-reviewed later wave.
-- **Human-in-the-loop two-gate vetting queue** (REQUIREMENTS Frame 5 / PLAN §3.9) —
+  port is deliberately deferred to a separate, independently security-reviewed phase.
+- **Human-in-the-loop two-gate vetting queue** —
   the "human-verified" safety frame made concrete and STRUCTURAL: two distinct
   fail-closed review gates, each enforcing that nothing advances without a recorded
   human verdict (the guarantee is the ABSENCE of an advance-path, not policy).
@@ -74,10 +74,10 @@ detection-and-analysis core.
   append-only transparency log (`CAUSE_VET_ENQUEUED` / `CAUSE_VET_ASSIGNED` /
   `CAUSE_VET_VERDICT` / `FINDING_FLAGGED` / `FINDING_VET_ASSIGNED` /
   `FINDING_VET_VERDICT`), covered by the unchanged `verify_log`. The actual onward
-  routing of a routable finding to real external recipients is a deliberately
-  deferred, network-touching, separately-security-reviewed later wave.
+  routing of a routable finding to real external recipients is deliberately
+  deferred to a network-touching, independently security-reviewed phase.
 
-- **Public transparency read-surfaces** (REQUIREMENTS Frame 4 / PLAN §3.6 / §3.9) —
+- **Public transparency read-surfaces** —
   the "court-grade / auditable / maximally transparent" frame made concrete as a
   READ-ONLY projection (`cairn.public` + a `cairn public ...` CLI surface) that lets
   anyone independently verify Cairn's integrity WITHOUT privileged access. It adds
@@ -100,7 +100,7 @@ detection-and-analysis core.
   captured content, observation bytes, analysis text, or PII — the safety is the
   projection's shape, not a call-time filter. CLI: `cairn public causes` /
   `public outcomes` / `public verify-log` / `public log`. A served web/HTTP read
-  API + HTML rendering of these surfaces is a deliberately deferred later wave.
+  API + HTML rendering of these surfaces is a deliberately deferred phase.
 
 - **Routing / action spine** (the prime-directive keystone — "practical help =
   action taken") — the path that turns a human-verified ROUTABLE finding into a
@@ -125,10 +125,10 @@ detection-and-analysis core.
   The recorded routing event + recipient acknowledgement ARE the "action taken" the
   prime directive measures. Real external-recipient integration / network egress
   (Safe Browsing / abuse.ch / registrars / partner endpoints) is a deliberately
-  deferred, separately-security-reviewed later wave — the `RecipientChannel` seam is
+  deferred to a separate, independently security-reviewed phase — the `RecipientChannel` seam is
   where it will plug in.
 
-- **Analysis→finding bridge** (PLAN §3.5 — the previously-missing seam) — the
+- **Analysis→finding bridge** — the previously-missing seam — the
   producer that turns a real verify-layer `VerifyVerdict` over a captured
   `ExaminationPacket` into a flagged `Finding`, joining the engine's detect/analyze
   half (execute → verify → verdict) to its vet/route half (Finding → human Gate-2 →
@@ -146,7 +146,7 @@ detection-and-analysis core.
   in which the finding is PRODUCED by the analysis layer (capture → verify → flag →
   human ROUTABLE → dispatch → recorded action, `verify_log` ok) rather than
   synthetic — the two halves are now one continuous loop. A `cairn analyze` CLI
-  wrapper and auto-flagging inside `run_cause` are deliberately deferred later waves.
+  wrapper and auto-flagging inside `run_cause` are deliberately deferred to later phases.
 
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.

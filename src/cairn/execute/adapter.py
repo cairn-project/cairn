@@ -1,6 +1,6 @@
-"""The model-agnostic adapter seam (PLAN §3.3 "the leverage point").
+"""The model-agnostic adapter seam ("the leverage point").
 
-An ``Adapter`` is the AI-system analog of the BOINC client (research 02 A.2): it
+An ``Adapter`` is the AI-system analog of the BOINC client: it
 takes an already-validated ``WorkUnit``, renders the portable payload into a
 runtime-native call, runs it, and returns a ``CandidateResult`` stamped with its
 provenance. The seam makes **no vendor assumption** — a Claude Code / OpenAI /
@@ -8,7 +8,7 @@ ollama / generic-OpenAI-compatible adapter is just a subclass overriding
 ``produce`` and declaring its real ``capabilities``. Adding a runtime = writing
 one adapter, never changing the work-unit format.
 
-Wave 2 ships the abstract base + the offline ``MockAdapter`` (mock_adapter.py).
+ ships the abstract base + the offline ``MockAdapter`` (mock_adapter.py).
 Live network adapters are a follow-on increment — none are implemented here.
 """
 

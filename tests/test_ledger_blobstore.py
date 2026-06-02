@@ -1,4 +1,4 @@
-"""Content-addressed blob store tests (BUILD-PLAN §25.1, PLAN §3.6).
+"""Content-addressed blob store tests.
 
 Round-trip + content-addressing (same content => same key, dedup).
 """

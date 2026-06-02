@@ -1,4 +1,4 @@
-"""Schema-validation tests (BUILD-PLAN §6.1)."""
+"""Schema-validation tests."""
 
 from __future__ import annotations
 

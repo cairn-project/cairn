@@ -1,6 +1,6 @@
-"""run_pilot — the end-to-end runner driving the REAL backbone (§33).
+"""run_pilot — the end-to-end runner driving the REAL backbone.
 
-Wires waves 1..4 over the benign pilot cause, fully offline:
+Wires the full engine backbone over the benign pilot cause, fully offline:
 
   define_task (ledger) -> claim_task (atomic exclusive) -> run_work_unit
   (PilotNodeAdapter, distinct families) -> store_result (blob + attestation +
@@ -11,10 +11,10 @@ Returns a structured ``PilotRunSummary`` (per-unit verdicts, model-diversity in
 quorum, honeypot catches, reputation deltas, the transparency-log head hash).
 
 The ledger / verify layers are the REAL ones — no mocks. The only stand-in is
-``PilotNodeAdapter`` (the sanctioned offline model stand-in via the Adapter seam).
+``PilotNodeAdapter`` (the designated offline model stand-in via the Adapter seam).
 
 Claim modeling: N nodes redundantly EXECUTE one unit (redundancy is the verify
-layer's point). The wave-4 claim is EXCLUSIVE per task_id, so each node claims,
+layer's point). The claim is EXCLUSIVE per task_id, so each node claims,
 executes, then releases before the next claims — exercising the REAL atomic-claim
 + release path rather than bypassing it.
 """

@@ -1,4 +1,4 @@
-"""Wave-5 tests: run_pilot drives the REAL backbone end-to-end (BUILD-PLAN §35).
+"""Tests: run_pilot drives the REAL backbone end-to-end.
 
 OUTCOME-ALTITUDE: invokes the real production runner on a FRESH ledger with no
 pre-arranged verdict/result/claim state. Offline.
@@ -43,7 +43,7 @@ def test_run_pilot_honeypot_catches_bad_node(tmp_path):
     )
 
     # The bad node is caught on the honeypot (seeded) unit, regardless of peer
-    # agreement — PLAN §3.5 L4.
+    # agreement —.
     assert summary.total_honeypot_catches >= 1
     hp_units = [u for u in summary.units if u.honeypot_catches]
     assert hp_units, "no unit reported a honeypot catch"

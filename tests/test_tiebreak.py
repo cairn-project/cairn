@@ -1,4 +1,4 @@
-"""Tiebreak policy tests (BUILD-PLAN §18.6, PLAN §3.5 L1 / research 01 §1).
+"""Tiebreak policy tests.
 
 DISPUTED with headroom ⇒ escalate one more node; ACCEPTED ⇒ no escalation;
 DISPUTED at the target_nresults ceiling ⇒ no escalation (escalating past budget

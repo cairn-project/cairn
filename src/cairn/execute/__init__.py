@@ -1,17 +1,17 @@
-"""cairn.execute — the model-agnostic EXECUTE / ADAPTER layer (wave 2).
+"""cairn.execute — the model-agnostic EXECUTE / ADAPTER layer.
 
-Sits directly on top of the wave-1 work-unit + acceptance-contract spec. Ships:
-the abstract ``Adapter`` seam (PLAN §3.3 "the leverage point"), a deterministic
-offline ``MockAdapter``, the portable-payload ``render_payload`` (research 02
-A.2), the ``Capabilities`` + ``meets_floor`` self-selection model, a
-calibration-probe stub (research 01 §5.4), and the ``run_work_unit`` execute flow
-that wires the wave-1 ``validate_work_unit`` + ``evaluate_acceptance``.
+Sits directly on top of the work-unit + acceptance-contract spec. Ships:
+the abstract ``Adapter`` seam (the leverage point), a deterministic
+offline ``MockAdapter``, the portable-payload ``render_payload``,
+the ``Capabilities`` + ``meets_floor`` self-selection model, a
+calibration-probe stub, and the ``run_work_unit`` execute flow
+that wires the ``validate_work_unit`` + ``evaluate_acceptance``.
 
-Wave 6 adds the FIRST live adapter, ``ClaudeCliAdapter`` (a real Claude model via
-the isolated subscription ``claude -p`` CLI), composing on this same seam.
+It also provides the first live adapter, ``ClaudeCliAdapter`` (a real Claude
+model via the isolated ``claude -p`` CLI), composing on this same seam.
 
-DEFERRED (later waves): other live adapters (OpenAI / ollama / generic), the
-verify/quorum layer (PLAN §3.5), real attestation/signing (PLAN §3.6), the real
+DEFERRED (later phases): other live adapters (OpenAI / ollama / generic), the
+verify/quorum layer, real attestation/signing, the real
 adversarial calibration probe, and pull/submit transport.
 """
 
@@ -42,7 +42,7 @@ from .result import CandidateResult
 __all__ = [
     # seam + reference adapter
     "Adapter",
-    "ClaudeCliAdapter",  # wave 6 — first live adapter
+    "ClaudeCliAdapter", # — first live adapter
     "ClaudeCliError",
     "MockAdapter",
     # render

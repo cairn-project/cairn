@@ -1,4 +1,4 @@
-"""The analysis→finding bridge — the missing seam (BUILD-PLAN §5).
+"""The analysis→finding bridge — the missing seam.
 
 ``flag_from_verdict`` is the single producer of a ``Finding`` from a real
 verify-layer outcome. Before this module the engine had two working halves that
@@ -14,7 +14,7 @@ content-addresses the finding, persists it over ``ledger.blobs``, and appends th
 ``FINDING_FLAGGED`` transparency-log entry). The bridge adds no new hashing, no
 new translog kind, no new queue state.
 
-Fail-quiet (BUILD-PLAN §5): an analysis the policy declines produces NO finding
+Fail-quiet: an analysis the policy declines produces NO finding
 and writes NOTHING — symmetrical to the verify layer returning a non-accepted
 verdict without dispatch. Only a policy-flagged verdict emits a finding, and the
 EXISTING human Gate-2 still governs whether that finding ever routes.

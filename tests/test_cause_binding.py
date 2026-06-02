@@ -1,4 +1,4 @@
-"""Cause ⇄ work-units binding tests (PLAN §2 + §3.3 + §3.8)."""
+"""Cause ⇄ work-units binding tests."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ def test_provider_restamps_units_to_bound_cause():
         # Every unit belongs to the bound cause, not the hard-coded pilot literal.
         assert u["cause_id"] == _CAUSE
         assert u["task_id"].startswith(f"{_CAUSE}::")
-        # And still validates against the wave-1 spec (no new schema introduced).
+        # And still validates against the spec (no new schema introduced).
         assert validate_work_unit(u).valid
 
 

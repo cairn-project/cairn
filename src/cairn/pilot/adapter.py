@@ -1,6 +1,6 @@
-"""PilotNodeAdapter — a deterministic, offline node for the pilot cause (§32).
+"""PilotNodeAdapter — a deterministic, offline node for the pilot cause.
 
-A concrete ``Adapter`` (the wave-2 seam) that produces the CORRECT pilot answer
+A concrete ``Adapter`` (the seam) that produces the CORRECT pilot answer
 by applying the same deterministic rule the gold standard uses
 (``cause.classify_license``). Because the answer is computed from the unit inputs
 rather than echoed from the schema, it is MEANINGFUL: honest nodes of DISTINCT
@@ -10,7 +10,7 @@ rather than echoed from the schema, it is MEANINGFUL: honest nodes of DISTINCT
 This is a NEW adapter subclass — it composes the real ``Adapter`` /
 ``CandidateResult`` and does NOT fork or modify ``MockAdapter`` (which remains the
 schema-echo reference). It makes NO network call and uses NO model: the
-"inference" is the offline rule table, the sanctioned deterministic model
+"inference" is the offline rule table, the designated deterministic model
 stand-in for an offline pilot.
 """
 
@@ -36,7 +36,7 @@ class PilotNodeAdapter(Adapter):
     satisfiable. ``wrong=True`` makes a deliberately-bad node: it inverts
     ``is_open_license`` and garbles ``license_id`` so the output is still
     schema-VALID but DIVERGES from the gold standard — caught by the honeypot
-    regardless of peer agreement (PLAN §3.5 L4).
+    regardless of peer agreement.
     """
 
     version = _ADAPTER_VERSION

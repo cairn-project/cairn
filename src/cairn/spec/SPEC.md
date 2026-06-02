@@ -1,9 +1,8 @@
 # Work-Unit + Acceptance-Contract SPEC (v1)
 
 The single load-bearing **stable interface** of the distributed
-cause-coordination engine (PLAN.md §3.3, §3.4 deliverable 1; research 02 A.1).
-It is the interface between Layer A (the engine) and Layer B (a cause): a cause
-is "just another work unit" expressed in this spec.
+cause-coordination engine. It is the interface between Layer A (the engine) and
+Layer B (a cause): a cause is "just another work unit" expressed in this spec.
 
 The canonical machine-readable artifact is
 [`work_unit.schema.json`](./work_unit.schema.json) (JSON Schema, Draft 2020-12).
@@ -21,8 +20,8 @@ objective + inputs + output_schema + acceptance_contract
 
 Everything model-specific (prompt template, system prompt, tool wiring) is
 synthesized **locally by an adapter** for its runtime. That synthesis — the
-adapter layer — is a **later wave** (PLAN §3.3/§3.4, phase P1) and is NOT in
-this spec. This spec defines only the unit and how to validate it.
+adapter layer — is a **later phase** and is NOT in this spec. This spec defines
+only the unit and how to validate it.
 
 ## Fields
 
@@ -30,7 +29,7 @@ this spec. This spec defines only the unit and how to validate it.
 |---|---|---|---|
 | `schema_version` | yes | semver string | Spec version this unit was authored against. See **Versioning** below. |
 | `task_id` | yes | string | Stable unique id; ties a result back to its unit; dedup / sybil anchor. |
-| `cause_id` | yes | string | First-class cause binding (PLAN §2). Which coordinated effort this serves. |
+| `cause_id` | yes | string | First-class cause binding. Which coordinated effort this serves. |
 | `objective` | yes | string | Natural-language task outcome. Model-agnostic. |
 | `inputs` | yes | object | The data to operate on. **Exactly one** of: `{inline: <data>}` OR `{pointer: <ref>, hash: <hash>}` (content-addressed). |
 | `output_schema` | yes | object | A JSON Schema describing the required result structure. The runtime-agnostic result contract. |
@@ -39,32 +38,32 @@ this spec. This spec defines only the unit and how to validate it.
 | `redundancy_policy` | yes | object | `target_nresults` (int ≥1), `min_quorum` (int ≥1), `model_diversity` (int ≥0, distinct model families). Consumed by the deferred verify layer. |
 | `provenance_requirements` | yes | object | Per-result attestation flags: `model_family`, `signed_result`, `trace` (all bool). Feeds the deferred audit ledger. |
 | `deadline` | no | ISO-8601 date-time | Optional absolute deadline. |
-| `lease` | no | object | `{duration_seconds: int ≥1}` — claim lease; reclaim-and-reissue on expiry. Claim logic is a later wave. |
+| `lease` | no | object | `{duration_seconds: int ≥1}` — claim lease; reclaim-and-reissue on expiry. Claim logic is a later phase. |
 
 ### `inputs` — inline xor content-addressed
 
 `inputs` is a JSON-Schema `oneOf`: a unit carries **either** inline data
 **or** a content-addressed pointer + hash, never both and never neither.
 Content-addressing is how large or shared inputs are referenced without
-inlining them; pointer resolution (git/IPFS) is a later wave — the spec only
+inlining them; pointer resolution (git/IPFS) is a later phase — the spec only
 carries the reference + integrity hash.
 
-### `capability_floor` — the capability tier (F2)
+### `capability_floor` — the capability tier
 
 A model-agnostic unit can only *require* capabilities the weakest enrolled
 runtime has. The unit is **model-agnostic within a capability tier, not
-uniformly** (research 02 A.2). `capability_floor` makes the tier explicit so a
+uniformly**. `capability_floor` makes the tier explicit so a
 weak runtime that can't meet the floor is routed away rather than silently
 poisoning the result pool. Self-declared capability is itself an untrusted claim
-— the join-time calibration probe that validates it is a later wave.
+— the join-time calibration probe that validates it is a later phase.
 
 ## Acceptance contract — predicate kinds
 
 `acceptance_contract.predicates` is a **conjunctive** list: ALL predicates must
 pass for the contract to pass. Each predicate is a **pure, machine-checkable
 function over a result dict** — no LLM, no network. These are the cheap
-client-side filter (research 02 A.1 step 4); the semantic / quorum verify layer
-(deferred, PLAN §3.5) sits **above** them.
+client-side filter; the semantic / quorum verify layer
+(deferred) sits **above** them.
 
 `field` paths are **dotted** (e.g. `vendor.url`) and resolve into the result.
 A numeric path segment indexes into an array (e.g. `citations.0` is the first
@@ -84,9 +83,9 @@ field being absent.
 An **unknown** `kind` is a hard error — `evaluate_acceptance` fails closed,
 never silently passes.
 
-These predicate kinds cover exactly what research 02 A.1 names the validator
-must check: "format, required fields, value ranges, citations-required,
-refusal-handling."
+These predicate kinds cover exactly what the validator
+must check: format, required fields, value ranges, citations-required, and
+refusal-handling.
 
 ## Versioning rule
 
@@ -98,7 +97,7 @@ refusal-handling."
 - **MINOR** — an additive **optional** field. Older consumers keep working.
 - **PATCH** — a documentation or constraint clarification with no field change.
 
-This is the "open, versioned spec" property (PLAN §3.4): anyone can write an
+This is the "open, versioned spec" property: anyone can write an
 adapter for any future runtime against a pinned MAJOR, and the spec can evolve
 additively without breaking deployed adapters.
 
@@ -107,13 +106,12 @@ The current spec version is **1.0.0** (`$id` `.../v1.json`).
 ## What this spec deliberately does NOT define (deferred)
 
 - the **adapter layer** (how `objective`+`inputs`+`output_schema` is rendered
-  into a runtime-native call) — PLAN §3.3/§3.4, phase P1;
+  into a runtime-native call) — a later phase;
 - the **verify layer** that consumes `redundancy_policy` /
   `provenance_requirements` (quorum, model-diversity, LLM-judge, honeypots) —
-  PLAN §3.5, phase P1;
+  a later phase;
 - the **ledger / claim** semantics that consume `task_id` / `lease` /
-  `deadline` (atomic claim, leases, transparency log) — PLAN §3.1/§3.6,
-  phase P2.
+  `deadline` (atomic claim, leases, transparency log) — a later phase.
 
-The spec carries the *fields* those layers need; their *behavior* is later
-waves.
+The spec carries the *fields* those layers need; their *behavior* is deferred to
+later phases.

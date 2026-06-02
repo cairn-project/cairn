@@ -1,4 +1,4 @@
-"""Wave-6 tests: ClaudeCliAdapter — the first live adapter (BUILD-PLAN §43).
+"""Tests: ClaudeCliAdapter — the first live adapter.
 
 OFFLINE + deterministic: the real ``claude -p`` subprocess is mocked by injecting
 a fake ``transcript_fn``; NO test spawns a real model. Covers JSON parsing (bare /
@@ -150,7 +150,7 @@ def test_build_argv_contains_isolation_flags(tmp_path):
 
 def test_empty_mcp_config_has_no_servers():
     # The config written next to every spawn declares NO MCP servers, so strict
-    # mode loads nothing (no Telegram plugin, no bot-slot theft).
+    # mode loads nothing (no MCP servers or plugins from the caller's environment).
     assert _EMPTY_MCP_CONFIG == {"mcpServers": {}}
     assert _EMPTY_MCP_CONFIG["mcpServers"] == {}
 

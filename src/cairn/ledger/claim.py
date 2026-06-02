@@ -1,13 +1,14 @@
-"""Atomic exclusive claim + leases (PLAN §3.1 — the one mutual-exclusion point).
+"""Atomic exclusive claim + leases (the one mutual-exclusion point).
 
-PLAN §3.1: "Claim — EXCLUSIVE via atomic ref CAS (the one place real mutual
-exclusion is bought cheaply, no blockchain)". On a plain filesystem the analog of
+A claim is EXCLUSIVE via an atomic ref compare-and-swap — the one place real
+mutual exclusion is bought cheaply, with no consensus protocol. On a plain
+filesystem the analog of
 a git-ref compare-and-swap is an atomic ``O_EXCL`` file create: exactly one
 creator wins the race for ``claims/<task_id>``; everyone else gets ``FileExistsError``.
 That single OS-level atomic primitive makes double-claim STRUCTURALLY impossible —
 no lock server, no consensus round.
 
-Churn handling (PLAN §3.1): claims carry a lease with an expiry. A node that
+Churn handling: claims carry a lease with an expiry. A node that
 vanishes lets its claim expire, and an expired claim reopens the unit for re-claim.
 Expiry is evaluated against an INJECTED ``Clock`` (no wall-clock hardcoding) so the
 lease behaviour is deterministically testable.

@@ -1,4 +1,4 @@
-"""Routing policy — best-fit match, tie-break, locality-aware escalation (AC.ROUTE.2/3).
+"""Routing policy — best-fit match, tie-break, locality-aware escalation.
 
 Best-fit selection requires BOTH locality and domain to intersect; the most-specific
 match wins; ties break deterministically by recipient id. On NO match, escalation to
@@ -31,7 +31,7 @@ def _attrs(locality, domain) -> FindingRoutingAttributes:
     return FindingRoutingAttributes.of(locality=locality, domain=domain)
 
 
-# --- AC.ROUTE.2 — best-fit match ---------------------------------------------
+# --- best-fit match ---------------------------------------------
 
 
 def test_matches_recipient_when_both_locality_and_domain_intersect():
@@ -80,7 +80,7 @@ def test_tie_break_is_deterministic_by_lexicographic_recipient_id():
     assert d2.recipient.recipient_id == "aaa"  # reproducible
 
 
-# --- AC.ROUTE.3 — locality-aware escalation / no silent drop -----------------
+# --- locality-aware escalation / no silent drop -----------------
 
 
 def test_no_match_escalates_to_the_explicit_fallback():

@@ -7,11 +7,11 @@ ROUTABLE ``Finding`` (the ``cairn.vetting`` finding-vetting gate's output) into 
 recorded action dispatched to the recipient best fit to act on it, closing
 detect → verify → human-vet → ACT.
 
-Three composed pieces (BUILD-PLAN-routing-spine.md §1):
+Three composed pieces:
 
   * ``RecipientChannel`` seam (``channel.py``) — the delivery interface a routed
     finding reaches a recipient through. The EXTENSION POINT where real network
-    channels plug in later. This wave ships ONLY the deterministic, OFFLINE
+    channels plug in later. This release ships ONLY the deterministic, OFFLINE
     ``InMemoryRecipientChannel`` (no network, no real recipient, no randomness).
   * Routing policy (``policy.py``) — ``RoutingPolicy.route`` selects the best-fit
     recipient by mission-neutral locality+domain tags, with LOCALITY-AWARE
@@ -28,12 +28,12 @@ finding state, the cause layer (a finding/route belongs to a cause via its
 forks nothing. Mission-NEUTRAL — recipients + findings are generic; no
 scam/phishing/sensitive recipients or content.
 
-DEFERRED (later, separately-security-reviewed waves): real external-recipient
-integration + network egress (Safe Browsing / abuse.ch / registrars / partner
-endpoints — the ``RecipientChannel`` seam is where they plug in), a real
-partner-of-record directory + identity verification, retry / delivery-failure /
-dead-letter handling, multi-recipient fan-out / quorum routing, and a ``cairn route``
-CLI (library-only this wave).
+DEFERRED (to later, independently security-reviewed phases): real
+external-recipient integration + network egress (Safe Browsing / abuse.ch /
+registrars / partner endpoints — the ``RecipientChannel`` seam is where they plug
+in), a real partner-of-record directory + identity verification, retry /
+delivery-failure / dead-letter handling, multi-recipient fan-out / quorum
+routing, and a ``cairn route`` CLI (library-only for now).
 """
 
 from __future__ import annotations

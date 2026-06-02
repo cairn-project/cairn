@@ -1,6 +1,6 @@
-"""RecipientChannel seam + the deterministic offline channel (AC.ROUTE.4).
+"""RecipientChannel seam + the deterministic offline channel.
 
-The only channel shipped this wave is deterministic + offline: it records every
+The only channel shipped this release is deterministic + offline: it records every
 dispatch and returns a DispatchAck whose ack_ref is derived from the dispatch
 material (reproducible, no network, no randomness).
 """
@@ -26,7 +26,7 @@ def _dispatch(recipient_id="r1", reason="matched") -> RoutingDispatch:
     )
 
 
-# --- AC.ROUTE.4 — the seam + the deterministic offline channel ---------------
+# --- the seam + the deterministic offline channel ---------------
 
 
 def test_in_memory_channel_satisfies_the_recipient_channel_protocol():

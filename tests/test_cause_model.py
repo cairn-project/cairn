@@ -1,4 +1,4 @@
-"""Cause-layer tests: the Cause first-class object (PLAN §2 + §3.9 gated listing).
+"""Cause-layer tests: the Cause first-class object.
 
 Offline, no pre-arranged ledger state.
 """
@@ -63,7 +63,7 @@ def test_fresh_cause_is_requested_and_not_listable():
 
 
 def test_listability_rule_per_status():
-    # GATED LISTING (PLAN §3.9): only APPROVED / LIVE are publicly listable.
+    # GATED LISTING: only APPROVED / LIVE are publicly listable.
     assert _cause(CauseStatus.APPROVED).is_publicly_listable is True
     assert _cause(CauseStatus.LIVE).is_publicly_listable is True
     assert _cause(CauseStatus.REQUESTED).is_publicly_listable is False

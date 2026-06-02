@@ -1,12 +1,12 @@
 """The capture port seam + the deterministic offline static-document port.
 
 A ``CapturePort`` is the seam by which a capture turns a target into a tuple of
-inert ``Observation``s. This PR ships ONLY a deterministic, OFFLINE port that
+inert ``Observation``s. This release ships ONLY a deterministic, OFFLINE port that
 reads a bundled local fixture (a synthetic static document) and emits inert
 observations — NO real browser, NO real URL fetched, NO network egress.
 
 The real headless-browser / IP-masked capture port is a DELIBERATELY DEFERRED,
-separately-security-reviewed later wave (BUILD-PLAN §8). That wave implements this
+separately security-reviewed later phase. That phase implements this
 same ``CapturePort`` protocol; nothing about the inert-packet design changes.
 
 A port exposes ``target_ref`` (the OPAQUE label of what was captured — a fixture
@@ -28,7 +28,7 @@ from .packet import (
     Observation,
 )
 
-# The provenance method label for the only port shipped in this wave.
+# The provenance method label for the only port shipped in this release.
 METHOD_STATIC_DOCUMENT_FIXTURE = "static-document-fixture"
 
 _DEFAULT_FIXTURE = "capture_target_benign.json"

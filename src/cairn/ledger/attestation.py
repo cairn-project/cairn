@@ -1,14 +1,14 @@
-"""Provenance attestation + signing seam (PLAN §3.6, research 02 A.2 step 5).
+"""Provenance attestation + signing seam.
 
-Wave 2 carried provenance as a PLACEHOLDER: ``CandidateResult.signature`` was a
-plain hash, explicitly "no real signing". This wave upgrades that into a real
+ carried provenance as a PLACEHOLDER: ``CandidateResult.signature`` was a
+plain hash, explicitly "no real signing". This release upgrades that into a real
 ``Attestation`` record — a hash of the output bound to the producing
 adapter/model_family, sealed with a keyed signature.
 
 The signing is a SEAM. The local implementation is HMAC-SHA256 over the canonical
 attestation bytes (stdlib ``hmac``, no heavy deps). HMAC is symmetric — it proves
 integrity to a holder of the key, NOT third-party non-repudiation; real
-asymmetric keypairs / A2A signed agent cards are a later wave. The function
+asymmetric keypairs / A2A signed agent cards are a later phase. The function
 signatures (``sign_attestation`` / ``verify_attestation``) are the stable seam
 that survives that swap. The key is ALWAYS supplied by the caller — never a
 checked-in secret.
@@ -76,9 +76,9 @@ def verify_attestation(att: Attestation, *, key: bytes) -> bool:
 
 
 def attest_candidate(result: CandidateResult, *, key: bytes) -> Attestation:
-    """Build a real, signed ``Attestation`` from a wave-2 ``CandidateResult``.
+    """Build a real, signed ``Attestation`` from a ``CandidateResult``.
 
-    Composes on the wave-2 type (reads its fields) — does NOT fork it. Upgrades
+    Composes on the type (reads its fields) — does NOT fork it. Upgrades
     the candidate's placeholder ``signature`` into a real keyed signature over a
     content-addressed output hash bound to the producing adapter.
     """

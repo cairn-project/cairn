@@ -1,4 +1,4 @@
-"""ThresholdFlagPolicy — the generic mission-neutral flag bar (BUILD-PLAN §6).
+"""ThresholdFlagPolicy — the generic mission-neutral flag bar.
 
 The policy maps a verify ``VerifyVerdict`` to a ``FlagDecision`` using only a
 generic confidence threshold over an ACCEPTED verdict's output. It hard-codes no

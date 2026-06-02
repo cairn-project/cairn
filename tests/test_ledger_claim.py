@@ -1,4 +1,4 @@
-"""Atomic claim + lease-expiry tests (BUILD-PLAN §25.2-3, PLAN §3.1).
+"""Atomic claim + lease-expiry tests.
 
 The atomic O_EXCL claim makes double-claim impossible; an expired lease reopens
 the unit. Time is an injected FixedClock so the lease behaviour is deterministic.

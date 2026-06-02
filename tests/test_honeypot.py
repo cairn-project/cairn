@@ -1,4 +1,4 @@
-"""Honeypot / gold-standard tests (BUILD-PLAN §18.4, PLAN §3.5 L4).
+"""Honeypot / gold-standard tests.
 
 The load-bearing case: a node that fails the known-answer unit is flagged EVEN
 WHEN it agrees with a (bad) peer majority — L4 catches the collusion L1 quorum
