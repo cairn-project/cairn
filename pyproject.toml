@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 # package path and import root; nothing else hard-codes the name.
 name = "cairn"
 version = "0.1.0"
-description = "Distributed cause-coordination engine (Layer A) — wave-1 foundation: the work-unit + acceptance-contract spec."
+description = "Distributed cause-coordination engine (Layer A) — a mission-neutral, model-agnostic distributed detection-and-analysis engine with cross-model verification, human-in-the-loop vetting, and a tamper-evident transparency log."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
