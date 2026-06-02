@@ -4,7 +4,7 @@
 cause-coordination design: a decentralized, model-agnostic
 distributed-detection-and-analysis force-multiplier that runs N causes on
 one protocol. It is standard-library-first; the only runtime dependency is
-`jsonschema`. (The name `cairn` is a working placeholder.)
+`jsonschema`. (`cairn` is the project's final, owner-ratified name.)
 
 This guide covers installing the project, a minimal usage example, and
 running the tests. For the field-by-field work-unit spec see

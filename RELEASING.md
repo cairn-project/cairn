@@ -14,8 +14,7 @@ Derived from `pyproject.toml`:
 
 - **Build backend:** [`hatchling`](https://hatch.pypa.io/) (`build-system.requires = ["hatchling"]`, `build-backend = "hatchling.build"`).
 - **Version source:** static — `project.version` is hard-coded (currently `0.1.0`). Hatch is *not* configured for VCS/tag-derived versioning, so the version is bumped by editing `pyproject.toml` directly.
-- **Distribution name:** `cairn`.
-  - Note: `pyproject.toml` flags `cairn` as a **placeholder** name (PLAN.md open decision #9); a rename would change the distribution name and the `src/cairn` package path. Resolve the name before the first public/PyPI release.
+- **Distribution name:** `cairn` — the project's **final, owner-ratified name** (closes the former PLAN.md open decision #9). No rename pending.
 - **Python support:** `requires-python = ">=3.11"`.
 - **License:** MIT.
 - **Console script:** `cairn = "cairn.cli:main"` (installs a `cairn` command).
@@ -77,8 +76,7 @@ twine check dist/*
 
 No publish target is configured in the repo, so pick one explicitly:
 
-- **PyPI** (after resolving the placeholder-name decision and confirming the
-  name is available):
+- **PyPI** (after confirming the `cairn` name is available on PyPI):
 
   ```sh
   twine upload dist/*
@@ -105,4 +103,4 @@ No publish target is configured in the repo, so pick one explicitly:
   removing manual `twine`/`gh` steps.
 - Consider `hatch-vcs` to derive `project.version` from the git tag, eliminating
   the manual `pyproject.toml` edit and keeping tag and version in lockstep.
-- Resolve the `cairn` placeholder name before the first public publish.
+- Confirm the `cairn` name is available on PyPI before the first public publish (the project name itself is final).

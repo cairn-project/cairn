@@ -6,11 +6,10 @@
 > A cairn is built one stone at a time, by many hands — to mark the safe way, to
 > warn of the danger ahead, and to honor those who came before. Add your stone.
 
-> **Placeholder name.** `cairn` is a working placeholder. The real,
-> mission-neutral project name is an **open owner decision** (PLAN.md decision
-> #9 — the engine is general and multi-cause, not mission-specific, so the name
-> must not be mission-specific). Renaming touches only the package path and
-> import root.
+> **Name.** `cairn` is the project's **final, owner-ratified name** — chosen to
+> be mission-neutral because the engine is general and multi-cause, not
+> mission-specific. (This closes what was formerly tracked as PLAN.md open
+> decision #9; the name is no longer open.)
 
 cairn is the reusable Layer-A engine from the distributed cause-coordination
 design (`../PLAN.md`, `../REQUIREMENTS.md`): a decentralized, model-agnostic
@@ -38,6 +37,75 @@ the engine. It is **not** built into loam and does not depend on it.
   in-memory implementations.
 - **License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
   dependency is `jsonschema`.
+
+## What the human gate does — and does NOT — guarantee (read this too)
+
+The engine's safety story rests on a **human sign-off gate** before any cause
+becomes listable and before any finding becomes routable. That gate is real and
+fail-closed — but be precise about what it does today, because we would rather
+you read this than discover it:
+
+- **The "human" is unauthenticated free-text.** `reviewer_id`, `granted_by`,
+  `created_by`, `decider`, and `node_id` are caller-supplied strings with **no
+  authentication anywhere in the engine**. A recorded "human verdict" proves *a
+  string was present with a reason* — not that a real, independent, or qualified
+  human acted. Identity-authentication is a **deliberately deferred wave**.
+- **There is one gate, and no enforced separation of duties.** Nothing in the
+  code prevents the same actor from requesting a cause, "reviewing" it under a
+  second name, and dispatching an action. The five-frame gate-check enforces
+  that all five frames were *addressed*, not that an independent human addressed
+  them substantively.
+- **The audit log proves integrity, not truth.** The append-only hash-chained
+  transparency log (`cairn verify-log`) proves no entry was edited, removed, or
+  reordered. It does **not** prove a finding was correct, a reviewer was real, or
+  a target was actually engaged in the conduct. A wrongful action is recorded as
+  faithfully as a correct one. The log has **no external anchoring** yet, so an
+  operator who holds the file could in principle rewrite the whole chain from
+  genesis undetectably to anyone holding only that operator's copy.
+- **The attestation seam is HMAC (symmetric).** It proves "someone holding the
+  key signed," which for a single operator is "the operator signed its own work"
+  — integrity to a key-holder, **not** third-party non-repudiation. Asymmetric
+  signing is a deferred wave.
+- **The engine is mission-neutral and general.** The conduct a cause targets is
+  free-text the requester fills; the engine hard-codes no limit on what conduct
+  or whom a cause may target. The only barrier today is the (unauthenticated,
+  single-actor-capable) human cause-vetter. The engine is therefore general
+  enough to be pointed at a real person — **the current shipped scope is the
+  benign OSS-license-classification pilot, which exercises none of that surface,
+  but the general engine's misuse surface is real and is named here on purpose.**
+
+These are **owned design boundaries, not discovered defects.** See
+[docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) for the full invariant register
+(including the explicit `[PLACEHOLDER]` invariants), and "Known, deferred gaps"
+below.
+
+## Known, deferred gaps (named, not hidden)
+
+These are known to the maintainer and **deliberately deferred to later,
+separately-reviewed waves** — listed so an outside reviewer sees them as already
+on the radar rather than as discoveries:
+
+- **Authenticated identity + separation of duties** — every actor is currently
+  unauthenticated free-text (THREAT-MODEL INV-Z5). No asymmetric signing yet.
+- **Target-protection / misuse-against-a-legitimate-party** — there is no
+  code-level mechanism preventing the gates from being driven against an
+  innocent party (THREAT-MODEL INV-Z6); only the human vetter stands in the way.
+- **External transparency-log anchoring** — no published head hashes / third-party
+  witness, so a single operator's rewrite is undetectable to anyone holding only
+  that operator's copy (THREAT-MODEL INV-U3).
+- **Multi-operator / compromised-operator trust** — the trust model assumes one
+  honest operator; recruiting multiple operators is exactly the assumption this
+  does not yet cover.
+- **Abuse-response: retraction, appeal, and incident recovery** — there is no
+  path to reverse or retract a dispatched action, no appeal for a wrongly-targeted
+  party, and no key-rotation / log-recovery playbook.
+- **Anti-abuse at intake (rate-limiting / coordination-detection)** —
+  THREAT-MODEL INV-A3 is a placeholder; nothing yet prevents coordinated mass-flagging.
+
+An **acceptable-cause / prohibited-target policy** — what conduct may be
+targeted and what targets are categorically off-limits — is a **governance
+decision the owner has not yet made**; see [GOVERNANCE.md](GOVERNANCE.md) for the
+flagged-open stub.
 
 ## What's in this repo
 
@@ -79,8 +147,10 @@ section of [CHANGELOG.md](CHANGELOG.md) for the authoritative per-layer detail):
 - **Public transparency surfaces** — redacted-by-construction read-only views of
   causes, vetted outcomes, and the hash-chain skeleton, plus public log
   verification reusing `verify_log` verbatim. `src/cairn/public/`.
-- **Routing / action spine** — turns a human-verified ROUTABLE finding into a
-  RECORDED ACTION dispatched to the best-fit recipient (locality + domain tags,
+- **Routing / action spine** — turns a human-signed-off ROUTABLE finding (a
+  recorded human verdict — see the gate-guarantee note above for what that does
+  and does not assure) into a RECORDED ACTION dispatched to the best-fit recipient
+  (locality + domain tags,
   with fail-closed escalation so a routable finding is never silently dropped),
   recorded on the same transparency log. Ships only an offline
   `InMemoryRecipientChannel`. `src/cairn/routing/`.

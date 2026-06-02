@@ -49,7 +49,12 @@ For each frame, state your claim and whether you believe it passes:
 - **doesnt_target_good_people** — does it avoid harming good actors / protect the vulnerable?
 - **legal** — is the activity lawful in the relevant jurisdiction(s)?
 - **court_grade_auditable** — is the evidence trail auditable and tamper-evident?
-- **human_verified** — is a human in the loop before any action is taken?
+  (Note: today the engine delivers a tamper-evident, append-only audit log;
+  identity-authentication, external anchoring, and non-repudiation are deferred
+  waves, so "court-grade" is an aspirational target, not a verified property.)
+- **human_verified** — is a human in the loop before any action is taken? (Note:
+  the gate records a human verdict; the human is currently unauthenticated
+  free-text — see SECURITY.md for the precise boundary.)
 
 ## Anything else
 

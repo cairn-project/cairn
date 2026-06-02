@@ -3,9 +3,10 @@
 Wave 1 of the distributed cause-coordination engine. Builds **only** the stable
 interface + scaffold + tests. Plan-before-code per the build discipline.
 
-Working package name `cairn` is a **placeholder** — the real name is open
-owner decision #9 (PLAN §9). Mission-neutral name TBD; nothing in this wave
-hard-codes the placeholder anywhere but the package path and import root.
+Package name `cairn` is the project's **final, owner-ratified name**
+(mission-neutral by design — this closes what was formerly PLAN §9 / open
+owner decision #9). Nothing hard-codes the name anywhere but the package path
+and import root.
 
 Traceability: every file maps to a named PLAN / REQUIREMENTS element. Listed
 per-file below. No speculative code for unnamed cases (ODD-lite).

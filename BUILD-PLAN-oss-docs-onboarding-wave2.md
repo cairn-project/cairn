@@ -30,7 +30,8 @@ real engine (execute / verify / ledger+transparency / cause / contribute /
 capture / vetting / public / routing — all shipped, per CHANGELOG `[Unreleased]`
 Added) PLUS an honest maturity statement: pre-1.0 (0.x), unreleased, benign
 pilot-stage, mission-neutral, MIT. Point newcomers at QUICKSTART + CONTRIBUTING.
-Keep: the cairn epigraph, the placeholder-name note, the not-built-into-loam note,
+Keep: the cairn epigraph, the name note (now: final/owner-ratified, formerly the
+placeholder-name note), the not-built-into-loam note,
 stdlib-first/jsonschema requirement. Accuracy both directions: it runs
 end-to-end (don't undersell) AND it's 0.x pilot-stage with deferred real-world
 adapters (don't oversell).

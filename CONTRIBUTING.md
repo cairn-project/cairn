@@ -7,9 +7,10 @@ to institutions that have authority to act. That means the bar for transparency,
 auditability, and honest limitations is high, and contributions are reviewed
 against that bar.
 
-> **Name note.** "Cairn" is a working placeholder; the final, mission-neutral
-> public name is not yet ratified. Where a final repo URL or public name would
-> appear below, you will see a clearly-marked `[placeholder]`.
+> **Name.** "Cairn" is the project's **final, owner-ratified name**, chosen to
+> be mission-neutral. (This closes what was formerly tracked as PLAN.md open
+> decision #9.) The repository lives at
+> <https://github.com/lukeivers/cairn>.
 
 By contributing you agree that your contributions are licensed under the
 project's [MIT License](LICENSE), and you agree to abide by our
@@ -27,10 +28,16 @@ project's [MIT License](LICENSE), and you agree to abide by our
   verify layer, the ledger, the transparency log, or any safety gate should be
   weighed against it.
 - **Understand the safety frames.** Every significant design choice in this
-  project is checked against five non-negotiable frames (works / doesn't-target-
-  good-people / legal / court-grade-auditable / human-verified). See the
-  project plan and `BUILD-PLAN.md`. A change that weakens any frame will be
-  declined regardless of how clean the code is.
+  project is checked against five named frames (works / doesn't-target-good-people
+  / legal / court-grade-auditable / human-verified). See the project plan and
+  `BUILD-PLAN.md`. A change that weakens any frame will be declined regardless of
+  how clean the code is. Two of these frame names are **aspirational, not yet
+  verified properties**: `court_grade_auditable` today means a tamper-evident,
+  append-only audit log (identity-authentication, external anchoring, and
+  non-repudiation are deferred waves), and `human_verified` means a recorded
+  human verdict exists (the human is unauthenticated free-text). See
+  [SECURITY.md](SECURITY.md) → "What the human gate does — and does NOT —
+  guarantee today" for the precise boundary.
 
 ---
 
@@ -60,7 +67,7 @@ Python before opening a PR.
 `main` is protected. **All changes land through pull requests; no one pushes
 directly to `main`.**
 
-1. **Fork** the repository (once the public repo exists — `[placeholder]`).
+1. **Fork** the repository (<https://github.com/lukeivers/cairn>).
 2. **Branch** from `main` with a descriptive name
    (`fix/lease-expiry-off-by-one`, `feat/honeypot-density-knob`).
 3. **Make your change** with tests. New behavior requires a test; a bug fix
@@ -122,8 +129,8 @@ test(pilot): cover bad-node honeypot-catch path
 ## Where to ask
 
 - **General questions / design discussion:** open a
-  [discussion or issue](.github/ISSUE_TEMPLATE/) on the public repo
-  (`[placeholder]` until the repo is stood up).
+  [discussion or issue](.github/ISSUE_TEMPLATE/) on the repository
+  (<https://github.com/lukeivers/cairn>).
 - **Security / trust-integrity vulnerabilities:** **private** channel only —
   [SECURITY.md](SECURITY.md).
 - **Conduct concerns:** see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

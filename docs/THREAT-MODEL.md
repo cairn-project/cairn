@@ -20,8 +20,13 @@
 
 Cairn is a distributed cause-coordination engine: it runs N causes on one
 protocol, coordinating distributed detection-and-analysis work and turning
-human-verified outcomes into recorded action. The assets worth protecting,
-described in the project's own terms (verified against `src/`):
+human-signed-off outcomes into recorded action. Throughout this document,
+**"human-verified" / "human-signed-off" means a recorded human verdict (with a
+reason) exists — NOT that the human was authenticated, independent, or
+qualified.** Identity authentication is an explicit deferred placeholder
+(INV-Z5); see [`SECURITY.md`](../SECURITY.md) → "What the human gate does — and
+does NOT — guarantee today" for the precise boundary. The assets worth
+protecting, described in the project's own terms (verified against `src/`):
 
 1. **The cause registry & governance record** (`cairn.cause`, `cairn.contribute`).
    The set of causes, their request→decision history, the five-frame gate-check
