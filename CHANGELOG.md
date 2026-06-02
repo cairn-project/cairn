@@ -128,5 +128,25 @@ detection-and-analysis core.
   deferred, separately-security-reviewed later wave — the `RecipientChannel` seam is
   where it will plug in.
 
+- **Analysis→finding bridge** (PLAN §3.5 — the previously-missing seam) — the
+  producer that turns a real verify-layer `VerifyVerdict` over a captured
+  `ExaminationPacket` into a flagged `Finding`, joining the engine's detect/analyze
+  half (execute → verify → verdict) to its vet/route half (Finding → human Gate-2 →
+  dispatch). Before this, `Finding` referenced an `AutomatedVerdict` that NO code
+  path produced — every finding was hand-fabricated in tests. Comprises a generic,
+  mission-neutral `FlagPolicy` seam (`cairn.analysis`) — the only shipped policy is
+  `ThresholdFlagPolicy`, a configurable opaque-label confidence threshold over an
+  ACCEPTED verdict's output (hard-codes no domain vocabulary; an uninteresting
+  analysis flags nothing) — and the `flag_from_verdict` driver that owns the
+  DECISION (the injected policy) and delegates the RECORD to the EXISTING
+  `FindingVetQueue.flag` (content-address + `FINDING_FLAGGED` log entry; no new
+  hashing, no new translog kind). Fail-quiet: a declined policy produces no finding
+  and writes nothing; only a policy-flagged verdict emits one, and the EXISTING
+  human Gate-2 still governs whether it ever routes. The first outcome-altitude e2e
+  in which the finding is PRODUCED by the analysis layer (capture → verify → flag →
+  human ROUTABLE → dispatch → recorded action, `verify_log` ok) rather than
+  synthetic — the two halves are now one continuous loop. A `cairn analyze` CLI
+  wrapper and auto-flagging inside `run_cause` are deliberately deferred later waves.
+
 ### Notes
 - Honest limitations are documented in `docs/THREAT-MODEL.md`.
