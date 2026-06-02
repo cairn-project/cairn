@@ -6,53 +6,215 @@
 > A cairn is built one stone at a time, by many hands — to mark the safe way, to
 > warn of the danger ahead, and to honor those who came before. Add your stone.
 
-> **Placeholder name.** `cairn` is a working placeholder. The real,
-> mission-neutral project name is an **open owner decision** (PLAN.md decision
-> #9 — the engine is general and multi-cause, not suicide-specific, so the name
-> must not be mission-specific). Renaming touches only the package path and
-> import root.
+## What is cairn?
 
-This is the reusable Layer-A engine from the distributed cause-coordination
+**cairn is a platform for coordinating vetted, transparent causes at a scale and
+consistency people can't sustain alone — AI pointed at work that's genuinely
+worth doing, with humans deciding what's worth doing and signing off before
+anything acts.**
+
+Most of what's said about AI right now is that it extracts: it takes from
+creators, burns resources, and concentrates the gains. cairn is a deliberate
+counter-shape. It's a use of AI a person could actually rally behind — many
+volunteers lending their own AI to *collectively notice harm* and route
+human-verified findings to the institutions that can act, doing patient,
+repetitive coordination work no group of humans could keep up by hand, while
+humans stay in control of every judgment that matters. The AI does the tireless
+watching and cross-checking; people decide what's worth watching, and a human
+signs off before anything leaves the system.
+
+The mission of the **platform** is distinct from the mission of any **cause** it
+runs. cairn itself is **mission-neutral**: it's the coordination engine, not an
+opinion about any one target. Each cause defines its own conduct-to-watch-for as
+per-cause configuration; the engine hard-codes none of it. That's deliberate —
+the platform earns trust by being a fair, auditable mechanism, and the causes
+that run on it are chosen, and vetted, by people.
+
+> **Honest boundary (read the maturity block below before believing any of
+> this is "done").** The engine is complete and runnable today, but its entire
+> safety story currently rests on a *single human sign-off gate whose "human" is
+> an unauthenticated free-text string*, and the real-world network pieces (live
+> capture, external delivery) are deliberately not built yet. cairn is something
+> to rally behind *because* it's being built carefully and in the open — not
+> because it's finished. The next section says exactly what it does and does not
+> guarantee.
+
+> **Name.** `cairn` is the project's **final, owner-ratified name** — chosen to
+> be mission-neutral because the engine is general and multi-cause, not
+> mission-specific. (This closes what was formerly tracked as PLAN.md open
+> decision #9; the name is no longer open.)
+
+cairn is the reusable Layer-A engine from the distributed cause-coordination
 design (`../PLAN.md`, `../REQUIREMENTS.md`): a decentralized, model-agnostic
 distributed-detection-and-analysis force-multiplier that runs N causes on one
-protocol. It is **not** built into loam and does not depend on it.
+protocol. Volunteers lend their own AI to collectively notice harm and route it
+to the institutions that can act. It is **mission-neutral** — the protocol runs
+many causes; the conduct a cause targets is a per-cause property, not baked into
+the engine. It is **not** built into loam and does not depend on it.
 
-## What's in this repo right now (wave 1 — foundation only)
+## Maturity — read this first
 
-Wave 1 builds the single load-bearing **stable interface** the whole engine
-hangs off: the **work-unit + acceptance-contract spec** (PLAN §3.3, the A↔B
-interface). Per the design, "the interface between A and B is the work-unit +
-acceptance-contract spec" — so it is built first, before anything that consumes
-it.
+- **Pre-1.0 (`0.x`), unreleased.** No version is tagged or published yet; the
+  CHANGELOG sits at `[Unreleased]`. While `0.x`, minor versions may break.
+- **Complete and runnable, pilot-stage.** The full Layer-A engine is built and
+  exercised by **276 passing tests**. `cairn pilot` runs the benign pilot
+  end-to-end on a fresh ledger, and the append-only transparency log it writes
+  independently verifies (`cairn verify-log`). This is a working engine, not a
+  skeleton.
+- **The shipped pilot cause is deliberately benign.** The runnable cause is an
+  OSS-license-classification pilot — a mission-neutral exercise of the full
+  detect → verify → human-vet → route path with no sensitive logic. Real-world
+  capture (headless browser / network egress) and real external-recipient
+  delivery are **deliberately deferred, separately-security-reviewed later
+  waves**; today's capture and delivery seams ship only offline, deterministic,
+  in-memory implementations.
+- **License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
+  dependency is `jsonschema`.
 
-- `src/cairn/spec/work_unit.schema.json` — the canonical **versioned JSON
-  Schema** for a work unit.
-- `src/cairn/spec/SPEC.md` — human-readable field-by-field spec + the
-  versioning rule.
-- `src/cairn/types.py` — pydantic-free dataclasses for the work unit and
-  acceptance predicates.
-- `src/cairn/validate.py` — `validate_work_unit(unit)`.
-- `src/cairn/acceptance.py` — `evaluate_acceptance(result, contract)` and
-  the machine-checkable predicate kinds.
-- `src/cairn/fixtures/` — 3 example work units.
-- `tests/` — schema-validation, acceptance-evaluation, and fixture-parse tests.
+## What the human gate does — and does NOT — guarantee (read this too)
 
-## What is explicitly DEFERRED to later waves
+The engine's safety story rests on a **human sign-off gate** before any cause
+becomes listable and before any finding becomes routable. That gate is real and
+fail-closed — but be precise about what it does today, because we would rather
+you read this than discover it:
 
-This wave ships **only the spec + validation**. It does **not** build:
+- **The "human" is unauthenticated free-text.** `reviewer_id`, `granted_by`,
+  `created_by`, `decider`, and `node_id` are caller-supplied strings with **no
+  authentication anywhere in the engine**. A recorded "human verdict" proves *a
+  string was present with a reason* — not that a real, independent, or qualified
+  human acted. Identity-authentication is a **deliberately deferred wave**.
+- **There is one gate, and no enforced separation of duties.** Nothing in the
+  code prevents the same actor from requesting a cause, "reviewing" it under a
+  second name, and dispatching an action. The five-frame gate-check enforces
+  that all five frames were *addressed*, not that an independent human addressed
+  them substantively.
+- **The audit log proves integrity, not truth.** The append-only hash-chained
+  transparency log (`cairn verify-log`) proves no entry was edited, removed, or
+  reordered. It does **not** prove a finding was correct, a reviewer was real, or
+  a target was actually engaged in the conduct. A wrongful action is recorded as
+  faithfully as a correct one. The log has **no external anchoring** yet, so an
+  operator who holds the file could in principle rewrite the whole chain from
+  genesis undetectably to anyone holding only that operator's copy.
+- **The attestation seam is HMAC (symmetric).** It proves "someone holding the
+  key signed," which for a single operator is "the operator signed its own work"
+  — integrity to a key-holder, **not** third-party non-repudiation. Asymmetric
+  signing is a deferred wave.
+- **The engine is mission-neutral and general.** The conduct a cause targets is
+  free-text the requester fills; the engine hard-codes no limit on what conduct
+  or whom a cause may target. The only barrier today is the (unauthenticated,
+  single-actor-capable) human cause-vetter. The engine is therefore general
+  enough to be pointed at a real person — **the current shipped scope is the
+  benign OSS-license-classification pilot, which exercises none of that surface,
+  but the general engine's misuse surface is real and is named here on purpose.**
 
-- the **verify layer** (k-redundancy quorum, model-diversity, LLM-judge,
-  honeypots) — PLAN §3.5, phase P1;
-- the **execute / adapter runtime** (Claude Code / OpenAI / ollama adapters,
-  capability calibration) — PLAN §3.3/§3.4, phase P1;
-- the **ledger** (thin git-ledger coordinator, atomic claim, leases,
-  transparency log) — PLAN §3.1/§3.6, phase P2;
-- distribution storefronts, cause-discovery/vetting, partner sourcing, and the
-  escalation/action engine — PLAN §3.7–§3.9, §4, §7, phases P3–P6.
+These are **owned design boundaries, not discovered defects.** See
+[docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) for the full invariant register
+(including the explicit `[PLACEHOLDER]` invariants), and "Known, deferred gaps"
+below.
 
-The spec ships the *fields* those layers will consume (`redundancy_policy`,
-`provenance_requirements`, `capability_floor`, `task_id`/`deadline`/`lease`),
-but none of their logic. See `BUILD-PLAN.md` for the full deferral list.
+## Known, deferred gaps (named, not hidden)
+
+These are known to the maintainer and **deliberately deferred to later,
+separately-reviewed waves** — listed so an outside reviewer sees them as already
+on the radar rather than as discoveries:
+
+- **Authenticated identity + separation of duties** — every actor is currently
+  unauthenticated free-text (THREAT-MODEL INV-Z5). No asymmetric signing yet.
+- **Target-protection / misuse-against-a-legitimate-party** — there is no
+  code-level mechanism preventing the gates from being driven against an
+  innocent party (THREAT-MODEL INV-Z6); only the human vetter stands in the way.
+- **External transparency-log anchoring** — no published head hashes / third-party
+  witness, so a single operator's rewrite is undetectable to anyone holding only
+  that operator's copy (THREAT-MODEL INV-U3).
+- **Multi-operator / compromised-operator trust** — the trust model assumes one
+  honest operator; recruiting multiple operators is exactly the assumption this
+  does not yet cover.
+- **Abuse-response: retraction, appeal, and incident recovery** — there is no
+  path to reverse or retract a dispatched action, no appeal for a wrongly-targeted
+  party, and no key-rotation / log-recovery playbook.
+- **Anti-abuse at intake (rate-limiting / coordination-detection)** —
+  THREAT-MODEL INV-A3 is a placeholder; nothing yet prevents coordinated mass-flagging.
+
+An **acceptable-cause / prohibited-target policy** — what conduct may be
+targeted and what targets are categorically off-limits — is a **governance
+decision the owner has not yet made**; see [GOVERNANCE.md](GOVERNANCE.md) for the
+flagged-open stub.
+
+## What's in this repo
+
+The engine composes a single end-to-end loop —
+**spec → execute → verify → ledger/transparency → cause → contribute → capture →
+vet → publish → route** — every layer built and tested (see the `[Unreleased]`
+section of [CHANGELOG.md](CHANGELOG.md) for the authoritative per-layer detail):
+
+- **Spec** — a versioned JSON-Schema **work-unit + acceptance-contract** (the
+  runtime-agnostic interface defining a unit of AI work and its machine-checkable
+  acceptance). `src/cairn/spec/`, `validate.py`, `acceptance.py`.
+- **Execute / adapter layer** — a model-agnostic adapter seam with a
+  deterministic mock adapter and a live `claude -p` adapter (spawn-isolated by
+  construction). `src/cairn/execute/`.
+- **Verify layer** — redundancy + model-diversity quorum, semantic agreement
+  (not bit-equality), honeypot/gold-standard scoring, reputation, and a tiebreak
+  policy. `src/cairn/verify/`.
+- **Ledger + transparency** — a content-addressed blob store, atomic exclusive
+  claim with leases, an HMAC attestation seam, and an append-only hash-chained,
+  Certificate-Transparency-style log with independent `verify_log` verification.
+  `src/cairn/ledger/`.
+- **Cause layer** — a mission-neutral first-class `Cause` object (id, status,
+  five-frame self-assessment, target-conduct + protected-boundary,
+  partner-of-record posture), gated request intake and a *reasoned* decision
+  (approval OR rejection-with-reason — no silent rejection), and a gated public
+  `list_causes` (approved/live only). `src/cairn/cause/`, `src/cairn/vetting/`.
+- **Contributor opt-in + cause-bound execution** — an explicit, gated, revocable
+  contributor opt-in (opt-in to a non-listable cause is refused) and a
+  cause-scoped run loop driving a cause's units through execute → verify →
+  ledger/transparency. `src/cairn/contribute/`.
+- **Inert capture abstraction** — the seam by which a trust-gated CAPTURE
+  operator freezes a live target into a STATIC, INERT, content-addressed
+  examination packet that the open analysis layer judges *without* re-visiting
+  the live target. Ships only an offline `StaticDocumentCapturePort` (a local
+  fixture; no browser, no URL fetched, no network egress). `src/cairn/capture/`.
+- **Human-in-the-loop two-gate vetting** — two distinct fail-closed review gates
+  (cause-vetter and finding-vetter); nothing advances without a recorded human
+  decision. `src/cairn/vetting/`.
+- **Public transparency surfaces** — redacted-by-construction read-only views of
+  causes, vetted outcomes, and the hash-chain skeleton, plus public log
+  verification reusing `verify_log` verbatim. `src/cairn/public/`.
+- **Routing / action spine** — turns a human-signed-off ROUTABLE finding (a
+  recorded human verdict — see the gate-guarantee note above for what that does
+  and does not assure) into a RECORDED ACTION dispatched to the best-fit recipient
+  (locality + domain tags,
+  with fail-closed escalation so a routable finding is never silently dropped),
+  recorded on the same transparency log. Ships only an offline
+  `InMemoryRecipientChannel`. `src/cairn/routing/`.
+
+## Deliberately deferred (later, separately-reviewed waves)
+
+The seams exist; their real-world implementations are intentionally not built
+here:
+
+- **Real capture** — a headless-browser / IP-masked capture port (today:
+  offline local-fixture port only).
+- **Real recipient delivery** — network egress to external recipients (Safe
+  Browsing / abuse.ch / registrars / partner endpoints); today the
+  `RecipientChannel` seam ships only an in-memory channel.
+- **Served read API** — an HTTP/HTML rendering of the public-transparency
+  surfaces (today: library-level views only).
+- **CI/release automation** — see [RELEASING.md](RELEASING.md) (proposed) and
+  [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Get started
+
+- **Run it / install it:** [docs/QUICKSTART.md](docs/QUICKSTART.md) — clone →
+  `pip install -e .` → `cairn pilot` → request/approve a cause → `cairn
+  contribute` → `cairn public verify-log`.
+- **Contribute:** [CONTRIBUTING.md](CONTRIBUTING.md), the
+  [Code of Conduct](CODE_OF_CONDUCT.md), and [GOVERNANCE.md](GOVERNANCE.md).
+- **Understand the security posture:** [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md)
+  and [SECURITY.md](SECURITY.md).
+- **Propose a cause:** open a
+  [cause request](.github/ISSUE_TEMPLATE/cause_request.md); an approved cause is
+  recorded on-ledger and decided through the five-frame gate.
 
 ## Requirements
 
@@ -67,7 +229,7 @@ python3.13 -m venv .venv          # any python >= 3.11
 .venv/bin/pytest
 ```
 
-## Public API (wave 1)
+## Public API
 
 ```python
 from cairn import validate_work_unit, evaluate_acceptance, load_fixture
@@ -80,3 +242,10 @@ contract = unit["acceptance_contract"]
 acc = evaluate_acceptance({"answer": "...", "citations": ["..."]}, contract)
 assert acc.passed
 ```
+
+The top-level `cairn` package also re-exports the execute / adapter seam
+(`run_work_unit`, `MockAdapter`, …), the verify / trust layer (`verify_unit`,
+`decide_quorum`, …), and the read-only public-transparency surfaces
+(`PublicTransparency`, `list_published_causes`, …). See `src/cairn/__init__.py`
+for the full exported surface and [docs/QUICKSTART.md](docs/QUICKSTART.md) for
+the CLI.

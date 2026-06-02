@@ -1,11 +1,15 @@
 """cairn — distributed cause-coordination engine (Layer A).
 
-PLACEHOLDER package name (PLAN.md open decision #9). Shipped so far: the
-work-unit + acceptance-contract spec + validation (wave 1, the A<->B stable
-interface); the model-agnostic execute / adapter seam (wave 2); the verify /
-trust layer that aggregates N candidate results into a trust verdict (wave 3,
-PLAN §3.5). Ledger / transport, distribution, cause-vetting, partner sourcing,
-and the escalation/action engine are later waves.
+``cairn`` is the project's final, owner-ratified name (this closes what was
+formerly tracked as PLAN.md open decision #9). The full Layer-A engine is built:
+the work-unit + acceptance-contract spec + validation (the A<->B stable
+interface); the model-agnostic execute / adapter seam; the verify / trust layer
+that aggregates N candidate results into a trust verdict; the ledger /
+transparency log; the cause layer + contributor opt-in; the inert capture
+abstraction; the human-in-the-loop two-gate vetting; the public-transparency
+surfaces; and the routing / action spine. Real-world capture (headless browser /
+network egress) and real external-recipient delivery are deliberately deferred,
+separately-security-reviewed later waves.
 """
 
 from __future__ import annotations
