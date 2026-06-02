@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/lukeivers/cairn/security/advisories/new
+    about: >-
+      Do NOT open a public issue for security vulnerabilities. Use a private
+      security advisory, or follow the process in SECURITY.md. We practice
+      coordinated disclosure.

@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: Cairn
+abstract: >-
+  A decentralized, model-agnostic, distributed detection-and-analysis engine:
+  volunteers lend their own AI to collectively notice harm and route it to the
+  institutions that can act. Mission-neutral; runs many causes on one protocol,
+  with cross-model verification, human-in-the-loop vetting, and a tamper-evident
+  transparency log.
+type: software
+authors:
+  - name: "[AUTHOR — owner to fill]"
+repository-code: "https://github.com/lukeivers/cairn"
+url: "https://github.com/lukeivers/cairn"
+license: MIT
+version: "0.1.0"
+keywords:
+  - distributed-systems
+  - ai
+  - detection
+  - transparency
+  - human-in-the-loop
