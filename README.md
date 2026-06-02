@@ -6,6 +6,39 @@
 > A cairn is built one stone at a time, by many hands — to mark the safe way, to
 > warn of the danger ahead, and to honor those who came before. Add your stone.
 
+## What is cairn?
+
+**cairn is a platform for coordinating vetted, transparent causes at a scale and
+consistency people can't sustain alone — AI pointed at work that's genuinely
+worth doing, with humans deciding what's worth doing and signing off before
+anything acts.**
+
+Most of what's said about AI right now is that it extracts: it takes from
+creators, burns resources, and concentrates the gains. cairn is a deliberate
+counter-shape. It's a use of AI a person could actually rally behind — many
+volunteers lending their own AI to *collectively notice harm* and route
+human-verified findings to the institutions that can act, doing patient,
+repetitive coordination work no group of humans could keep up by hand, while
+humans stay in control of every judgment that matters. The AI does the tireless
+watching and cross-checking; people decide what's worth watching, and a human
+signs off before anything leaves the system.
+
+The mission of the **platform** is distinct from the mission of any **cause** it
+runs. cairn itself is **mission-neutral**: it's the coordination engine, not an
+opinion about any one target. Each cause defines its own conduct-to-watch-for as
+per-cause configuration; the engine hard-codes none of it. That's deliberate —
+the platform earns trust by being a fair, auditable mechanism, and the causes
+that run on it are chosen, and vetted, by people.
+
+> **Honest boundary (read the maturity block below before believing any of
+> this is "done").** The engine is complete and runnable today, but its entire
+> safety story currently rests on a *single human sign-off gate whose "human" is
+> an unauthenticated free-text string*, and the real-world network pieces (live
+> capture, external delivery) are deliberately not built yet. cairn is something
+> to rally behind *because* it's being built carefully and in the open — not
+> because it's finished. The next section says exactly what it does and does not
+> guarantee.
+
 > **Name.** `cairn` is the project's **final, owner-ratified name** — chosen to
 > be mission-neutral because the engine is general and multi-cause, not
 > mission-specific. (This closes what was formerly tracked as PLAN.md open
