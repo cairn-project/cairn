@@ -1,6 +1,6 @@
-"""End-to-end execute-flow tests (BUILD-PLAN §12.5).
+"""End-to-end execute-flow tests.
 
-run_work_unit wires wave-1 validate + acceptance with the wave-2 adapter seam.
+run_work_unit wires validate + acceptance with the adapter seam.
 Offline (MockAdapter) only.
 """
 

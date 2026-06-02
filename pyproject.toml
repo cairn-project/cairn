@@ -3,8 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-# NOTE: "cairn" is the final, owner-ratified project name (mission-neutral by
-# design). This closes what was formerly tracked as PLAN.md open decision #9.
+# "cairn" is mission-neutral by design — the engine is general and multi-cause.
 name = "cairn"
 version = "0.1.0"
 description = "Distributed cause-coordination engine (Layer A) — a mission-neutral, model-agnostic distributed detection-and-analysis engine with cross-model verification, human-in-the-loop vetting, and a tamper-evident transparency log."

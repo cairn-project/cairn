@@ -1,4 +1,4 @@
-"""Quorum + redundancy aggregation with the model-diversity gate (PLAN §3.5 L1).
+"""Quorum + redundancy aggregation with the model-diversity gate.
 
 Takes the agreement clusters (``agreement.py``) over N candidate results for ONE
 work unit and decides a quorum status against the unit's ``RedundancyPolicy``:
@@ -7,7 +7,7 @@ work unit and decides a quorum status against the unit's ``RedundancyPolicy``:
     diversity requirement (≥ ``required_diversity`` distinct model families).
   * ``INSUFFICIENT_DIVERSITY`` — a cluster reaches ``min_quorum`` by SIZE but is
     formed by too few distinct model families (the anti-collusion rejection — a
-    single model family is NOT a valid quorum; PLAN §3.5 L1 inverts BOINC
+    single model family is NOT a valid quorum; inverts BOINC
     homogeneity on purpose).
   * ``NO_QUORUM`` — no cluster reaches ``min_quorum`` (too few agreeing results).
   * ``DISPUTED`` — results split into competing clusters and none reaches quorum,
@@ -15,10 +15,10 @@ work unit and decides a quorum status against the unit's ``RedundancyPolicy``:
     to simply too few results) — the signal the tiebreak policy escalates on.
 
 Model-diversity requirement: read from ``RedundancyPolicy.model_diversity``.
-PLAN §3.5 L1 mandates ≥2 distinct families. The wave-1 field defaults to 0
-(unset); per BUILD-PLAN §17 a value <= 1 is treated as "unset" and the safe
+The anti-collusion floor mandates ≥2 distinct families. The field defaults to 0
+(unset); a value <= 1 is treated as "unset" and the safe
 default of 2 is applied so the anti-collusion primitive is ON by default. An
-explicit ``model_diversity = 1`` (owner-ratified) disables it for a benign cause.
+explicit ``model_diversity = 1`` (deliberately configured) disables it for a benign cause.
 """
 
 from __future__ import annotations
@@ -42,8 +42,8 @@ def required_diversity(policy: RedundancyPolicy) -> int:
     """Resolve the effective model-diversity requirement for a policy.
 
     A policy value <= 1 means "unset" -> apply the safe anti-collusion default of
-    2 distinct families (BUILD-PLAN §17 / PLAN §3.5 L1). An explicit value >= 2 is
-    honored as-is. An explicit ``1`` (owner-ratified) disables diversity.
+    2 distinct families. An explicit value >= 2 is
+    honored as-is. An explicit ``1`` (deliberately configured) disables diversity.
     """
     declared = policy.model_diversity
     if declared <= 0:

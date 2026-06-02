@@ -1,9 +1,9 @@
-"""Ledger facade — the THIN coordinator (PLAN §3.1, top-pick topology).
+"""Ledger facade — the THIN coordinator (top-pick topology).
 
-PLAN §3.1: a git-style ledger holding ``tasks/`` (open units, content-addressed),
-``claims/``, ``results/``. It is "thin, commodity, mirrorable, and
+A git-style ledger holding ``tasks/`` (open units, content-addressed),
+``claims/``, ``results/``. It is thin, commodity, mirrorable, and
 non-truth-deciding — it orders claims and stores blobs; it does NOT decide truth
-(the quorum does)". This facade wires the wave-4 components into that one
+(the quorum does). This facade wires the components into that one
 coordinator:
 
   objects/         content-addressed blob store (tasks + results live here)
@@ -14,7 +14,7 @@ coordinator:
   reputation.jsonl the persisted reputation delta log
 
 Truth-deciding stays OUT of the ledger: ``record_verdict`` only WRITES the
-wave-3 ``verify_unit`` verdict into the transparency log; it never decides it.
+ ``verify_unit`` verdict into the transparency log; it never decides it.
 """
 
 from __future__ import annotations
@@ -93,8 +93,8 @@ class Ledger:
     ) -> str:
         """Store a result blob (+ real attestation) and log a RESULT_RECORDED entry.
 
-        Returns the result blob key. The attestation upgrades the wave-2
-        placeholder signature into a real keyed attestation (PLAN §3.6).
+        Returns the result blob key. The attestation upgrades the
+        placeholder signature into a real keyed attestation.
         """
         result_blob = {
             "task_id": candidate.task_id,
@@ -146,9 +146,9 @@ class Ledger:
         return result_key
 
     def record_verdict(self, task_id: str, verdict: Any) -> None:
-        """Log a wave-3 verify verdict (does NOT decide it — only records it).
+        """Log a verify verdict (does NOT decide it — only records it).
 
-        ``verdict`` is a wave-3 ``VerifyVerdict``; the ledger reads its public,
+        ``verdict`` is a ``VerifyVerdict``; the ledger reads its public,
         already-decided fields and appends a VERDICT_RECORDED transparency entry.
         """
         self.translog.append(

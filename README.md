@@ -39,25 +39,21 @@ that run on it are chosen, and vetted, by people.
 > because it's finished. The next section says exactly what it does and does not
 > guarantee.
 
-> **Name.** `cairn` is the project's **final, owner-ratified name** — chosen to
-> be mission-neutral because the engine is general and multi-cause, not
-> mission-specific. (This closes what was formerly tracked as PLAN.md open
-> decision #9; the name is no longer open.)
+> **Name.** `cairn` is mission-neutral by design — the engine is general and
+> multi-cause, not tied to any one mission.
 
-cairn is the reusable Layer-A engine from the distributed cause-coordination
-design (`../PLAN.md`, `../REQUIREMENTS.md`): a decentralized, model-agnostic
-distributed-detection-and-analysis force-multiplier that runs N causes on one
-protocol. Volunteers lend their own AI to collectively notice harm and route it
-to the institutions that can act. It is **mission-neutral** — the protocol runs
-many causes; the conduct a cause targets is a per-cause property, not baked into
-the engine. It is **not** built into loam and does not depend on it.
+cairn is a decentralized, model-agnostic distributed-detection-and-analysis
+force-multiplier that runs N causes on one protocol. Volunteers lend their own AI
+to collectively notice harm and route it to the institutions that can act. It is
+**mission-neutral** — the protocol runs many causes; the conduct a cause targets
+is a per-cause property, not baked into the engine.
 
 ## Maturity — read this first
 
 - **Pre-1.0 (`0.x`), unreleased.** No version is tagged or published yet; the
   CHANGELOG sits at `[Unreleased]`. While `0.x`, minor versions may break.
 - **Complete and runnable, pilot-stage.** The full Layer-A engine is built and
-  exercised by **276 passing tests**. `cairn pilot` runs the benign pilot
+  exercised by **291 passing tests**. `cairn pilot` runs the benign pilot
   end-to-end on a fresh ledger, and the append-only transparency log it writes
   independently verifies (`cairn verify-log`). This is a working engine, not a
   skeleton.
@@ -65,9 +61,9 @@ the engine. It is **not** built into loam and does not depend on it.
   OSS-license-classification pilot — a mission-neutral exercise of the full
   detect → verify → human-vet → route path with no sensitive logic. Real-world
   capture (headless browser / network egress) and real external-recipient
-  delivery are **deliberately deferred, separately-security-reviewed later
-  waves**; today's capture and delivery seams ship only offline, deterministic,
-  in-memory implementations.
+  delivery are **deliberately deferred to separate, independently
+  security-reviewed phases**; today's capture and delivery seams ship only
+  offline, deterministic, in-memory implementations.
 - **License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
   dependency is `jsonschema`.
 
@@ -82,7 +78,7 @@ you read this than discover it:
   `created_by`, `decider`, and `node_id` are caller-supplied strings with **no
   authentication anywhere in the engine**. A recorded "human verdict" proves *a
   string was present with a reason* — not that a real, independent, or qualified
-  human acted. Identity-authentication is a **deliberately deferred wave**.
+  human acted. Identity-authentication is a **deliberately deferred phase**.
 - **There is one gate, and no enforced separation of duties.** Nothing in the
   code prevents the same actor from requesting a cause, "reviewing" it under a
   second name, and dispatching an action. The five-frame gate-check enforces
@@ -98,7 +94,7 @@ you read this than discover it:
 - **The attestation seam is HMAC (symmetric).** It proves "someone holding the
   key signed," which for a single operator is "the operator signed its own work"
   — integrity to a key-holder, **not** third-party non-repudiation. Asymmetric
-  signing is a deferred wave.
+  signing is a deferred phase.
 - **The engine is mission-neutral and general.** The conduct a cause targets is
   free-text the requester fills; the engine hard-codes no limit on what conduct
   or whom a cause may target. The only barrier today is the (unauthenticated,
@@ -115,8 +111,8 @@ below.
 ## Known, deferred gaps (named, not hidden)
 
 These are known to the maintainer and **deliberately deferred to later,
-separately-reviewed waves** — listed so an outside reviewer sees them as already
-on the radar rather than as discoveries:
+independently reviewed phases** — listed so an outside reviewer sees them as
+already on the radar rather than as discoveries:
 
 - **Authenticated identity + separation of duties** — every actor is currently
   unauthenticated free-text (THREAT-MODEL INV-Z5). No asymmetric signing yet.
@@ -188,7 +184,7 @@ section of [CHANGELOG.md](CHANGELOG.md) for the authoritative per-layer detail):
   recorded on the same transparency log. Ships only an offline
   `InMemoryRecipientChannel`. `src/cairn/routing/`.
 
-## Deliberately deferred (later, separately-reviewed waves)
+## Deliberately deferred (later, independently reviewed phases)
 
 The seams exist; their real-world implementations are intentionally not built
 here:

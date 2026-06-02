@@ -1,6 +1,6 @@
-"""Provenance attestation / signing-seam tests (BUILD-PLAN §25.5, PLAN §3.6).
+"""Provenance attestation / signing-seam tests.
 
-attest_candidate upgrades a wave-2 CandidateResult's placeholder signature into a
+attest_candidate upgrades a CandidateResult's placeholder signature into a
 real keyed attestation; verify_attestation passes for an untampered record and
 fails when the output hash is altered.
 """
@@ -23,7 +23,7 @@ def _candidate(output):
         model_family="mock",
         adapter_version="mock-0.1.0",
         produced_at="1970-01-01T00:00:00Z",
-        signature="mock-sig:placeholder",  # wave-2 placeholder
+        signature="mock-sig:placeholder", # placeholder
     )
 
 

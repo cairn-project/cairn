@@ -1,4 +1,4 @@
-"""Cause-layer tests: the five-frame gate-check STRUCTURE enforcer (PLAN §3.9 + §6)."""
+"""Cause-layer tests: the five-frame gate-check STRUCTURE enforcer."""
 
 from __future__ import annotations
 

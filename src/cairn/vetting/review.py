@@ -1,6 +1,6 @@
-"""Shared review primitives for the two-gate vetting queue (BUILD-PLAN §2).
+"""Shared review primitives for the two-gate vetting queue.
 
-The "human-verified" frame (REQUIREMENTS Frame 5) made structural: a reviewer is
+The "human-verified" frame made structural: a reviewer is
 just an id + a recorded decision (no auth backend, no UI — those are deferred).
 Both gates (cause-vetting + finding-vetting) share:
 

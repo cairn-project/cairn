@@ -1,6 +1,6 @@
 """The inert examination packet — a frozen, content-addressed evidence bundle.
 
-This is the load-bearing safety abstraction (BUILD-PLAN-capture-bundle §3). A
+This is the load-bearing safety abstraction. A
 gated CAPTURE operator turns a live target into a STATIC, INERT
 ``ExaminationPacket``; the open analysis layer judges that packet WITHOUT anyone
 re-visiting the live target. The packet contains ONLY static, JSON-serializable
@@ -21,7 +21,7 @@ So the only operation an analyst can perform is reading frozen data. "Re-visit t
 live target" is not an expressible operation on the analysis path — it is excluded
 by the ABSENCE of any locator/fetch surface, not merely by policy.
 
-Content-addressing mirrors the engine (PLAN §3.6): ``content_hash`` /
+Content-addressing mirrors the engine: ``content_hash`` /
 ``packet_hash`` are sha256 of canonical JSON, so identical capture input yields an
 identical packet hash (dedup + tamper-evidence). The ``packet_hash`` equals the
 blob content key the packet is stored under (``store.py``).
@@ -152,7 +152,7 @@ def _packet_material(
 
 @dataclass(frozen=True)
 class ExaminationPacket:
-    """A frozen, content-addressed, INERT evidence bundle (BUILD-PLAN §3).
+    """A frozen, content-addressed, INERT evidence bundle.
 
     Every field is static recorded data. ``target_ref`` is an OPAQUE label (a
     fixture id / content-address), NOT a dereferenceable live locator — there is no

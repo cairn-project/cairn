@@ -1,15 +1,15 @@
-"""The CAUSE first-class object (PLAN §2 + §3.9 + §6).
+"""The CAUSE first-class object.
 
-PLAN §2: "A cause is a first-class object" — it owns its id, name, status, its
+A cause is a first-class object — it owns its id, name, status, its
 own 5-frame gate compliance record, partner-of-record posture, and an
-output_schema reference its work-units bind to. The general engine runs N causes
-(PLAN §3.8); this module models ONE cause as a typed, content-addressable record.
+output_schema reference its work-units bind to. The general engine runs N causes;
+this module models ONE cause as a typed, content-addressable record.
 
 MISSION-NEUTRAL: a "cause" is generic. The `target_conduct` / `protected_boundary`
-fields are free-text the requester fills; this module hard-codes NO scam/SN/
-sensitive specifics (those are a later mission wave).
+fields are free-text the requester fills; this module hard-codes NO
+domain-specific specifics (those are deferred to a later phase).
 
-Listability is GATED (PLAN §3.9 / §1 sequencing): a cause is publicly listable /
+Listability is GATED (sequencing): a cause is publicly listable /
 accepting-compute ONLY after a decision approves it. `is_publicly_listable` is the
 single source of that rule (status ∈ {APPROVED, LIVE}).
 """
@@ -22,7 +22,7 @@ from typing import Any, Optional
 
 from ..ledger.blobstore import canonical_json, content_key
 
-# The five frame keys — mirror PLAN §6 / REQUIREMENTS "ACCEPTANCE GATE — five
+# The five frame keys — mirror / "ACCEPTANCE GATE — five
 # non-negotiable frames". Order is fixed and load-bearing for completeness checks.
 FRAME_KEYS: tuple[str, ...] = (
     "works",
@@ -34,7 +34,7 @@ FRAME_KEYS: tuple[str, ...] = (
 
 
 class CauseStatus(str, Enum):
-    """Lifecycle status of a cause (PLAN §3.9 gated listing)."""
+    """Lifecycle status of a cause."""
 
     REQUESTED = "requested"
     APPROVED = "approved"
@@ -44,14 +44,14 @@ class CauseStatus(str, Enum):
 
 
 # A cause is publicly listable / accepting-compute ONLY in these states
-# (PLAN §3.9: listing is gated; only an approval flips it listable). REQUESTED /
+# (listing is gated; only an approval flips it listable). REQUESTED /
 # REJECTED / PAUSED are visible only through the request/decision history.
 _LISTABLE_STATES = frozenset({CauseStatus.APPROVED, CauseStatus.LIVE})
 
 
 @dataclass(frozen=True)
 class FrameVerdict:
-    """One frame of the requester's 5-frame self-assessment (PLAN §2).
+    """One frame of the requester's 5-frame self-assessment.
 
     The requester asserts, per named frame, a `claim` (how the cause meets the
     frame) and whether it `passes`. This is the requester's SELF-assessment —
@@ -72,7 +72,7 @@ class FrameVerdict:
 
 @dataclass(frozen=True)
 class FiveFrameAssessment:
-    """The requester's self-assessment across all five frames (PLAN §2/§6).
+    """The requester's self-assessment across all five frames.
 
     Stored as a frame-keyed mapping so completeness ("all five present") is a
     set check, not a positional one.
@@ -104,12 +104,12 @@ class FiveFrameAssessment:
 
 @dataclass(frozen=True)
 class Cause:
-    """A first-class cause object (PLAN §2).
+    """A first-class cause object.
 
     ``cause_id`` is content-addressed from the canonical draft (name +
     description + conduct/boundary + output_schema_ref + partner posture +
     self-assessment), so the same draft always yields the same id (dedup +
-    tamper-evidence, mirroring the engine's content-addressing — PLAN §3.6).
+    tamper-evidence, mirroring the engine's content-addressing).
     """
 
     cause_id: str
@@ -129,7 +129,7 @@ class Cause:
 
     @property
     def is_publicly_listable(self) -> bool:
-        """Gated-listing rule (PLAN §3.9): listable iff APPROVED or LIVE."""
+        """Gated-listing rule: listable iff APPROVED or LIVE."""
         return self.status in _LISTABLE_STATES
 
     @staticmethod

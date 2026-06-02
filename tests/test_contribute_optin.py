@@ -1,4 +1,4 @@
-"""Contributor opt-in tests (PLAN §3.9b — gated, recorded, revocable consent)."""
+"""Contributor opt-in tests (gated, recorded, revocable consent)."""
 
 from __future__ import annotations
 

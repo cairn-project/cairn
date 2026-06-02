@@ -1,4 +1,4 @@
-"""Finding-vetting gate tests (AC.VET.5–8).
+"""Finding-vetting gate tests.
 
 Exercises the human finding-vetting queue producing the ROUTABLE/REJECTED state.
 Mission-neutral: a synthetic finding references a packet hash + a generic automated
@@ -32,7 +32,7 @@ def _fresh(tmp_path):
     return Ledger(tmp_path / "ledger", FixedClock(start=0.0), signing_key=_KEY)
 
 
-# --- AC.VET.5 flag/enqueue ---------------------------------------------------
+# --- flag/enqueue ---------------------------------------------------
 
 
 def test_flag_finding_lands_pending_content_addressed_and_logged(tmp_path):
@@ -58,7 +58,7 @@ def test_flag_same_finding_twice_refused(tmp_path):
                    flagged_by="node-1")
 
 
-# --- AC.VET.6 assign ---------------------------------------------------------
+# --- assign ---------------------------------------------------------
 
 
 def test_assign_moves_to_under_review_and_logs(tmp_path):
@@ -73,7 +73,7 @@ def test_assign_moves_to_under_review_and_logs(tmp_path):
     assert kinds.count(KIND_FINDING_VET_ASSIGNED) == 1
 
 
-# --- AC.VET.7 verdict + ROUTABLE gate (fail-closed) --------------------------
+# --- verdict + ROUTABLE gate (fail-closed) --------------------------
 
 
 def test_not_routable_without_verdict_fail_closed(tmp_path):
@@ -146,7 +146,7 @@ def test_finding_tamper_detected_on_load(tmp_path):
     assert loaded.automated_verdict.flag_label == "flagged"
 
 
-# --- AC.VET.8 transparency ---------------------------------------------------
+# --- transparency ---------------------------------------------------
 
 
 def test_full_finding_gate_log_verifies(tmp_path):

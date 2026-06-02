@@ -35,8 +35,8 @@ boundary (the guarantee that an analyst only ever sees the frozen bundle and can
 re-visit the live target), and the `capture_packet` / `load_packet_for_analysis`
 flow. Note that the only capture port shipped today is the deterministic, OFFLINE
 `StaticDocumentCapturePort` (synthetic local fixture; no real browser/network); the
-real headless-browser / network-egress capture port is a deferred, separately
-security-reviewed wave and is NOT yet in this repository.
+real headless-browser / network-egress capture port is a deferred, independently
+security-reviewed phase and is NOT yet in this repository.
 
 It also includes the **human-in-the-loop two-gate vetting queue** (`cairn.vetting`):
 the two fail-closed human-review gates (the cause-vetting gate `CauseVetQueue` whose
@@ -46,9 +46,9 @@ recorded human verdict). The load-bearing trust property here is the *absence of
 advance-path*: a report of any way to make a cause publicly listable, or a finding
 routable, WITHOUT a recorded human verdict (or any way to record a silent rejection
 with no reason) is in scope. Note that onward routing of a routable finding to real
-external recipients is NOT in this repository — it is a deferred, network-touching,
-separately security-reviewed wave; this gate only produces the human-verified
-ROUTABLE/REJECTED state.
+external recipients is NOT in this repository — it is a deferred,
+network-touching, independently security-reviewed phase; this gate only produces
+the human-verified ROUTABLE/REJECTED state.
 
 It also includes the **routing / action spine** (`cairn.routing`): the
 `RecipientChannel` delivery seam, the locality-aware routing policy, and the
@@ -60,12 +60,12 @@ finding is in scope; and (2) **no silent drop** — every routable finding route
 matched recipient OR an explicitly-recorded fallback escalation, never nowhere; a
 report of any way to make a routable finding vanish without a recorded routing event
 (or a misconfigured registry that drops rather than raising) is in scope. The
-`RecipientChannel` seam is the place where, in a later wave, real network egress will
+`RecipientChannel` seam is the place where, in a later phase, real network egress will
 live — and is therefore a deliberately scoped trust boundary worth naming: the ONLY
 channel shipped today is the deterministic, OFFLINE `InMemoryRecipientChannel` (no
 network, no real recipient, no randomness). Real external-recipient integration /
 network egress (Safe Browsing / abuse.ch / registrars / partner endpoints) is a
-deferred, separately security-reviewed wave and is NOT yet in this repository.
+deferred, independently security-reviewed phase and is NOT yet in this repository.
 
 Out of scope here: third-party runtimes a contributor chooses to run, and the
 operational deployment of any specific cause (those carry their own policies).
@@ -94,7 +94,7 @@ explicit (these are owned boundaries, not defects):
   rewrite the chain from genesis undetectably to anyone holding only that copy.
 - **Attestation is HMAC (symmetric).** It proves a key-holder signed — for a
   single operator, "the operator signed its own work" — **not** third-party
-  non-repudiation. Asymmetric signing is a deferred wave.
+  non-repudiation. Asymmetric signing is a deferred phase.
 
 Wherever this repository uses the **`court_grade_auditable`** frame name, read it
 as **aspirational**: the code delivers a *tamper-evident, append-only audit log
@@ -105,7 +105,7 @@ security reviewer confirm what would actually meet an evidentiary bar.
 
 ## Known, deferred security gaps (named, not hidden)
 
-These are known and deliberately deferred to later, separately-reviewed waves —
+These are known and deliberately deferred to later, independently reviewed phases —
 named here so a reviewer sees them as on-the-radar, not as discoveries:
 
 - **Authenticated identity + separation of duties** (INV-Z5; asymmetric signing).

@@ -1,4 +1,4 @@
-"""cairn.contribute — the contributor opt-in + cause-scoped run loop (PLAN §3.9b).
+"""cairn.contribute — the contributor opt-in + cause-scoped run loop.
 
 The DEMAND side of the engine: how a contributor consents to put their AI capacity
 toward a SPECIFIC approved cause, and how that cause's bound work units then run
@@ -9,7 +9,7 @@ WorkUnitRegistry) + the execute/verify/ledger engine — it forks nothing.
   optin.py   OptInRegistry — gated opt-in (REFUSES a non-listable cause) + revoke
   run.py     run_cause(...) -> CauseRunSummary — the gated, opted-in run loop
 
-DEFERRED (later waves): real-model contribute adapters (only the offline pilot
+DEFERRED (later phases): real-model contribute adapters (only the offline pilot
 mock here), capture/detection logic, vetting UI, distribution ramps, the
 escalation/action engine, network transport.
 """

@@ -1,17 +1,17 @@
 """Execute flow — validate -> probe -> capability-gate -> produce -> accept.
 
-``run_work_unit`` is the wave-2 entry point. It composes the wave-1 functions
-(``validate_work_unit``, ``evaluate_acceptance``) with the wave-2 adapter seam +
+``run_work_unit`` is the entry point. It composes the functions
+(``validate_work_unit``, ``evaluate_acceptance``) with the adapter seam +
 capability model. This is one node's local execution of a single work unit; the
-cross-node verify/quorum layer (PLAN §3.5) that aggregates N CandidateResults is
-the NEXT wave and sits ABOVE this.
+cross-node verify/quorum layer that aggregates N CandidateResults is
+a later phase and sits ABOVE this.
 
-Pipeline (research 02 A.2 steps 2/4 + PLAN §3.3 self-selection):
-  1. validate the raw unit dict against the spec (wave-1)            [fail-closed]
+Pipeline:
+  1. validate the raw unit dict against the spec [fail-closed]
   2. (optional) calibration probe of the adapter's self-declared caps [fail-closed]
   3. capability-floor self-selection gate                            [fail-closed]
   4. adapter.produce -> CandidateResult
-  5. evaluate_acceptance — the cheap client-side filter (wave-1)
+  5. evaluate_acceptance — the cheap client-side filter
   6. return an ExecuteOutcome
 
 No network, no signing, no quorum here.
@@ -73,10 +73,10 @@ def run_work_unit(
     optional calibration probe of the adapter's self-declared capabilities; when
     omitted, calibration is skipped (the seam is in place for the real probe).
 
-    Composes wave-1 ``validate_work_unit`` + ``evaluate_acceptance`` — does not
+    Composes ``validate_work_unit`` + ``evaluate_acceptance`` — does not
     re-implement either. Fails closed at every gate.
     """
-    # 1. validate (wave-1)
+    # 1. validate
     validation = validate_work_unit(unit_dict)
     if not validation.valid:
         return ExecuteOutcome(
@@ -87,7 +87,7 @@ def run_work_unit(
 
     unit = WorkUnit.from_dict(unit_dict)
 
-    # 2. optional calibration probe of self-declared capabilities (research 01 §5.4)
+    # 2. optional calibration probe of self-declared capabilities
     calibration: Optional[CalibrationResult] = None
     if probe is not None:
         calibration = probe.verify(adapter.capabilities)
@@ -100,7 +100,7 @@ def run_work_unit(
                 + "; ".join(calibration.reasons),
             )
 
-    # 3. capability-floor self-selection gate (PLAN §3.3)
+    # 3. capability-floor self-selection gate
     capability_check = meets_floor(adapter.capabilities, unit.capability_floor)
     if not capability_check.qualifies:
         return ExecuteOutcome(
@@ -115,7 +115,7 @@ def run_work_unit(
     # 4. produce the candidate result
     candidate = adapter.produce(unit)
 
-    # 5. client-side acceptance filter (wave-1)
+    # 5. client-side acceptance filter
     acceptance = evaluate_acceptance(candidate.output, unit.acceptance_contract)
 
     status = STATUS_ACCEPTED if acceptance.passed else STATUS_ACCEPTED_ACCEPTANCE_FAILED

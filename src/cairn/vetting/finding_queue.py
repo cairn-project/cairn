@@ -1,11 +1,11 @@
 """Finding-vetting gate — the human review queue producing the ROUTABLE state.
 
-The second of the two fail-closed gates (BUILD-PLAN §1, Gate 2). A human
+The second of the two fail-closed gates (Gate 2). A human
 finding-vetter reviews a flagged ``Finding`` before it may be marked ROUTABLE
 (eligible to be acted on / routed onward). No finding becomes routable without a
 recorded human finding-vetter verdict. The actual onward routing to external
 recipients is OUT of scope (deferred, network-touching, security-reviewed later
-wave); this gate only produces the human-verified ROUTABLE/REJECTED state.
+phase); this gate only produces the human-verified ROUTABLE/REJECTED state.
 
   * ``flag`` — content-address + store a mission-neutral ``Finding`` and enqueue it
     (``FINDING_FLAGGED``); the finding references an existing ``packet_hash``.
@@ -87,7 +87,7 @@ class FindingVetQueue:
         self._index_dir = Path(ledger._root) / "finding_vet_queue"  # noqa: SLF001
         self._index_dir.mkdir(parents=True, exist_ok=True)
 
-    # --- flag/enqueue (AC.VET.5) ---------------------------------------------
+    # --- flag/enqueue ---------------------------------------------
 
     def flag(
         self,
@@ -135,7 +135,7 @@ class FindingVetQueue:
         )
         return finding
 
-    # --- assign (AC.VET.6) ---------------------------------------------------
+    # --- assign ---------------------------------------------------
 
     def assign(self, finding_hash: str, reviewer_id: str) -> PendingFindingReview:
         """Assign a pending finding to a reviewer (AWAITING_REVIEW → UNDER_REVIEW)."""
@@ -158,7 +158,7 @@ class FindingVetQueue:
         )
         return updated
 
-    # --- record human verdict (AC.VET.7) -------------------------------------
+    # --- record human verdict -------------------------------------
 
     def record_verdict(
         self, finding_hash: str, routable: bool, reason: str, reviewer_id: str
@@ -199,7 +199,7 @@ class FindingVetQueue:
         )
         return updated
 
-    # --- the fail-closed routing-eligibility state (AC.VET.7) ----------------
+    # --- the fail-closed routing-eligibility state ----------------
 
     def finding_state(self, finding_hash: str) -> FindingState:
         """Derive the human-verified routing-eligibility state from the verdict.

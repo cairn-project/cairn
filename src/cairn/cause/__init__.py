@@ -1,4 +1,4 @@
-"""cairn.cause — the CAUSE layer (PLAN §2 + §3.9 + §6).
+"""cairn.cause — the CAUSE layer.
 
 The cause data model + registry + public list + request intake + the gated-listing
 gate, composed ON the engine's ledger + transparency log (it reuses

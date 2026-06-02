@@ -8,7 +8,7 @@ and recorded with a ``PACKET_CAPTURED`` entry on the SAME transparency log.
 ``load_packet_for_analysis`` is the OPEN consumer: anyone may load a captured
 packet BY ITS CONTENT KEY and receive an ``AnalysisView`` — the only thing the
 analysis layer ever sees. The analyst is handed the packet, never a live target;
-the view has no live-locator/fetch surface (``packet.py`` §3), so "re-visit the
+the view has no live-locator/fetch surface (``packet.py``), so "re-visit the
 live target" is not expressible. Capture happens once (gated); analysis consumes
 the frozen artifact (open).
 
@@ -48,11 +48,11 @@ def capture_packet(
     node_id: str,
     cause_id: Optional[str] = None,
 ) -> ExaminationPacket:
-    """Freeze a target into an inert packet — GATED, fail-closed (BUILD-PLAN §5).
+    """Freeze a target into an inert packet — GATED, fail-closed.
 
     Args:
       port: the capture port (the deterministic offline ``StaticDocumentCapturePort``
-        in this wave) that yields the inert observations.
+        in this release) that yields the inert observations.
       gate: the ``CaptureGate`` deciding whether ``node_id`` holds the CAPTURE role.
       ledger: the real ``Ledger`` (carries its injected clock + blob store + log).
       node_id: the capturing operator's node id (must hold an ACTIVE grant).

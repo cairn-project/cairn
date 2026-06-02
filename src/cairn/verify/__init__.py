@@ -1,8 +1,8 @@
-"""cairn.verify — the VERIFY / TRUST layer (wave 3, PLAN §3.5).
+"""cairn.verify — the VERIFY / TRUST layer.
 
-Sits ABOVE the wave-2 execute layer: wave 2 produces ONE ``CandidateResult`` per
+Sits ABOVE the execute layer: produces ONE ``CandidateResult`` per
 node; this layer aggregates N of them (from N nodes, one work unit) into a trust
-verdict, fully offline. Defense in depth (PLAN §3.5):
+verdict, fully offline. Defense in depth:
 
   L1  quorum + redundancy + MODEL-DIVERSITY gate    (quorum.py)
   L2  semantic agreement (objective + judge seam)   (agreement.py, judge.py)
@@ -11,11 +11,11 @@ verdict, fully offline. Defense in depth (PLAN §3.5):
       Gensyn-style tiebreak-the-disputed-unit       (tiebreak.py)
       verify_unit aggregation entry point           (aggregate.py)
 
-DEFERRED (later waves): ledger/transport (atomic claim, leases, signing, the
-transparency log — wave 4), LIVE LLM-as-judge (network; only the seam + offline
+DEFERRED (later phases): ledger/transport (atomic claim, leases, signing, the
+transparency log), LIVE LLM-as-judge (network; only the seam + offline
 MockJudge ship here), Sybil resistance (L5), the SERENE/CoVFeFE collusion-
-resilient backstop (L6), prompt-injection adapter defenses (§3.5 B.3), and the
-trusted-core membership governance (§3.5 B.4).
+resilient backstop (L6), prompt-injection adapter defenses (B.3), and the
+trusted-core membership governance (B.4).
 """
 
 from __future__ import annotations

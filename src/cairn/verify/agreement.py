@@ -1,19 +1,19 @@
-"""Semantic agreement — clustering N candidate results (PLAN §3.5 L2).
+"""Semantic agreement — clustering N candidate results.
 
-Agreement is NOT bit-equality. Heterogeneous LLM outputs never bit-match
-(research 02 A.0/B.0), so the verify layer clusters candidate results by a
-canonical AGREEMENT KEY and treats one cluster as "these results agree."
+Agreement is NOT bit-equality. Heterogeneous LLM outputs never bit-match, so the
+verify layer clusters candidate results by a canonical AGREEMENT KEY and treats
+one cluster as "these results agree."
 
 Two concrete agreement functions:
   * ``ObjectiveAgreement`` — deterministic outputs: exact / normalized-string /
     caller-supplied predicate key. The cheap path when the unit's output is
     machine-deterministic.
   * ``SubjectiveAgreement`` — delegates the key to a pluggable ``Judge`` (the
-    LLM-as-judge seam; offline ``MockJudge`` this wave).
+    LLM-as-judge seam; offline ``MockJudge`` this release).
 
 The output of both is a list of ``Cluster``s, each carrying its members and the
 distinct ``model_family`` values present — the input the quorum + model-diversity
-gate (PLAN §3.5 L1) consumes.
+gate consumes.
 """
 
 from __future__ import annotations
@@ -77,7 +77,7 @@ def _normalize_str(s: str) -> str:
 
 
 class ObjectiveAgreement(AgreementFunction):
-    """Deterministic-output agreement (PLAN §3.5 L2 objective path).
+    """Deterministic-output agreement.
 
     Key derivation, in priority order:
       * ``key_fn`` — caller predicate returning a hashable key (most general).
@@ -136,7 +136,7 @@ class ObjectiveAgreement(AgreementFunction):
 
 
 class SubjectiveAgreement(AgreementFunction):
-    """Subjective-output agreement via a pluggable ``Judge`` (PLAN §3.5 L2).
+    """Subjective-output agreement via a pluggable ``Judge``.
 
     Delegates the agreement key to the judge. With ``MockJudge`` this is fully
     offline + deterministic; with a real LLM judge it is a network call (later

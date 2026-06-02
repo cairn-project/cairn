@@ -1,4 +1,4 @@
-"""Agreement clustering tests (BUILD-PLAN §18.1, PLAN §3.5 L2).
+"""Agreement clustering tests.
 
 Agreement is semantic, NOT bit-equality. ObjectiveAgreement clusters
 normalized-equal outputs; SubjectiveAgreement + MockJudge clusters

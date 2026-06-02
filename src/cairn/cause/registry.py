@@ -1,14 +1,14 @@
-"""Cause registry + request intake + gated decision + public list (PLAN §3.9).
+"""Cause registry + request intake + gated decision + public list.
 
 Composes on the REAL engine — it does NOT fork the ledger:
-  * ``ledger.blobs``     content-addressed cause storage (PLAN §3.6)
+  * ``ledger.blobs`` content-addressed cause storage
   * ``ledger.translog``  the SAME append-only CT-style log the engine already
-                         writes detection auditability to (PLAN §3.6 "ONE log,
+                         writes detection auditability to ("ONE log,
                          TWO uses"); cause requests + decisions are its second
                          use (CAUSE_REQUEST / CAUSE_DECISION kinds already exist).
-  * ``verify_log``       the no-silent-rejection guarantee (PLAN §3.9).
+  * ``verify_log`` the no-silent-rejection guarantee.
 
-The gate (PLAN §3.9): a cause CANNOT be listed-as-live / accept compute until a
+The gate: a cause CANNOT be listed-as-live / accept compute until a
 decision approves it. ``submit_cause_request`` only records the request (status
 REQUESTED, NOT listable). ``decide_cause`` records a reasoned CAUSE_DECISION —
 approval OR rejection, WITH the reason — and ONLY approval flips the cause
@@ -47,7 +47,7 @@ class CauseRegistry:
     # --- intake --------------------------------------------------------------
 
     def submit_cause_request(self, draft: dict) -> Cause:
-        """Record a cause REQUEST (PLAN §3.9c). NOT publicly listable yet.
+        """Record a cause REQUEST. NOT publicly listable yet.
 
         ``draft`` carries the cause's immutable fields + the requester's
         ``five_frame`` self-assessment + ``created_by``. The id is content-
@@ -104,7 +104,7 @@ class CauseRegistry:
         decider: str,
         gate_result: GateCheckResult,
     ) -> Cause:
-        """Record a reasoned approve/reject decision (PLAN §3.9 no-silent-rejection).
+        """Record a reasoned approve/reject decision.
 
         Enforces: a non-empty ``reason`` (no silent decision) AND a COMPLETE
         five-frame gate-check (every frame addressed — structure enforced). Both
@@ -151,7 +151,7 @@ class CauseRegistry:
     def list_causes(
         self, status_filter: Optional[CauseStatus] = None
     ) -> list[Cause]:
-        """List causes (PLAN §3.9a directory).
+        """List causes.
 
         Default (no filter): ONLY publicly-listable causes (APPROVED / LIVE) —
         the public cause list. An explicit ``status_filter`` returns the
@@ -173,7 +173,7 @@ class CauseRegistry:
     # --- transparency --------------------------------------------------------
 
     def verify_transparency(self):
-        """Independently re-verify the transparency log (PLAN §3.9 / §3.6).
+        """Independently re-verify the transparency log.
 
         Reuses the engine's ``verify_log`` — the no-silent-rejection guarantee
         holds over cause requests + decisions exactly as it does over detection

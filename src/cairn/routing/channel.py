@@ -2,9 +2,9 @@
 
 A routed finding reaches a recipient through a ``RecipientChannel`` — a narrow
 delivery interface (a ``Protocol``). This is the EXTENSION POINT where, in a later
-separately-security-reviewed wave, real network channels (registrar / partner /
-abuse endpoints, email / HTTP transport) will plug in. THIS wave ships ONLY a
-deterministic, OFFLINE ``InMemoryRecipientChannel`` (AC.ROUTE.4): no network, no
+separately security-reviewed phase, real network channels (registrar / partner /
+abuse endpoints, email / HTTP transport) will plug in. THIS release ships ONLY a
+deterministic, OFFLINE ``InMemoryRecipientChannel``: no network, no
 real recipient, no randomness — it records every dispatch and returns a synthetic
 ``DispatchAck`` whose ``ack_ref`` is DERIVED from the dispatch material (so the
 worked example is fully reproducible).
@@ -83,7 +83,7 @@ class RecipientChannel(Protocol):
     """The delivery seam: how a routed finding reaches a recipient.
 
     A channel exposes a ``name`` and a ``deliver(dispatch) -> DispatchAck``. Real
-    network channels implement this Protocol in a later wave; this wave ships only
+    network channels implement this Protocol in a later phase; this release ships only
     the deterministic offline ``InMemoryRecipientChannel``.
     """
 
@@ -94,7 +94,7 @@ class RecipientChannel(Protocol):
 
 
 class InMemoryRecipientChannel:
-    """The ONLY channel shipped this wave — deterministic, offline, no egress.
+    """The ONLY channel shipped this release — deterministic, offline, no egress.
 
     Records every dispatch it receives (inspectable via ``dispatched``) and returns
     a ``DispatchAck`` whose ``ack_ref`` is the sha256 of the dispatch material — so

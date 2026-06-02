@@ -1,4 +1,4 @@
-"""Wave-6 tests: live_smoke over the REAL backbone with a mocked live node (§43).
+"""Tests: live_smoke over the REAL backbone with a mocked live node.
 
 OUTCOME-ALTITUDE: invokes the real ``live_smoke`` on a FRESH ledger with no
 pre-arranged state. The live ``ClaudeCliAdapter`` node's subprocess is mocked via

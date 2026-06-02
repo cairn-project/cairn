@@ -1,4 +1,4 @@
-"""Cause-vetting gate tests (AC.VET.1–4, AC.VET.8).
+"""Cause-vetting gate tests.
 
 Exercises the human cause-vetting queue + its fail-closed bridge into the EXISTING
 ``CauseRegistry.decide_cause``. Offline, deterministic (FixedClock). NO pre-arranged
@@ -41,7 +41,7 @@ def _fresh(tmp_path):
     return ledger, registry, cause
 
 
-# --- AC.VET.1 enqueue --------------------------------------------------------
+# --- enqueue --------------------------------------------------------
 
 
 def test_enqueue_requested_cause_lands_pending_and_logged(tmp_path):
@@ -75,7 +75,7 @@ def test_enqueue_twice_refused(tmp_path):
         queue.enqueue(cause)
 
 
-# --- AC.VET.2 assign ---------------------------------------------------------
+# --- assign ---------------------------------------------------------
 
 
 def test_assign_moves_to_under_review_and_logs(tmp_path):
@@ -89,7 +89,7 @@ def test_assign_moves_to_under_review_and_logs(tmp_path):
     assert kinds.count(KIND_CAUSE_VET_ASSIGNED) == 1
 
 
-# --- AC.VET.3 recorded human verdict + no-silent-rejection -------------------
+# --- recorded human verdict + no-silent-rejection -------------------
 
 
 def test_record_approve_verdict_logged(tmp_path):
@@ -130,7 +130,7 @@ def test_double_verdict_refused(tmp_path):
                              reviewer_id="vetter-1")
 
 
-# --- AC.VET.4 fail-closed bridge into the existing cause decision ------------
+# --- fail-closed bridge into the existing cause decision ------------
 
 
 def test_apply_without_recorded_verdict_refused_and_not_listable(tmp_path):
@@ -170,7 +170,7 @@ def test_apply_reject_verdict_keeps_cause_unlistable(tmp_path):
     assert registry.list_causes() == []
 
 
-# --- AC.VET.8 transparency ---------------------------------------------------
+# --- transparency ---------------------------------------------------
 
 
 def test_full_cause_gate_log_verifies(tmp_path):

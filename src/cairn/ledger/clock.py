@@ -1,6 +1,6 @@
-"""Clock seam — injected time, never a hardwired wall clock (PLAN §3.1).
+"""Clock seam — injected time, never a hardwired wall clock.
 
-Claim leases (PLAN §3.1 churn handling) need a notion of "now" to decide whether
+Claim leases need a notion of "now" to decide whether
 a claim has expired. Hardwiring ``time.time()`` would make lease tests
 non-deterministic, so every component that needs time takes a ``Clock``. The only
 module that touches the real wall clock is ``SystemClock``; everything else asks

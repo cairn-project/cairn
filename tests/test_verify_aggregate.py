@@ -1,8 +1,8 @@
-"""verify_unit end-to-end tests (BUILD-PLAN §18.7 — OUTCOME-ALTITUDE).
+"""verify_unit end-to-end tests (OUTCOME-ALTITUDE).
 
 verify_unit is invoked with N freshly-built CandidateResults and NO pre-arranged
 verdict state — it runs the full L2->L1->L4->L3 + tiebreak pipeline and returns
-one VerifyVerdict. This is the wave's outcome-altitude entry point.
+one VerifyVerdict. This is the layer's outcome-altitude entry point.
 """
 
 from __future__ import annotations

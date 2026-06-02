@@ -1,15 +1,14 @@
 """cairn — distributed cause-coordination engine (Layer A).
 
-``cairn`` is the project's final, owner-ratified name (this closes what was
-formerly tracked as PLAN.md open decision #9). The full Layer-A engine is built:
+The full Layer-A engine is built:
 the work-unit + acceptance-contract spec + validation (the A<->B stable
 interface); the model-agnostic execute / adapter seam; the verify / trust layer
 that aggregates N candidate results into a trust verdict; the ledger /
 transparency log; the cause layer + contributor opt-in; the inert capture
 abstraction; the human-in-the-loop two-gate vetting; the public-transparency
 surfaces; and the routing / action spine. Real-world capture (headless browser /
-network egress) and real external-recipient delivery are deliberately deferred,
-separately-security-reviewed later waves.
+network egress) and real external-recipient delivery are deliberately deferred to
+separate, independently security-reviewed phases.
 """
 
 from __future__ import annotations
@@ -100,7 +99,7 @@ __all__ = [
     # fixtures
     "load_fixture",
     "list_fixtures",
-    # execute / adapter layer (wave 2)
+    # execute / adapter layer
     "Adapter",
     "MockAdapter",
     "render_payload",
@@ -112,7 +111,7 @@ __all__ = [
     "TrivialCalibrationProbe",
     "run_work_unit",
     "ExecuteOutcome",
-    # verify / trust layer (wave 3, PLAN §3.5)
+    # verify / trust layer
     "verify_unit",
     "VerifyVerdict",
     "AgreementFunction",

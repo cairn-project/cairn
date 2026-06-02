@@ -1,6 +1,6 @@
-"""Contributor opt-in registry (PLAN §3.9b — explicit, gated, revocable consent).
+"""Contributor opt-in registry (explicit, gated, revocable consent).
 
-The DEMAND-SIDE of the §3.9 gate: a contributor may opt a node into a cause ONLY
+The DEMAND-SIDE of the gate: a contributor may opt a node into a cause ONLY
 when that cause is publicly listable (approved/live). Opt-in to a non-listable
 cause (requested / rejected / paused) is REFUSED — the same gate that keeps a
 non-vetted cause out of the public list keeps it from accepting compute.
@@ -8,7 +8,7 @@ non-vetted cause out of the public list keeps it from accepting compute.
 Composes on the engine: consent records persist over ``ledger.blobs`` and every
 opt-in / revoke is appended to the SAME append-only transparency log
 (``CONSENT_RECORDED`` / ``CONSENT_REVOKED``), so consent is auditable on the same
-chain as cause decisions and detection results (PLAN §3.6 one-log-two-uses,
+chain as cause decisions and detection results
 extended to consent). It forks nothing.
 """
 
@@ -46,11 +46,11 @@ class OptInRegistry:
     def opt_in(
         self, node_id: str, cause_id: str, agreed_summary: str
     ) -> ConsentRecord:
-        """Record consent for ``node_id`` to work ``cause_id`` (PLAN §3.9b).
+        """Record consent for ``node_id`` to work ``cause_id``.
 
         REFUSES (``OptInRefused``) if the cause is not publicly listable — a
         requested / rejected / paused cause cannot accept contributor compute (the
-        §3.9 gate). Otherwise records an ACTIVE ``ConsentRecord`` and appends a
+         gate). Otherwise records an ACTIVE ``ConsentRecord`` and appends a
         ``CONSENT_RECORDED`` entry to the transparency log.
         """
         # get_cause raises CauseError on an unknown id (surfaced to the caller).
@@ -59,7 +59,7 @@ class OptInRegistry:
             raise OptInRefused(
                 f"cannot opt into cause {cause_id!r}: it is not publicly listable "
                 f"(status={cause.status.value}). Opt-in is only valid for an "
-                "approved/live cause (PLAN §3.9 gate)."
+                "approved/live cause."
             )
 
         record = ConsentRecord(

@@ -1,4 +1,4 @@
-"""Fixture-parse tests (BUILD-PLAN §6.3)."""
+"""Fixture-parse tests."""
 
 from __future__ import annotations
 

@@ -1,7 +1,7 @@
-"""Honeypots / gold-standard seeded units (PLAN §3.5 L4).
+"""Honeypots / gold-standard seeded units.
 
 L4 is *the single most important mechanism for the safety-mission insider
-threat* (PLAN §3.5, research 02 B.1). A honeypot is a work unit whose correct
+threat*. A honeypot is a work unit whose correct
 answer is known in advance. Each node's result is scored against that known
 answer; a node that fails a known-answer unit is flagged and down-weighted
 **regardless of peer agreement**. This is precisely the collusion that L1
@@ -12,9 +12,9 @@ Scoring composes the same ``AgreementFunction`` used for quorum: a node's result
 "passes" the honeypot iff it agrees (same cluster key) with the expected output.
 The per-node scores feed the reputation accumulator (``reputation.py``, L3).
 
-This wave builds the honeypot SCORING + the reputation-feed seam. WHICH units are
-honeypots and how densely they are seeded is the trusted core's job (PLAN §3.5
-B.4, owner-gated) — not built here.
+This release builds the honeypot SCORING + the reputation-feed seam. WHICH units
+are honeypots and how densely they are seeded is the trusted core's
+responsibility — not built here.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ class HoneypotScore:
 
 @dataclass
 class Honeypot:
-    """A seeded unit carrying a known-expected answer (PLAN §3.5 L4).
+    """A seeded unit carrying a known-expected answer.
 
     ``expected_output`` is the gold-standard result output. ``agreement`` is the
     function used to decide whether a node's output matches it — defaults to a
@@ -67,7 +67,7 @@ class Honeypot:
         """Score each node's result against the known answer.
 
         ``node_id`` is taken from the candidate's ``adapter_name`` (the per-node
-        identity available this wave; a real node identity arrives with the
+        identity available this release; a real node identity arrives with the
         ledger). Pass iff the result's agreement key equals the expected key —
         i.e. the node's answer semantically matches the gold standard.
         """

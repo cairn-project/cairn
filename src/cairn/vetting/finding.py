@@ -7,7 +7,7 @@ NO domain detection logic; ``flag_label`` is an opaque generic string), plus
 provenance. It carries NO scam/phishing/sensitive content — the language is
 clinical and abstract by construction.
 
-Content-addressing mirrors the engine (PLAN §3.6): ``finding_hash`` is the sha256
+Content-addressing mirrors the engine: ``finding_hash`` is the sha256
 of the canonical JSON of the immutable material, so an identical flagged item
 always yields an identical hash (dedup + tamper-evidence), and the hash equals the
 blob content key the finding is stored under (``finding_queue.py``).

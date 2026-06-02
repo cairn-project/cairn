@@ -1,6 +1,6 @@
-"""The benign pilot cause — open-source-license classification (BUILD-PLAN §31).
+"""The benign pilot cause — open-source-license classification.
 
-A concrete, NON-SENSITIVE distributed-analysis task expressed as REAL wave-1 work
+A concrete, NON-SENSITIVE distributed-analysis task expressed as REAL work
 units: for each bundled benign text snippet (a dataset license blurb), a node must
 emit ``{is_open_license: bool, license_id: string}``. The answer is
 deterministically derivable from the snippet text, so it is machine-checkable
@@ -9,7 +9,7 @@ and is satisfiable by N distinct-family nodes that AGREE (diversity quorum).
 
 The cause reuses the EXACT shape of ``fixtures/benign_pilot.json`` (schema 1.0.0,
 the ``{is_open_license, license_id}`` output schema, the same acceptance
-predicates). It does NOT introduce a new spec — it instantiates the wave-1 one.
+predicates). It does NOT introduce a new spec — it instantiates the one.
 
 Inputs are bundled (``fixtures/pilot_license_snippets.json``) — no network.
 """
@@ -23,7 +23,7 @@ from typing import Any
 PILOT_CAUSE_ID = "pilot.oss-license-classification"
 
 # Which unit is the gold-standard SEED whose Honeypot scores every node against
-# the known answer (PLAN §3.5 L4). Any snippet works; we seed a clear positive.
+# the known answer. Any snippet works; we seed a clear positive.
 HONEYPOT_SNIPPET_ID = "bike-counts"
 
 _SNIPPETS_FIXTURE = "pilot_license_snippets.json"
@@ -84,7 +84,7 @@ def unit_task_id(snippet_id: str) -> str:
 
 
 def build_unit(snippet: dict[str, Any]) -> dict[str, Any]:
-    """Build ONE wave-1 work-unit dict from a snippet (reusing benign_pilot shape).
+    """Build ONE work-unit dict from a snippet (reusing benign_pilot shape).
 
     ``model_diversity`` is set explicitly to 2 so the anti-collusion diversity
     gate is ON and satisfiable by two distinct model families.

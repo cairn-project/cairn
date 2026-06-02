@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cairn.example/spec/work_unit/v1.json",
   "title": "Work Unit",
-  "description": "The model-agnostic work-unit + acceptance-contract spec (PLAN.md §3.3, research 02 A.1). The single stable interface between Layer A (engine) and Layer B (a cause). The portable payload is objective + inputs + output_schema + acceptance_contract; everything model-specific is synthesized locally by an adapter (not in scope for wave 1).",
+  "description": "The model-agnostic work-unit + acceptance-contract spec. The single stable interface between Layer A (engine) and Layer B (a cause). The portable payload is objective + inputs + output_schema + acceptance_contract; everything model-specific is synthesized locally by an adapter (not in scope for this spec).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -30,7 +30,7 @@
     },
     "cause_id": {
       "type": "string",
-      "description": "First-class cause binding (PLAN §2). Which coordinated effort this unit serves; each cause owns its own ledger / partner-bindings / trust-core.",
+      "description": "First-class cause binding. Which coordinated effort this unit serves; each cause owns its own ledger / partner-bindings / trust-core.",
       "minLength": 1
     },
     "objective": {
@@ -39,7 +39,7 @@
       "minLength": 1
     },
     "inputs": {
-      "description": "The data to operate on: EITHER inline data OR a content-addressed pointer + hash (research 02 A.1). Exactly one form.",
+      "description": "The data to operate on: EITHER inline data OR a content-addressed pointer + hash. Exactly one form.",
       "type": "object",
       "oneOf": [
         {
@@ -57,7 +57,7 @@
           "properties": {
             "pointer": {
               "type": "string",
-              "description": "Content-addressed pointer to the input blob (e.g. a CID or ledger path). Resolution is a later-wave concern; the spec only carries the reference.",
+              "description": "Content-addressed pointer to the input blob (e.g. a CID or ledger path). Resolution is a later-phase concern; the spec only carries the reference.",
               "minLength": 1
             },
             "hash": {
@@ -71,7 +71,7 @@
     },
     "output_schema": {
       "type": "object",
-      "description": "JSON Schema describing the required result structure. The runtime-agnostic contract; the more structured, the cheaper objective verification becomes (research 02). Carried as an embedded schema document; not itself validated against draft meta-schema in wave 1."
+      "description": "JSON Schema describing the required result structure. The runtime-agnostic contract; the more structured, the cheaper objective verification becomes. Carried as an embedded schema document; not itself validated against the draft meta-schema here."
     },
     "acceptance_contract": {
       "type": "object",
@@ -89,7 +89,7 @@
     "capability_floor": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Minimum capability the unit needs. Lets the dispatcher route units away from runtimes that can't do them. Model-agnostic WITHIN a capability tier, not uniformly (F2, research 02 A.2). Self-declared capability is itself untrusted (calibration probe is a later wave).",
+      "description": "Minimum capability the unit needs. Lets the dispatcher route units away from runtimes that can't do them. Model-agnostic WITHIN a capability tier, not uniformly. Self-declared capability is itself untrusted (calibration probe is a later phase).",
       "properties": {
         "context_window": {
           "type": "integer",
@@ -112,7 +112,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["target_nresults", "min_quorum"],
-      "description": "Redundancy + quorum config the (deferred) verify layer consumes (PLAN §3.5, research 02 Part B). Wave 1 ships the fields; no quorum logic.",
+      "description": "Redundancy + quorum config the (deferred) verify layer consumes. This spec ships the fields; no quorum logic.",
       "properties": {
         "target_nresults": {
           "type": "integer",
@@ -134,7 +134,7 @@
     "provenance_requirements": {
       "type": "object",
       "additionalProperties": false,
-      "description": "What the runtime must attest per result (research 02 A.1). Feeds the deferred audit-trail / transparency ledger (PLAN §3.6).",
+      "description": "What the runtime must attest per result. Feeds the deferred audit-trail / transparency ledger.",
       "properties": {
         "model_family": {
           "type": "boolean",
@@ -159,7 +159,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["duration_seconds"],
-      "description": "Optional claim lease; reclaim-and-reissue on expiry (BOINC-style). Claim/CAS logic is a later wave (ledger, PLAN §3.1).",
+      "description": "Optional claim lease; reclaim-and-reissue on expiry (BOINC-style). Claim/CAS logic is a later phase (ledger).",
       "properties": {
         "duration_seconds": {
           "type": "integer",

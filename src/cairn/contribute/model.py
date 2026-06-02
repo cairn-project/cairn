@@ -1,7 +1,8 @@
-"""The contributor consent record (PLAN §3.9b).
+"""The contributor consent record.
 
-PLAN §3.9b: "explicit contributor OPT-IN. Informed consent to exactly what their
-AI will do + which cause — never silent enlistment." A ``ConsentRecord`` is that
+Contribution requires an explicit contributor OPT-IN: informed consent to
+exactly what their AI will do and which cause — never silent enlistment. A
+``ConsentRecord`` is that
 informed consent made durable: WHO (node_id), WHICH cause (cause_id), WHEN
 (consented_at), WHAT they agreed to (agreed_summary, human-readable), and whether
 the consent is still ACTIVE (revocable).

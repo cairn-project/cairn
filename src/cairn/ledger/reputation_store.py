@@ -1,16 +1,15 @@
-"""Ledger-backed reputation persistence (PLAN §3.5 L3 — "persistence belong to
-the ledger wave").
+"""Ledger-backed reputation persistence — persistence belongs to the ledger layer.
 
-Wave 3 shipped ``InMemoryReputation`` and explicitly deferred persistence to this
-wave. ``LedgerReputation`` keeps the wave-3 ``Reputation`` interface unchanged
-(``score`` / ``apply`` / ``apply_all``) and reuses the wave-3 bounding math
+The verify layer ships ``InMemoryReputation`` and defers persistence to this
+layer. ``LedgerReputation`` keeps the ``Reputation`` interface unchanged
+(``score`` / ``apply`` / ``apply_all``) and reuses the bounding math
 (neutral prior, [0,1] bounds, per-event weights) by subclassing
 ``InMemoryReputation`` — it does NOT fork the scoring logic. It adds durability:
 every applied ``ReputationDelta`` is appended to an on-disk JSONL log, and a fresh
 instance ``replay()``s that log to rebuild identical scores.
 
 This replaces the in-memory-only store with a ledger-backed one while preserving
-the earned-not-asserted semantics of wave 3.
+the earned-not-asserted semantics of.
 """
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from ..verify.reputation import (
 
 
 class LedgerReputation(InMemoryReputation):
-    """Durable reputation: wave-3 math, persisted as an append-only delta log."""
+    """Durable reputation: math, persisted as an append-only delta log."""
 
     def __init__(
         self,
@@ -41,7 +40,7 @@ class LedgerReputation(InMemoryReputation):
 
     def replay(self) -> None:
         """Rebuild in-memory scores from the persisted delta log."""
-        # Reset, then fold every persisted delta through the wave-3 math.
+        # Reset, then fold every persisted delta through the math.
         self._scores = {}
         if not self._path.exists():
             return
@@ -60,7 +59,7 @@ class LedgerReputation(InMemoryReputation):
                 super().apply(delta)
 
     def apply(self, delta: ReputationDelta) -> float:
-        """Apply one delta: fold in-memory (wave-3 math) AND append durably."""
+        """Apply one delta: fold in-memory (math) AND append durably."""
         new_score = super().apply(delta)
         with open(self._path, "a", encoding="utf-8") as fh:
             fh.write(

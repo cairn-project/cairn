@@ -1,12 +1,11 @@
 """Calibration-probe stub — validate a node's self-declared capabilities on join.
 
-research 01 §5.4 / PLAN §3.3 F2: "self-declared capability is itself an untrusted
-claim — does it get verified (a calibration probe task on join)?" The answer is
-yes, but the full adversarial probe (a real probe work-unit a joining node must
-execute and pass, so it cannot lie about a capability it does not actually have)
-is DEFERRED.
+Self-declared capability is itself an untrusted claim — does it get verified (a
+calibration probe task on join)? The answer is yes, but the full adversarial
+probe (a real probe work-unit a joining node must execute and pass, so it cannot
+lie about a capability it does not actually have) is DEFERRED.
 
-Wave 2 ships only the SHAPE: an abstract ``CalibrationProbe`` interface and a
+This module ships only the SHAPE: an abstract ``CalibrationProbe`` interface and a
 trivial implementation that checks the declared ``Capabilities`` are internally
 well-formed (non-negative context window, recognized modalities). This is a
 necessary-not-sufficient gate — it catches obviously-malformed declarations; it
@@ -21,7 +20,7 @@ from dataclasses import dataclass, field
 
 from .capability import Capabilities
 
-# Modalities the protocol recognizes this wave. A declared modality outside this
+# Modalities the protocol recognizes this release. A declared modality outside this
 # set is treated as malformed by the trivial probe (open to extension later).
 KNOWN_MODALITIES = frozenset({"text", "image", "audio", "video", "code"})
 
@@ -44,7 +43,7 @@ class CalibrationProbe(ABC):
     A real probe (deferred) issues an actual probe work-unit to the runtime and
     confirms the produced result is consistent with the self-declared
     ``Capabilities`` (e.g. a long-context probe only the claimed window can pass).
-    Wave 2 defines the seam; ``TrivialCalibrationProbe`` is the placeholder.
+     defines the seam; ``TrivialCalibrationProbe`` is the placeholder.
     """
 
     @abstractmethod
@@ -61,7 +60,7 @@ class TrivialCalibrationProbe(CalibrationProbe):
       * every declared modality is in ``KNOWN_MODALITIES``.
 
     It does NOT execute a probe task — it cannot catch an honest-looking lie. The
-    real adversarial probe is deferred (research 01 §5.4).
+    real adversarial probe is deferred.
     """
 
     def verify(self, capabilities: Capabilities) -> CalibrationResult:

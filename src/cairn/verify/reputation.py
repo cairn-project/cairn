@@ -1,7 +1,7 @@
-"""Reputation hook — earned reliability, never self-asserted (PLAN §3.5 L3).
+"""Reputation hook — earned reliability, never self-asserted.
 
 A minimal per-node and per-``model_family`` reliability accumulator. Reputation
-is EARNED via two signals (PLAN §3.5 L3, research 02 B.1):
+is EARNED via two signals:
   * agreement-with-consensus (a node in the winning quorum cluster gains; a node
     in a losing/minority cluster loses), and
   * honeypot outcomes (L4 — a honeypot pass gains, a honeypot FAIL is penalized
@@ -9,10 +9,10 @@ is EARNED via two signals (PLAN §3.5 L3, research 02 B.1):
     signal available and the one a colluder cannot fake).
 
 A new identity has no entry and therefore the neutral prior — the Sybil
-*reset-to-zero-on-new-identity* and persistence belong to the ledger wave; this
-wave sets the prior + the in-memory accumulation. Scores are bounded to [0, 1].
+*reset-to-zero-on-new-identity* and persistence belong to the ledger layer; this
+module sets the prior + the in-memory accumulation. Scores are bounded to [0, 1].
 
-Subjects are namespaced strings: a bare node id (``adapter_name`` this wave) or
+Subjects are namespaced strings: a bare node id (``adapter_name`` this release) or
 ``family:<model_family>`` for the per-family aggregate. The verify aggregator
 emits one delta per node AND one per family so both views accumulate.
 """
@@ -86,7 +86,7 @@ class Reputation(ABC):
 
 
 class InMemoryReputation(Reputation):
-    """In-memory bounded reputation accumulator (persistence = ledger wave)."""
+    """In-memory bounded reputation accumulator (persistence = ledger layer)."""
 
     def __init__(self, prior: float = NEUTRAL_PRIOR) -> None:
         self._prior = prior

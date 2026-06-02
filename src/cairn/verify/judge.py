@@ -1,13 +1,13 @@
-"""Judge seam + deterministic offline MockJudge (PLAN §3.5 L2).
+"""Judge seam + deterministic offline MockJudge.
 
-Heterogeneous LLM outputs never bit-match (research 02 A.0/B.0), so semantic
+Heterogeneous LLM outputs never bit-match, so semantic
 agreement cannot be exact-equality on raw text. A ``Judge`` maps a
 ``CandidateResult`` to an ``agreement_key`` — two results that the judge regards
 as semantically equivalent share a key and therefore cluster together.
 
 The real judge is an LLM-as-judge that makes a network call (cross-model majority
 voting raised precision 73.1% -> 95.6%, arXiv 2411.06535). That is a FOLLOW-ON
-increment — this wave ships ONLY the abstract seam plus a deterministic,
+increment — this release ships ONLY the abstract seam plus a deterministic,
 fully-offline ``MockJudge`` so the verify layer is testable with no network.
 
 ``MockJudge`` canonicalizes an output to a normal form (lowercase, collapsed

@@ -1,4 +1,4 @@
-"""Cause-scoped run loop tests (PLAN §2 + §3.3 + §3.9b).
+"""Cause-scoped run loop tests.
 
 Drives ``run_cause`` over the REAL engine (ledger / execute / verify / translog)
 + the REAL cause layer. Offline.

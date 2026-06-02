@@ -1,4 +1,4 @@
-"""capture_packet (gated) + load_packet_for_analysis (open) — AC.CAP.3/4/5."""
+"""capture_packet (gated) + load_packet_for_analysis (open)."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def test_capture_refused_for_ungranted_node(tmp_path):
 
 
 def test_capture_composes_on_ledger_and_translog(tmp_path):
-    # AC.CAP.4: packet content-addressed at packet_hash; PACKET_CAPTURED logged.
+    #: packet content-addressed at packet_hash; PACKET_CAPTURED logged.
     ledger = _ledger(tmp_path)
     gate = _granted(ledger)
     packet = capture_packet(
@@ -73,7 +73,7 @@ def test_revoke_then_capture_re_refuses(tmp_path):
 
 
 def test_load_for_analysis_is_open_and_returns_view(tmp_path):
-    # AC.CAP.5: loading a packet needs NO gate; returns an AnalysisView the
+    #: loading a packet needs NO gate; returns an AnalysisView the
     # analyst can read + judge from alone.
     ledger = _ledger(tmp_path)
     gate = _granted(ledger)

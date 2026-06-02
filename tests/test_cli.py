@@ -1,4 +1,4 @@
-"""Wave-5 tests: the thin cairn CLI (BUILD-PLAN §35).
+"""Tests: the thin cairn CLI.
 
 Exercises the REAL CLI entry via subprocess (OUTCOME-ALTITUDE: no pre-arranged
 state) and also via ``main()`` in-process for the verify-log OK/tamper paths.

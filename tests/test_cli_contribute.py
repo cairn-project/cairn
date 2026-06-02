@@ -1,4 +1,4 @@
-"""CLI tests for `cairn contribute` (PLAN §3.9b).
+"""CLI tests for `cairn contribute`.
 
 Exercises the REAL CLI: the outcome-altitude e2e runs via subprocess (fresh
 ledger dir, no pre-arranged state) — submit→approve a benign cause, then
@@ -58,7 +58,7 @@ def test_contribute_refused_for_unapproved_cause(tmp_path):
     ledger_dir = tmp_path / "ledger"
     cause_id = _request_id(ledger_dir)  # requested, NOT approved
     proc = _run_cli(["contribute", cause_id, "--ledger", str(ledger_dir)])
-    assert proc.returncode == 1  # the §3.9 gate refuses opt-in
+    assert proc.returncode == 1 # the gate refuses opt-in
     assert "REFUSED" in proc.stdout
 
 

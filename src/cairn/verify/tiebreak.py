@@ -1,4 +1,4 @@
-"""Disagreement / tiebreak policy (PLAN §3.5 L1, research 01 §1 + §3.2).
+"""Disagreement / tiebreak policy.
 
 Gensyn-style "tiebreak the disputed unit only": when a unit fails to reach a
 valid quorum because results SPLIT (``DISPUTED``) or there were simply too few
@@ -7,7 +7,7 @@ escalate ONE more node for *that unit only* rather than re-running the campaign.
 
 This module emits a ``TiebreakDecision`` — a returned policy decision, NOT a live
 re-dispatch. Transport (actually pulling another node) is the ledger/transport
-wave; here we only DECIDE whether escalation is warranted and by how many nodes,
+layer; here we only DECIDE whether escalation is warranted and by how many nodes,
 bounded by the unit's ``target_nresults`` headroom (don't escalate past the
 budget the policy set).
 """
@@ -33,7 +33,7 @@ class TiebreakDecision:
     ``escalate`` — escalate one (or more) additional node(s) for this unit only.
     ``extra_nodes`` — how many to escalate (1 = the Gensyn single-tiebreak).
     ``reason`` — human-readable justification. ``unit_task_id`` — the unit.
-    A returned POLICY, never a live re-dispatch (transport = ledger wave).
+    A returned POLICY, never a live re-dispatch (transport = ledger layer).
     """
 
     escalate: bool

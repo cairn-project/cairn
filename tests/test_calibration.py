@@ -1,6 +1,6 @@
-"""Calibration-probe stub tests (BUILD-PLAN §12.4).
+"""Calibration-probe stub tests.
 
-research 01 §5.4 — self-declared capability is untrusted; the trivial probe
+ — self-declared capability is untrusted; the trivial probe
 checks well-formedness only (necessary, not sufficient). Real adversarial
 probing is deferred.
 """

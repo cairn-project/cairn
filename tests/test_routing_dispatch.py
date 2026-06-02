@@ -1,4 +1,4 @@
-"""Dispatch driver — fail-closed gate + recorded action + transparency (AC.ROUTE.5/6/7).
+"""Dispatch driver — fail-closed gate + recorded action + transparency.
 
 dispatch_routable_finding fail-closed gates on FindingVetQueue.is_routable (REFUSES a
 PENDING/REJECTED finding), selects the recipient, delivers, and records FINDING_ROUTED
@@ -57,7 +57,7 @@ def _flag(queue, *, confidence=0.9):
     )
 
 
-# --- AC.ROUTE.5 — fail-closed on the human-verified gate ---------------------
+# --- fail-closed on the human-verified gate ---------------------
 
 
 def test_pending_finding_no_verdict_is_refused_not_routed(tmp_path):
@@ -98,7 +98,7 @@ def test_rejected_finding_is_refused_not_routed(tmp_path):
     assert channel.dispatched == ()
 
 
-# --- AC.ROUTE.6 — recorded action (the prime-directive unit) -----------------
+# --- recorded action (the prime-directive unit) -----------------
 
 
 def test_routable_finding_is_delivered_and_recorded(tmp_path):
@@ -168,7 +168,7 @@ def test_no_match_finding_escalates_to_fallback_recorded_no_drop(tmp_path):
     assert routed.payload["route_reason"] == "escalated_to_fallback"
 
 
-# --- AC.ROUTE.7 — transparency / verify_log ----------------------------------
+# --- transparency / verify_log ----------------------------------
 
 
 def test_verify_log_covers_the_new_routing_kinds(tmp_path):

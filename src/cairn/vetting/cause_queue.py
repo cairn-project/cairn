@@ -1,6 +1,6 @@
 """Cause-vetting gate — the human review queue feeding the existing cause decision.
 
-The first of the two fail-closed gates (BUILD-PLAN §1, Gate 1). A human
+The first of the two fail-closed gates (Gate 1). A human
 cause-vetter reviews a REQUESTED cause before it can become approved/listed. This
 composes on the EXISTING cause request→decision path (``cause/registry.py``); it
 does NOT fork the cause decision. It adds:
@@ -88,7 +88,7 @@ class CauseVetQueue:
         self._index_dir = Path(ledger._root) / "cause_vet_queue"  # noqa: SLF001
         self._index_dir.mkdir(parents=True, exist_ok=True)
 
-    # --- enqueue (AC.VET.1) --------------------------------------------------
+    # --- enqueue --------------------------------------------------
 
     def enqueue(self, cause: Cause) -> PendingCauseReview:
         """Enqueue a REQUESTED cause for human review; log ``CAUSE_VET_ENQUEUED``.
@@ -118,7 +118,7 @@ class CauseVetQueue:
         )
         return item
 
-    # --- assign (AC.VET.2) ---------------------------------------------------
+    # --- assign ---------------------------------------------------
 
     def assign(self, cause_id: str, reviewer_id: str) -> PendingCauseReview:
         """Assign a pending item to a reviewer (AWAITING_REVIEW → UNDER_REVIEW)."""
@@ -141,7 +141,7 @@ class CauseVetQueue:
         )
         return updated
 
-    # --- record human verdict (AC.VET.3) -------------------------------------
+    # --- record human verdict -------------------------------------
 
     def record_verdict(
         self, cause_id: str, approve: bool, reason: str, reviewer_id: str
@@ -182,7 +182,7 @@ class CauseVetQueue:
         )
         return updated
 
-    # --- the fail-closed bridge into the existing cause decision (AC.VET.4) --
+    # --- the fail-closed bridge into the existing cause decision --
 
     def apply_cause_verdict(
         self,

@@ -8,10 +8,10 @@
 > a complete treatment would require sensitive, mission-specific detail; those are
 > consolidated in [§5](#5-open-areas--to-flesh-out) as the maintainer's follow-ups.
 >
-> This model covers the engine code in **this** repository at its current wave.
-> The network-touching waves named throughout `SECURITY.md` (real headless-browser
+> This model covers the engine code in **this** repository at its current phase.
+> The network-touching phases named throughout `SECURITY.md` (real headless-browser
 > capture, real external-recipient egress) are **not yet in this repository** and
-> are each a separately security-reviewed wave; this document notes where their
+> are each an independently security-reviewed phase; this document notes where their
 > trust boundary will sit but does not model their internals.
 
 ---
@@ -83,7 +83,7 @@ crossing. The boundaries in this repository:
 
 Two boundaries named in `SECURITY.md` are **deferred trust seams** — present in
 the code as a deterministic offline placeholder, with the real network crossing
-scheduled for a later, separately-reviewed wave:
+scheduled for a later, independently reviewed phase:
 
 - The `RecipientChannel` delivery seam (today only the offline
   `InMemoryRecipientChannel`) is where real external egress will eventually live.
@@ -91,7 +91,7 @@ scheduled for a later, separately-reviewed wave:
   a real headless-browser / network fetch will eventually live.
 
 The boundary is named now precisely so the invariants below are stated in terms
-the future network wave must continue to satisfy.
+the future network phase must continue to satisfy.
 
 ---
 
@@ -242,7 +242,7 @@ abuse case would require sensitive detail.
 
 ## 4. Existing mitigations (verified against the code)
 
-The invariants above are not aspirational; the current wave already implements
+The invariants above are not aspirational; the current phase already implements
 these mitigations (each checked against `src/`):
 
 - **Fail-closed capture role.** `CaptureGate.is_granted` returns False for an
@@ -302,13 +302,13 @@ maintainer (the owner-authorized in-parts approach).
 | INV-U3 | Long-horizon non-repudiation / external anchoring of the transparency-log head. |
 
 Two cross-cutting follow-ups, both already named as deferred network seams in
-`SECURITY.md`, will need their own threat treatment when their wave lands:
+`SECURITY.md`, will need their own threat treatment when their phase lands:
 
 - **The real capture port** (headless-browser / network fetch) — the live-target
   trust boundary that today is held by the offline `StaticDocumentCapturePort`.
 - **The real recipient channel** (external egress) — the network delivery boundary
   that today is held by the offline `InMemoryRecipientChannel`.
 
-When those waves are designed, the invariants in [§3](#3-security-invariants--properties-that-must-hold)
+When those phases are designed, the invariants in [§3](#3-security-invariants--properties-that-must-hold)
 should be re-checked to confirm each still holds across the new network crossing,
 and the relevant placeholders revisited with their now-concrete attack surface.

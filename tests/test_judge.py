@@ -1,4 +1,4 @@
-"""MockJudge determinism tests (BUILD-PLAN §18.2, PLAN §3.5 L2).
+"""MockJudge determinism tests.
 
 The MockJudge is a deterministic offline test double for the real LLM judge.
 Its agreement_key must be deterministic, key-order-insensitive, and

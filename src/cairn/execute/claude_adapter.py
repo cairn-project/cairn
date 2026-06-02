@@ -1,29 +1,27 @@
-"""ClaudeCliAdapter — the FIRST live-model adapter (wave 6, BUILD-PLAN §38-§41).
+"""ClaudeCliAdapter — the first live-model adapter.
 
-The wave-2 ``Adapter`` seam's first LIVE implementation: instead of the
-deterministic offline ``MockAdapter`` / ``PilotNodeAdapter`` stand-ins, this
-adapter does a real Cairn work unit by calling a REAL Claude model through the
-subscription ``claude -p`` CLI (owner-approved). It renders the portable payload,
-builds a JSON-only prompt, spawns an ISOLATED ``claude -p``, parses the JSON out
-of the response (tolerating code fences / surrounding prose), and returns a
-``CandidateResult`` stamped ``model_family="claude"`` with real provenance.
+The ``Adapter`` seam's first LIVE implementation: instead of the deterministic
+offline ``MockAdapter`` / ``PilotNodeAdapter`` stand-ins, this adapter runs a real
+Cairn work unit by calling a Claude model through the ``claude -p`` CLI. It
+renders the portable payload, builds a JSON-only prompt, spawns an ISOLATED
+``claude -p``, parses the JSON out of the response (tolerating code fences /
+surrounding prose), and returns a ``CandidateResult`` stamped
+``model_family="claude"`` with real provenance.
 
-NON-NEGOTIABLE SPAWN ISOLATION (BUILD-PLAN §39): the spawn MUST NOT load the
-parent's plugins — in particular the Telegram MCP plugin, which an un-isolated
-``claude`` spawn loads and SIGTERM-steals the single bot slot, dropping the
-owner's live Telegram channel (PROVEN root cause 2026-05-29). The argv this
-adapter builds always carries ``--strict-mcp-config`` together with an EMPTY
-``--mcp-config`` (an empty-servers object) so NO MCP servers / plugins load.
-Cairn is standalone — this does NOT import loam's ``claude_print_client``; it is
-Cairn's own minimal isolated wrapper with the same discipline.
+SPAWN ISOLATION: the spawn MUST NOT inherit the caller environment's MCP servers
+or plugins — an un-isolated CLI spawn can load and interfere with whatever the
+caller has configured. The argv this adapter builds always carries
+``--strict-mcp-config`` together with an EMPTY ``--mcp-config`` (an empty-servers
+object) so NO MCP servers / plugins load. This is a self-contained minimal
+wrapper with no external dependency.
 
-FAIL-CLOSED (BUILD-PLAN §41): a nonzero exit, a timeout, an empty response, or
-unparseable output yields a ``CandidateResult`` with an empty ``{}`` output that
-the unit's acceptance contract REJECTS — never a crash, never a wave-through.
+FAIL-CLOSED: a nonzero exit, a timeout, an empty response, or unparseable output
+yields a ``CandidateResult`` with an empty ``{}`` output that the unit's
+acceptance contract REJECTS — never a crash, never a wave-through.
 
-TESTABILITY (BUILD-PLAN §40): the real spawn is reached only through the default
-``transcript_fn``. Inject a fake ``transcript_fn`` (``prompt -> str``) to keep the
-offline suite deterministic without ever calling real claude.
+TESTABILITY: the real spawn is reached only through the default ``transcript_fn``.
+Inject a fake ``transcript_fn`` (``prompt -> str``) to keep the offline suite
+deterministic without ever calling real claude.
 """
 
 from __future__ import annotations
@@ -43,14 +41,14 @@ from .result import CandidateResult
 #: adapter implementation version (provenance).
 _ADAPTER_VERSION = "claude-cli-0.1.0"
 
-#: default subscription model tier for the live call (no API key; cheap default).
+#: default model tier for the live call (a cheap default).
 _DEFAULT_MODEL = "sonnet"
 
 #: default subprocess timeout for one model call (seconds).
 _DEFAULT_TIMEOUT = 120.0
 
 #: the empty MCP-servers config written next to every spawn — strict + empty
-#: means NO MCP servers / plugins load (the Telegram-plugin isolation guarantee).
+#: means NO MCP servers / plugins load (the spawn-isolation guarantee).
 _EMPTY_MCP_CONFIG = {"mcpServers": {}}
 
 #: the strict isolation flag the regression test asserts is always present.
@@ -88,7 +86,7 @@ def _build_claude_argv(
     """Build the ISOLATED ``claude -p`` argv (pure — the regression-test unit).
 
     The argv ALWAYS carries ``--strict-mcp-config`` plus ``--mcp-config
-    <empty-servers config>`` so no MCP servers / plugins load (BUILD-PLAN §39).
+    <empty-servers config>`` so no MCP servers / plugins load.
     ``--output-format json`` lets the wrapper read the real model id for
     provenance. This function does no I/O — the caller writes the empty config to
     ``mcp_config_path`` first.
@@ -137,7 +135,7 @@ def _real_claude_print(
 ) -> str:
     """The REAL isolated ``claude -p`` spawn (default ``transcript_fn``).
 
-    Writes the empty MCP config, builds the isolated argv (§39), runs the
+    Writes the empty MCP config, builds the isolated argv, runs the
     subprocess feeding ``prompt`` on stdin, and returns the model's result text.
     Raises ``ClaudeCliError`` on nonzero exit / timeout / empty output so the
     adapter can fail closed.
@@ -208,7 +206,7 @@ def _extract_json(text: str) -> Optional[dict[str, Any]]:
 
 
 def _build_prompt(payload: RenderedPayload) -> str:
-    """Build the JSON-only prompt from the neutral rendered payload (§41).
+    """Build the JSON-only prompt from the neutral rendered payload.
 
     Reuses the vendor-neutral ``payload.prompt`` (objective + inputs + schema) and
     appends a strict JSON-only instruction. We still parse tolerantly downstream.

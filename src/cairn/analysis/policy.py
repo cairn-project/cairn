@@ -1,4 +1,4 @@
-"""Flagging policy — the generic, mission-neutral seam (BUILD-PLAN §4).
+"""Flagging policy — the generic, mission-neutral seam.
 
 A ``FlagPolicy`` maps a verify-layer ``VerifyVerdict`` to a ``FlagDecision``: an
 optional ``AutomatedVerdict`` (an OPAQUE ``flag_label`` + a ``confidence`` in
@@ -7,9 +7,9 @@ injectable point that keeps the analysis→finding bridge mission-neutral: it
 hard-codes NO domain vocabulary. ``flag_label`` is a caller-supplied opaque
 string; the threshold is a generic numeric bound.
 
-Why a policy seam, not an inline threshold (BUILD-PLAN §2): a "units of interest"
+Why a policy seam, not an inline threshold: a "units of interest"
 decision is RUNTIME / per-cause behaviour, not engine identity. The general
-engine runs many causes (PLAN §3.8), each able to supply its own flagging bar
+engine runs many causes, each able to supply its own flagging bar
 without touching the bridge. The only policy shipped here is the generic
 ``ThresholdFlagPolicy`` — a confidence threshold over an accepted verdict's
 output. No scam/sensitive/detection logic exists in this module by construction.

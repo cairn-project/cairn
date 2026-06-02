@@ -1,4 +1,4 @@
-"""flag_from_verdict — the analysis→finding bridge driver (BUILD-PLAN §6).
+"""flag_from_verdict — the analysis→finding bridge driver.
 
 The bridge owns the DECISION (the injected policy) and delegates the RECORD to the
 existing ``FindingVetQueue.flag``. A declined policy produces NO finding and writes

@@ -1,6 +1,6 @@
-"""Wave-5 tests: the benign pilot cause is well-formed (BUILD-PLAN §35).
+"""Tests: the benign pilot cause is well-formed.
 
-Every pilot unit validates against the wave-1 schema; each unit's gold answer
+Every pilot unit validates against the schema; each unit's gold answer
 passes that unit's OWN acceptance contract; the honest adapter produces the gold
 answer and the wrong adapter diverges (but stays schema-valid).
 """

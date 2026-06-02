@@ -1,4 +1,4 @@
-"""Shared builders for the wave-3 verify-layer tests.
+"""Shared builders for the verify-layer tests.
 
 A tiny factory for ``CandidateResult``s so the verify tests can construct N
 results from N nodes with controllable output + model_family without standing up

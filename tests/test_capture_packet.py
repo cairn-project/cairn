@@ -1,4 +1,4 @@
-"""Inert-by-construction + content-address properties (AC.CAP.1, AC.CAP.2).
+"""Inert-by-construction + content-address properties.
 
 The packet/observation/view types are the load-bearing safety abstraction: they
 must hold ONLY static JSON data and must expose NO live-fetch surface, so an
@@ -85,7 +85,7 @@ def test_packet_round_trip_detects_tamper():
 
 
 def test_packet_and_view_expose_no_live_locator_field():
-    # AC.CAP.2: no public attribute of the packet OR the analyst view names a
+    #: no public attribute of the packet OR the analyst view names a
     # dereferenceable live locator. target_ref is opaque (not a url/* field).
     p = _make_packet()
     view = AnalysisView.of(p)
@@ -97,7 +97,7 @@ def test_packet_and_view_expose_no_live_locator_field():
 
 
 def test_view_exposes_no_fetch_method():
-    # AC.CAP.2: no public method of the view (or packet) fetches/visits a live
+    #: no public method of the view (or packet) fetches/visits a live
     # target — "re-visit the live target" is not expressible.
     p = _make_packet()
     view = AnalysisView.of(p)

@@ -1,4 +1,4 @@
-"""Quorum + model-diversity tests (BUILD-PLAN §18.3, PLAN §3.5 L1).
+"""Quorum + model-diversity tests.
 
 ACCEPTED requires both size (>= min_quorum) AND diversity (>= 2 families).
 A single-family cluster that meets size is INSUFFICIENT_DIVERSITY — the
@@ -80,7 +80,7 @@ def test_diversity_default_applied_when_policy_unset():
 
 
 def test_explicit_diversity_one_disables_gate():
-    # Owner-ratified model_diversity=1 lets a single-family consensus pass.
+    # A deliberately configured model_diversity=1 lets a single-family consensus pass.
     rs = [
         make_result({"v": "yes"}, node="a", family="anthropic"),
         make_result({"v": "yes"}, node="b", family="anthropic"),

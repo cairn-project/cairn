@@ -1,6 +1,6 @@
-"""End-to-end ledger test (BUILD-PLAN §25.7, OUTCOME-ALTITUDE).
+"""End-to-end ledger test (OUTCOME-ALTITUDE).
 
-Invokes the full wave-1..4 pipeline on a fresh ledger with NO pre-arranged state:
+Invokes the full.4 pipeline on a fresh ledger with NO pre-arranged state:
 define_task -> claim_task -> run_work_unit (MockAdapter) x N -> store_result
 (blob + attestation + RESULT_RECORDED log entry) -> verify_unit -> record_verdict
 -> verify_log. Fully offline.
@@ -38,8 +38,8 @@ def test_define_claim_execute_store_verify_log(tmp_path):
     claim = ledger.claim_task(task_id, node_id="node-A", lease_seconds=120)
     assert claim.task_id == task_id
 
-    # 3. EXECUTE — produce a real candidate via the wave-2 flow (MockAdapter),
-    #    then form N diverse-family candidates so the wave-3 diversity gate is met.
+    # 3. EXECUTE — produce a real candidate via the flow (MockAdapter),
+    # then form N diverse-family candidates so the diversity gate is met.
     outcome = run_work_unit(unit_dict, MockAdapter())
     assert outcome.candidate is not None
     base = outcome.candidate
@@ -53,7 +53,7 @@ def test_define_claim_execute_store_verify_log(tmp_path):
     for cand in candidates:
         ledger.store_result(cand)
 
-    # 5. VERIFY — wave-3 trust decision over the stored candidates. The ledger does
+    # 5. VERIFY — trust decision over the stored candidates. The ledger does
     #    NOT decide truth; verify_unit does.
     policy = RedundancyPolicy.from_dict(unit_dict["redundancy_policy"])
     verdict = verify_unit(

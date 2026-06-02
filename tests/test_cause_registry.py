@@ -1,4 +1,4 @@
-"""Cause-layer tests: registry intake + gated decision + public list (PLAN §3.9).
+"""Cause-layer tests: registry intake + gated decision + public list.
 
 Drives the REAL CauseRegistry over a REAL Ledger + transparency log. Offline.
 """

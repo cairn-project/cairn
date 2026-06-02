@@ -1,4 +1,4 @@
-"""Trust-gated CAPTURE role — fail-closed grant/revoke + logging (AC.CAP.3)."""
+"""Trust-gated CAPTURE role — fail-closed grant/revoke + logging."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""verify_unit — the wave-3 verify-layer entry point (PLAN §3.5).
+"""verify_unit — the verify-layer entry point.
 
 Wires the defense-in-depth layers over N ``CandidateResult``s for ONE work unit:
 
@@ -10,12 +10,12 @@ Wires the defense-in-depth layers over N ``CandidateResult``s for ONE work unit:
   L3  reputation deltas   -> emit per-node + per-family deltas from consensus
                              membership + honeypot outcomes (earned, not asserted)
       tiebreak policy     -> emit an escalate-one-more-node decision for a
-                             non-accepted unit (research 01 §1; returned, not dispatched)
+                             non-accepted unit (returned, not dispatched)
 
-Returns a single ``VerifyVerdict``. This is the wave's outcome-altitude entry
+Returns a single ``VerifyVerdict``. This is the layer's outcome-altitude entry
 point: invoke it with freshly-produced candidates and no pre-arranged verdict
 state to get the full trust decision. Reputation deltas are RETURNED (and
-optionally applied to a passed-in ``Reputation``) — persistence is the ledger wave.
+optionally applied to a passed-in ``Reputation``) — persistence is the ledger layer.
 """
 
 from __future__ import annotations
@@ -110,10 +110,10 @@ def verify_unit(
         ``ObjectiveAgreement``); pass ``SubjectiveAgreement(judge)`` for the
         subjective path.
       honeypot: if this unit is a gold-standard seed, the ``Honeypot`` to score
-        each node against (PLAN §3.5 L4). Its scoring uses its OWN agreement
+        each node against. Its scoring uses its OWN agreement
         function.
       reputation: if provided, the returned deltas are applied to it (in-memory;
-        persistence = ledger wave). Always returned regardless.
+        persistence = ledger layer). Always returned regardless.
       unit_task_id: the unit id, threaded into the tiebreak decision.
 
     Returns a ``VerifyVerdict``.

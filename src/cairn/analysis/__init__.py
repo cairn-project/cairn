@@ -4,7 +4,7 @@ This package is the missing seam between the engine's detect/analyze half
 (execute → verify → verdict) and its vet/route half (Finding → human Gate-2 →
 dispatch). It produces a ``Finding`` from a real ``VerifyVerdict`` over a captured
 ``ExaminationPacket``, via a generic, injectable ``FlagPolicy`` that hard-codes no
-domain vocabulary (mission-neutral). See ``BUILD-PLAN-analysis-finding-bridge.md``.
+domain vocabulary (mission-neutral).
 
 Public surface:
   * ``FlagPolicy`` — the decision protocol (the seam).

@@ -1,4 +1,4 @@
-"""OUTCOME-ALTITUDE e2e (AC.CAP.6) — real entry points, fresh ledger, no state.
+"""OUTCOME-ALTITUDE e2e — real entry points, fresh ledger, no state.
 
 Drives the REAL ``capture_packet`` + ``load_packet_for_analysis`` entry points end
 to end on a fresh ledger with NO pre-arranged state:

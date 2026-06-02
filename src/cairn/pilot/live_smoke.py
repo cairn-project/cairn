@@ -1,6 +1,6 @@
-"""live_smoke — run the benign pilot with a LIVE Claude node (wave 6, §42).
+"""live_smoke — run the benign pilot with a LIVE Claude node.
 
-The wave-5 ``run_pilot`` drives the real backbone with deterministic offline
+The ``run_pilot`` drives the real backbone with deterministic offline
 ``PilotNodeAdapter`` nodes. ``live_smoke`` is the same end-to-end backbone
 (real ledger / verify / honeypot / transparency-log) but with ONE node driven by
 the live ``ClaudeCliAdapter`` — a real Claude model via the isolated ``claude -p``
@@ -66,7 +66,7 @@ def live_smoke(
         spawn (the live path).
       clock_fn: provenance clock for the live candidate (injectable, deterministic
         in tests).
-      model: subscription model tier for the live call (default ``sonnet``).
+      model: model tier for the live call (default ``sonnet``).
       timeout: per-call subprocess timeout (seconds).
 
     Returns a ``PilotRunSummary`` (same shape as ``run_pilot``). The live

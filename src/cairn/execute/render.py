@@ -1,6 +1,6 @@
 """Portable-payload render — the runtime-neutral surface an adapter consumes.
 
-research 02 A.2: ``objective`` + ``inputs`` + ``output_schema`` +
+``objective`` + ``inputs`` + ``output_schema`` +
 ``acceptance_contract`` is **the entire portable payload**. Everything
 model-specific (the actual prompt template, system prompt, tool wiring) is
 synthesized *locally by the adapter*. This module produces that neutral surface;
@@ -74,7 +74,7 @@ def _neutral_prompt(
 
 
 def render_payload(unit: WorkUnit) -> RenderedPayload:
-    """Render a validated WorkUnit into its portable payload (research 02 A.2).
+    """Render a validated WorkUnit into its portable payload.
 
     Pulls ONLY the four declarative fields off the unit; everything else stays
     behind the adapter seam. Pure + runtime-neutral — no network, no vendor

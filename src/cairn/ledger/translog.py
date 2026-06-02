@@ -1,5 +1,4 @@
-"""Append-only CT-style transparency log (PLAN §3.6 + REQUIREMENTS Frame 4 +
-cause-vetting governance).
+"""Append-only CT-style transparency log — detection audit + cause-vetting governance.
 
 A Merkle/hash-CHAINED append-only log. Each entry commits to the prior entry's
 hash, so the head hash transitively commits to the ENTIRE history — the
@@ -7,10 +6,10 @@ Certificate-Transparency pattern (Merkle log + independent monitor). Stored as
 JSONL, one entry per line, so the log is a plain text file that any monitor can
 re-derive from raw bytes.
 
-ONE log, TWO uses (made explicit — PLAN §3.6, REQUIREMENTS cause-vetting):
-  * DETECTION AUDITABILITY (Frame 4): RESULT_RECORDED / VERDICT_RECORDED entries
+ONE log, TWO uses:
+  * DETECTION AUDITABILITY: RESULT_RECORDED / VERDICT_RECORDED entries
     give an immutable record of who/what/when/which-model/what-decision.
-  * CAUSE-GOVERNANCE TRANSPARENCY (§3.9): CAUSE_REQUEST / CAUSE_DECISION entries
+  * CAUSE-GOVERNANCE TRANSPARENCY: CAUSE_REQUEST / CAUSE_DECISION entries
     record every cause request + decision (approval AND rejection with reason),
     so silent rejection or quiet removal is provably detectable.
 Same chain, same ``verify_log``.
@@ -36,14 +35,14 @@ from .clock import Clock
 # Genesis predecessor — 64 hex zeros (no prior entry).
 GENESIS_PREV = "0" * 64
 
-# Entry kinds — the dual-use vocabulary (PLAN §3.6).
-# Detection auditability (Frame 4):
+# Entry kinds — the dual-use vocabulary.
+# Detection auditability:
 KIND_RESULT_RECORDED = "RESULT_RECORDED"
 KIND_VERDICT_RECORDED = "VERDICT_RECORDED"
-# Cause-governance transparency (§3.9 — no silent rejection):
+# Cause-governance transparency (no silent rejection):
 KIND_CAUSE_REQUEST = "CAUSE_REQUEST"
 KIND_CAUSE_DECISION = "CAUSE_DECISION"
-# Contributor consent (§3.9b — explicit opt-in, never silent enlistment):
+# Contributor consent (explicit opt-in, never silent enlistment):
 KIND_CONSENT_RECORDED = "CONSENT_RECORDED"
 KIND_CONSENT_REVOKED = "CONSENT_REVOKED"
 # Inert evidence-bundle capture (trust-gated CAPTURE role; analysis is open):
@@ -53,8 +52,8 @@ KIND_CONSENT_REVOKED = "CONSENT_REVOKED"
 KIND_PACKET_CAPTURED = "PACKET_CAPTURED"
 KIND_CAPTURE_ROLE_GRANTED = "CAPTURE_ROLE_GRANTED"
 KIND_CAPTURE_ROLE_REVOKED = "CAPTURE_ROLE_REVOKED"
-# Human-in-the-loop two-gate vetting queue (the "human-verified" frame made
-# structural — REQUIREMENTS Frame 5). TWO distinct fail-closed gates, each
+# Human-in-the-loop two-gate vetting queue (the "human-verified" guarantee made
+# structural). TWO distinct fail-closed gates, each
 # recording its queue events + the human verdict on this SAME chain (no item
 # advances without a recorded human verdict):
 #   * Cause-vetting gate — a human cause-vetter reviews a REQUESTED cause before it
@@ -79,8 +78,8 @@ KIND_FINDING_VET_VERDICT = "FINDING_VET_VERDICT"
 #   * ROUTE_ACK_RECORDED records the recipient's acknowledgement/outcome.
 # Only a human-verified ROUTABLE finding reaches these entries (fail-closed on
 # FindingVetQueue.is_routable); a PENDING/REJECTED finding is refused, never logged.
-# Real external-recipient egress is a deferred, separately-security-reviewed wave;
-# this wave ships only a deterministic offline channel.
+# Real external-recipient egress is a deferred, separately security-reviewed phase;
+# this release ships only a deterministic offline channel.
 KIND_FINDING_ROUTED = "FINDING_ROUTED"
 KIND_ROUTE_ACK_RECORDED = "ROUTE_ACK_RECORDED"
 

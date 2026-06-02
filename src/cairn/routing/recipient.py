@@ -10,7 +10,7 @@ A ``RecipientRegistry`` holds a set of recipients PLUS a designated **fallback
 recipient** — the explicit locality-aware escalation target. The fallback is a
 first-class, named recipient (NOT "no recipient"): when nothing matches a finding's
 locality/domain, the policy escalates to it and records the escalation, so a
-routable finding is NEVER silently dropped (AC.ROUTE.1 / AC.ROUTE.3).
+routable finding is NEVER silently dropped.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ class Recipient:
     """A mission-neutral entity that can act on a routed finding.
 
     ``locality`` / ``domain`` are sets of opaque generic tags used for best-fit
-    matching; ``channel`` is the (deterministic offline, this wave) seam the
+    matching; ``channel`` is the (deterministic offline, this release) seam the
     finding is delivered over.
     """
 
@@ -63,9 +63,9 @@ class Recipient:
 class RecipientRegistry:
     """A set of mission-neutral recipients + a designated explicit fallback.
 
-    The ``fallback`` is the locality-aware escalation target (AC.ROUTE.1). A registry
+    The ``fallback`` is the locality-aware escalation target. A registry
     with neither recipients nor a fallback is a misconfiguration the routing policy
-    refuses loudly (AC.ROUTE.3) — it is never permitted to become a silent drop.
+    refuses loudly — it is never permitted to become a silent drop.
     """
 
     _recipients: dict[str, Recipient] = field(default_factory=dict)

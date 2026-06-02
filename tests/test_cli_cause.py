@@ -1,4 +1,4 @@
-"""Cause-layer tests: the cause CLI commands (PLAN §3.9).
+"""Cause-layer tests: the cause CLI commands.
 
 Exercises the REAL CLI entry via subprocess (OUTCOME-ALTITUDE: fresh ledger dir,
 no pre-arranged state) and via ``main()`` in-process. Offline.

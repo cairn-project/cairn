@@ -1,6 +1,6 @@
 """cairn.vetting — the human-in-the-loop TWO-GATE vetting queue.
 
-The "human-verified" frame (REQUIREMENTS Frame 5) made concrete + STRUCTURAL: two
+The "human-verified" frame made concrete + STRUCTURAL: two
 DISTINCT review gates, each FAIL-CLOSED — nothing advances past a gate without a
 recorded human verdict. The guarantee is enforced by the ABSENCE of an
 advance-path, not by policy.
@@ -26,7 +26,7 @@ DEFERRED (later, separately-security-reviewed waves): onward routing to real
 external recipients (network-touching; this gate only produces the ROUTABLE state),
 reviewer authn/authz + UI (a reviewer is just an id + a recorded decision), real
 detection logic / domain finding content, multi-reviewer quorum/escalation on the
-human gate, and a ``cairn vet`` CLI (library-only this wave).
+human gate, and a ``cairn vet`` CLI (library-only this release).
 """
 
 from __future__ import annotations

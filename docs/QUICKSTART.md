@@ -1,15 +1,14 @@
 # cairn — Quickstart
 
-`cairn` is the reusable Layer-A engine from the distributed
-cause-coordination design: a decentralized, model-agnostic
+`cairn` is a decentralized, model-agnostic
 distributed-detection-and-analysis force-multiplier that runs N causes on
 one protocol. It is standard-library-first; the only runtime dependency is
-`jsonschema`. (`cairn` is the project's final, owner-ratified name.)
+`jsonschema`.
 
 This guide covers installing the project, a minimal usage example, and
 running the tests. For the field-by-field work-unit spec see
-`src/cairn/spec/SPEC.md`; for the full scope and deferral list see the
-`BUILD-PLAN*.md` files and `README.md`.
+`src/cairn/spec/SPEC.md`; for the full scope and deferral list see
+`README.md`.
 
 ## Requirements
 

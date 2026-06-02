@@ -1,11 +1,10 @@
-"""The five-frame gate-check — STRUCTURE enforcer (PLAN §3.9 + §6).
+"""The five-frame gate-check — STRUCTURE enforcer.
 
-PLAN §3.9: "Include a 5-frame-gate-check function (a structured checklist the
-decider must pass; can be a stub that records the assessment — the human judgment
-is the decider's, but the STRUCTURE is enforced)."
+A structured 5-frame gate-check: a checklist the decider must pass. The human
+judgment is the decider's, but the STRUCTURE is enforced.
 
 This module does NOT make the human judgment. It enforces that the decider
-addressed ALL FIVE named frames (PLAN §6 / REQUIREMENTS gate) before a decision
+addressed ALL FIVE named frames before a decision
 is recordable. A gate-check that skips a frame is INCOMPLETE, and an incomplete
 gate-check cannot back an approval (the registry enforces that at decision time).
 The decider's per-frame pass/fail verdicts are recorded for the transparency log.

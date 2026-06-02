@@ -1,4 +1,4 @@
-"""Cause-scoped run loop (PLAN §2 + §3.3 + §3.9b).
+"""Cause-scoped run loop.
 
 ``run_cause`` is the contributor-facing end-to-end driver for ONE approved cause:
 
@@ -13,7 +13,7 @@ it reimplements none of them. The per-unit body mirrors the pilot runner's REAL
 exclusive-claim path (``run_pilot``) but is its own loop, so the pilot's public
 behaviour is untouched.
 
-Fail-closed gate (PLAN §3.9): a non-listable cause or a node that has NOT opted in
+Fail-closed gate: a non-listable cause or a node that has NOT opted in
 is REFUSED — never waved through. This is the demand-side of the listing gate.
 """
 
@@ -132,7 +132,7 @@ def run_cause(
     """
     node_families = node_families or ["claude", "gpt"]
 
-    # --- fail-closed gate (PLAN §3.9 demand side) ---------------------------
+    # --- fail-closed gate ---------------------------
     cause = cause_registry.get_cause(cause_id)  # raises on unknown id
     if not cause.is_publicly_listable:
         raise CauseRunRefused(
@@ -142,7 +142,7 @@ def run_cause(
     if not optin_registry.is_opted_in(node_id, cause_id):
         raise CauseRunRefused(
             f"node {node_id!r} has not opted into cause {cause_id!r}; "
-            "explicit opt-in is required (no silent enlistment, PLAN §3.9b)."
+            "explicit opt-in is required (no silent enlistment)."
         )
 
     provider = work_unit_registry.provider_for(cause_id)

@@ -4,9 +4,9 @@ These mirror the canonical JSON Schema (``spec/work_unit.schema.json``) and the
 human SPEC (``spec/SPEC.md``). They are convenience containers for typed access;
 the JSON Schema remains authoritative for validation (see ``validate.py``).
 
-Wave 1 scope (PLAN §3.3, research 02 A.1): the work-unit shape and the
+ scope: the work-unit shape and the
 acceptance-predicate shapes. No adapter, no verify-quorum, no ledger logic —
-those are later waves and are not modeled here beyond the fields the spec
+those are later phases and are not modeled here beyond the fields the spec
 already carries.
 """
 
@@ -18,7 +18,7 @@ from typing import Any, Optional
 
 @dataclass(frozen=True)
 class CapabilityFloor:
-    """Minimum capability a unit needs (PLAN §3.3 F2 capability-tier)."""
+    """Minimum capability a unit needs."""
 
     context_window: Optional[int] = None
     tools: list[str] = field(default_factory=list)
@@ -111,11 +111,11 @@ class Lease:
 
 @dataclass(frozen=True)
 class WorkUnit:
-    """A model-agnostic work unit (PLAN §3.3, research 02 A.1).
+    """A model-agnostic work unit.
 
     The portable payload is ``objective + inputs + output_schema +
     acceptance_contract``; everything model-specific is synthesized by an
-    adapter (later wave).
+    adapter (later phase).
     """
 
     schema_version: str

@@ -1,6 +1,6 @@
-"""Portable-payload render tests (BUILD-PLAN §12.1).
+"""Portable-payload render tests.
 
-research 02 A.2: objective + inputs + output_schema + acceptance_contract is the
+objective + inputs + output_schema + acceptance_contract is the
 ENTIRE portable payload — nothing else crosses the adapter seam.
 """
 

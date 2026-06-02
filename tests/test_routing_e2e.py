@@ -1,4 +1,4 @@
-"""OUTCOME-ALTITUDE e2e (AC.ROUTE.8) — the full detect→vet→ACT loop, fresh ledger.
+"""OUTCOME-ALTITUDE e2e — the full detect→vet→ACT loop, fresh ledger.
 
 Drives the REAL production entry points end to end on a fresh ledger with NO
 pre-arranged state, proving the routing/action spine operationally:

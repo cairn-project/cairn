@@ -1,4 +1,4 @@
-"""Recipient registry + explicit fallback (AC.ROUTE.1).
+"""Recipient registry + explicit fallback.
 
 The registry holds mission-neutral recipients (id + locality/domain tags + channel)
 and a designated EXPLICIT fallback recipient — the locality-aware escalation target,
@@ -23,7 +23,7 @@ def _recipient(rid, locality, domain) -> Recipient:
     )
 
 
-# --- AC.ROUTE.1 — registry + explicit fallback -------------------------------
+# --- registry + explicit fallback -------------------------------
 
 
 def test_registry_holds_recipients_and_returns_them():

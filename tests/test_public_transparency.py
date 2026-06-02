@@ -1,4 +1,4 @@
-"""Public transparency read-surfaces tests (AC.PUB.1–8).
+"""Public transparency read-surfaces tests.
 
 Drives the REAL public-read entry points over a REAL Ledger + transparency log.
 Offline, deterministic (FixedClock), synthetic benign data only. The redaction
@@ -64,7 +64,7 @@ def _approve(reg: CauseRegistry, name: str) -> str:
     return cause.cause_id
 
 
-# --- AC.PUB.1 — published-causes projection reuses the listing gate -----------
+# --- published-causes projection reuses the listing gate -----------
 
 
 def test_published_causes_reuse_listing_gate_only_approved(tmp_path):
@@ -83,7 +83,7 @@ def test_published_causes_reuse_listing_gate_only_approved(tmp_path):
     assert views[0].name == "approved-one"
 
 
-# --- AC.PUB.2 — public-cause view exposes only the public summary -------------
+# --- public-cause view exposes only the public summary -------------
 
 
 def test_public_cause_view_omits_internal_provenance_fields(tmp_path):
@@ -102,7 +102,7 @@ def test_public_cause_view_omits_internal_provenance_fields(tmp_path):
     assert view.frames_self_total == len(FRAME_KEYS)
 
 
-# --- AC.PUB.3 — vetted-outcomes reuse the finding-vet verdict state -----------
+# --- vetted-outcomes reuse the finding-vet verdict state -----------
 
 
 def test_vetted_outcomes_reuse_verdict_state_pending_excluded(tmp_path):
@@ -129,7 +129,7 @@ def test_vetted_outcomes_reuse_verdict_state_pending_excluded(tmp_path):
     assert by_packet["bb" * 32].verdict == "rejected"
 
 
-# --- AC.PUB.4 — vetted-outcome view is redacted by construction ---------------
+# --- vetted-outcome view is redacted by construction ---------------
 
 
 def test_vetted_outcome_view_redacted_by_construction(tmp_path):
@@ -147,7 +147,7 @@ def test_vetted_outcome_view_redacted_by_construction(tmp_path):
         )
 
 
-# --- AC.PUB.5 — public log verify composes on verify_log ----------------------
+# --- public log verify composes on verify_log ----------------------
 
 
 def test_public_verify_log_matches_verify_log_ok(tmp_path):
@@ -161,7 +161,7 @@ def test_public_verify_log_matches_verify_log_ok(tmp_path):
     assert result.length == 2
 
 
-# --- AC.PUB.6 — redacted public log view exposes only the chain skeleton ------
+# --- redacted public log view exposes only the chain skeleton ------
 
 
 def test_public_log_view_is_chain_skeleton_no_payload(tmp_path):
@@ -178,7 +178,7 @@ def test_public_log_view_is_chain_skeleton_no_payload(tmp_path):
     assert [v.entry_hash for v in views] == [e.entry_hash for e in entries]
 
 
-# --- AC.PUB.7 — read-only: PublicTransparency exposes no setter ---------------
+# --- read-only: PublicTransparency exposes no setter ---------------
 
 
 def test_public_transparency_is_read_only_no_setter(tmp_path):
@@ -193,7 +193,7 @@ def test_public_transparency_is_read_only_no_setter(tmp_path):
     ), public_methods
 
 
-# --- AC.PUB.8 (OUTCOME-ALTITUDE) — end-to-end on a fresh ledger + tamper -------
+# --- OUTCOME-ALTITUDE: end-to-end on a fresh ledger + tamper -------
 # outcome-altitude: true
 
 
