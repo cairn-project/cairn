@@ -97,8 +97,8 @@ No publish target is configured in the repo, so pick one explicitly:
 
 ## Recommended hardening (not yet present)
 
-- Add a CI workflow (`.github/workflows/`) that runs `pytest` on push/PR — the
-  repo currently has none.
+- A CI workflow (`.github/workflows/ci.yml`) runs `pytest` on every push and
+  pull request across Python 3.11–3.13. **(Done.)**
 - Add a release workflow triggered on `v*` tags that builds and publishes,
   removing manual `twine`/`gh` steps.
 - Consider `hatch-vcs` to derive `project.version` from the git tag, eliminating

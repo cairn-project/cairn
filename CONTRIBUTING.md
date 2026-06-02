@@ -53,12 +53,12 @@ python3.11 -m venv .venv          # any python >= 3.11 works
 .venv/bin/pytest
 ```
 
-`pytest` must be green locally before you open a pull request — a green local
-suite is the merge bar today. An automated CI matrix across Python 3.11, 3.12,
-and 3.13 is **intended but not yet present** in this repository (no
-`.github/workflows/` exists yet); see [RELEASING.md](RELEASING.md) ("Recommended
-hardening"). Until it lands, run the suite locally on at least your target
-Python before opening a PR.
+`pytest` must be green locally before you open a pull request, and **CI runs
+the full `pytest` suite on every push and pull request** across Python 3.11,
+3.12, and 3.13 (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+A green suite — locally and in CI — is the merge bar. Run the suite locally on
+at least your target Python before opening a PR so CI confirms rather than
+discovers.
 
 ---
 
@@ -77,8 +77,8 @@ directly to `main`.**
    including the safety-frames and "no secrets" checklist items.
 5. **Review.** At least one maintainer reviews. Discussion happens in the open
    on the PR. See [GOVERNANCE.md](GOVERNANCE.md) for how decisions are made.
-6. **Tests must be green.** The full `pytest` suite passes (locally today; via
-   CI once the automated matrix lands).
+6. **Tests must be green.** The full `pytest` suite passes locally and in CI
+   (the CI matrix runs on every push and pull request).
 7. **Merge.** A maintainer merges once review is approved and the suite is green.
 
 ---
