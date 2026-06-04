@@ -1,9 +1,8 @@
 """Provenance attestation + signing seam.
 
- carried provenance as a PLACEHOLDER: ``CandidateResult.signature`` was a
-plain hash, explicitly "no real signing". This release upgrades that into a real
-``Attestation`` record — a hash of the output bound to the producing
-adapter/model_family, sealed with a keyed signature.
+An ``Attestation`` record binds a hash of an adapter's output to the producing
+adapter/model_family and seals it with a keyed signature, turning provenance
+from a bare hash into a verifiable, tamper-evident claim.
 
 The signing is a SEAM. The local implementation is HMAC-SHA256 over the canonical
 attestation bytes (stdlib ``hmac``, no heavy deps). HMAC is symmetric — it proves

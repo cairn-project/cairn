@@ -2,16 +2,30 @@
 
 A claim is EXCLUSIVE via an atomic ref compare-and-swap — the one place real
 mutual exclusion is bought cheaply, with no consensus protocol. On a plain
-filesystem the analog of
-a git-ref compare-and-swap is an atomic ``O_EXCL`` file create: exactly one
-creator wins the race for ``claims/<task_id>``; everyone else gets ``FileExistsError``.
-That single OS-level atomic primitive makes double-claim STRUCTURALLY impossible —
-no lock server, no consensus round.
+filesystem the analog of a git-ref compare-and-swap is an atomic ``O_EXCL`` file
+create: exactly one creator wins the race for ``claims/<task_id>``; everyone
+else gets ``FileExistsError``. That single OS-level atomic primitive makes a
+double-claim on a FRESH (unclaimed) task structurally impossible — no lock
+server, no consensus round.
 
-Churn handling: claims carry a lease with an expiry. A node that
-vanishes lets its claim expire, and an expired claim reopens the unit for re-claim.
-Expiry is evaluated against an INJECTED ``Clock`` (no wall-clock hardcoding) so the
-lease behaviour is deterministically testable.
+The two claim paths have DIFFERENT guarantees, and the docstring is precise
+about which is which:
+
+  * **Fresh claim** — exclusion-atomic. ``O_EXCL`` guarantees at most one winner
+    at the kernel level; there is no read-then-write window to lose.
+  * **Expired-lease reclaim** — detect-and-retry, NOT exclusion-atomic. When the
+    ``O_EXCL`` create fails on an existing-but-expired claim, the holder is
+    overwritten via temp-file + ``os.replace`` (last-writer-wins), then the file
+    is re-read and the reclaimer confirms it still holds by matching its own
+    ``claim_id``. If a concurrent reclaimer won the ``os.replace`` race, the
+    ``claim_id`` will not match and this caller raises ``ClaimError`` rather than
+    falsely believing it holds the lease. Exactly one reclaimer ends up the
+    holder; the losers are told they lost.
+
+Churn handling: claims carry a lease with an expiry. A node that vanishes lets
+its claim expire, and an expired claim reopens the unit for re-claim. Expiry is
+evaluated against an INJECTED ``Clock`` (no wall-clock hardcoding) so the lease
+behaviour is deterministically testable.
 """
 
 from __future__ import annotations

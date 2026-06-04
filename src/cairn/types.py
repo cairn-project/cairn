@@ -4,10 +4,10 @@ These mirror the canonical JSON Schema (``spec/work_unit.schema.json``) and the
 human SPEC (``spec/SPEC.md``). They are convenience containers for typed access;
 the JSON Schema remains authoritative for validation (see ``validate.py``).
 
- scope: the work-unit shape and the
-acceptance-predicate shapes. No adapter, no verify-quorum, no ledger logic —
-those are later phases and are not modeled here beyond the fields the spec
-already carries.
+These dataclasses model the work-unit shape and the acceptance-predicate
+shapes only. They carry no adapter, verify-quorum, or ledger logic — those are
+later phases and are not modeled here beyond the fields the spec already
+carries.
 """
 
 from __future__ import annotations
