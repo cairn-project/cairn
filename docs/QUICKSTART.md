@@ -1,9 +1,11 @@
 # cairn — Quickstart
 
-`cairn` is a decentralized, model-agnostic
-distributed-detection-and-analysis force-multiplier that runs N causes on
-one protocol. It is standard-library-first; the only runtime dependency is
-`jsonschema`.
+`cairn` is a model-agnostic detection-and-analysis force-multiplier that runs N
+causes on one protocol. It is being built to become a decentralized,
+distributed, volunteer-powered network — that's the target; today it runs as a
+**single-operator, offline pilot**, with the distributed, multi-volunteer
+deployment a deliberately deferred phase. It is standard-library-first; the only
+runtime dependency is `jsonschema`.
 
 This guide covers installing the project, a minimal usage example, and
 running the tests. For the field-by-field work-unit spec see

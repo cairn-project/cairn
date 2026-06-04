@@ -18,9 +18,11 @@
 
 ## 1. Scope & assets
 
-Cairn is a distributed cause-coordination engine: it runs N causes on one
-protocol, coordinating distributed detection-and-analysis work and turning
-human-signed-off outcomes into recorded action. Throughout this document,
+Cairn is a cause-coordination engine built to be distributed: it runs N causes
+on one protocol, with the aim of coordinating distributed detection-and-analysis
+work and turning human-signed-off outcomes into recorded action. (Today it runs
+single-operator and offline; the distributed deployment is a deferred phase — see
+the maturity framing in `README.md` and `SECURITY.md`.) Throughout this document,
 **"human-verified" / "human-signed-off" means a recorded human verdict (with a
 reason) exists — NOT that the human was authenticated, independent, or
 qualified.** Identity authentication is an explicit deferred placeholder

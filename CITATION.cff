@@ -2,11 +2,14 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using these metadata."
 title: Cairn
 abstract: >-
-  A decentralized, model-agnostic, distributed detection-and-analysis engine:
-  volunteers lend their own AI to collectively notice harm and route it to the
-  institutions that can act. Mission-neutral; runs many causes on one protocol,
-  with cross-model verification, human-in-the-loop vetting, and a tamper-evident
-  transparency log.
+  A model-agnostic detection-and-analysis engine built to become a decentralized,
+  distributed network in which volunteers lend their own AI to collectively notice
+  harm and route it to the institutions that can act. That decentralized,
+  volunteer-powered network is the target; today the engine runs as a
+  single-operator, offline pilot, with the distributed deployment a deliberately
+  deferred, independently-reviewed phase. Mission-neutral; runs many causes on one
+  protocol, with cross-model verification, human-in-the-loop vetting, and a
+  tamper-evident transparency log.
 type: software
 authors:
   - name: "[AUTHOR — owner to fill]"
