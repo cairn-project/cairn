@@ -37,7 +37,7 @@ fi
 DRAFT="src/cairn/fixtures/cause_draft_benign.json"
 
 # --- a throwaway ledger, cleaned up on exit ---
-LEDGER="$(mktemp -d -t cairn-demo)"
+LEDGER="$(mktemp -d "${TMPDIR:-/tmp}/cairn-demo.XXXXXX")"
 cleanup() { rm -rf "$LEDGER"; }
 trap cleanup EXIT
 
