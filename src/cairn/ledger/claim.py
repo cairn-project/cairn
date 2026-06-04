@@ -13,14 +13,16 @@ about which is which:
 
   * **Fresh claim** — exclusion-atomic. ``O_EXCL`` guarantees at most one winner
     at the kernel level; there is no read-then-write window to lose.
-  * **Expired-lease reclaim** — detect-and-retry, NOT exclusion-atomic. When the
-    ``O_EXCL`` create fails on an existing-but-expired claim, the holder is
-    overwritten via temp-file + ``os.replace`` (last-writer-wins), then the file
-    is re-read and the reclaimer confirms it still holds by matching its own
-    ``claim_id``. If a concurrent reclaimer won the ``os.replace`` race, the
-    ``claim_id`` will not match and this caller raises ``ClaimError`` rather than
-    falsely believing it holds the lease. Exactly one reclaimer ends up the
-    holder; the losers are told they lost.
+  * **Expired-lease reclaim** — exclusion-atomic via a sidecar lock. When the
+    ``O_EXCL`` create fails on an existing-but-expired claim, the reclaimer must
+    first acquire a per-task ``O_EXCL`` lock file. Only one racer wins that lock;
+    it re-checks expiry UNDER the lock (closing the check-then-write window),
+    overwrites the claim via temp-file + ``os.replace``, and always releases the
+    lock. Racers that fail to take the lock raise ``ClaimError``. Exactly one
+    reclaimer ends up the holder; the losers are told they lost. (Earlier this
+    path was a bare ``os.replace`` + re-read confirm, which admitted MULTIPLE
+    simultaneous winners when reclaimers did not perfectly overlap — see the
+    concurrency tests.)
 
 Churn handling: claims carry a lease with an expiry. A node that vanishes lets
 its claim expire, and an expired claim reopens the unit for re-claim. Expiry is
@@ -117,7 +119,16 @@ class ClaimRegistry:
         """Atomically claim ``task_id`` for ``node_id`` with a lease.
 
         Succeeds if the task is unclaimed OR its existing claim has EXPIRED.
-        Raises ``ClaimError`` if an unexpired claim already exists.
+        Raises ``ClaimError`` if an unexpired claim already exists, or if another
+        node wins the reclaim race for an expired lease.
+
+        Both paths are exclusion-atomic. A FRESH claim is won by ``O_EXCL``
+        create — the kernel admits exactly one creator. An EXPIRED-LEASE reclaim
+        serialises its read-check-overwrite critical section behind a sidecar
+        ``O_EXCL`` lock file: exactly one racer acquires the lock, re-checks
+        expiry under it, and overwrites the claim; everyone else fails to acquire
+        the lock and is told they lost. There is no read-then-write window in
+        which two racers can both believe they hold the claim.
         """
         path = self._path_for(task_id)
         now = self._clock.now()
@@ -132,22 +143,57 @@ class ClaimRegistry:
             self._write_atomic(path, new)
             return new
         except FileExistsError:
-            # Someone holds the ref. Reclaim ONLY if their lease has expired.
+            # Someone holds the ref. Reclaim ONLY if their lease has expired,
+            # and serialise the whole check-then-overwrite under an O_EXCL lock
+            # so at most one reclaimer can act at a time.
             existing = self._read(path)
             if existing is not None and not existing.is_expired(now):
                 raise ClaimError(
                     f"task {task_id!r} is actively claimed by "
                     f"{existing.node_id!r} until {existing.expires_at}"
                 ) from None
-            # Expired (or unreadable) → atomically replace via temp + os.replace.
+            return self._reclaim_expired(path, new)
+
+    def _reclaim_expired(self, path: Path, new: Claim) -> Claim:
+        """Acquire the per-task lock and overwrite an expired claim under it.
+
+        The lock is an ``O_EXCL`` sidecar file: its create is the single
+        mutual-exclusion point for the reclaim. The holder re-reads the claim
+        under the lock (closing the check-then-write race), overwrites it via
+        atomic ``os.replace`` if still expired, and always removes the lock in a
+        ``finally`` so a normal failure does not strand it.
+
+        NOTE: the lock is held only for the brief, in-process reclaim critical
+        section and is always released. It deliberately carries no expiry of its
+        own; a process crash *between* the create and the ``finally`` is the one
+        case that could strand it. That is an acceptable, narrow tradeoff for
+        Layer A (a stranded lock blocks only further reclaims of one already-
+        expired task, never a fresh claim) and is far safer than the prior
+        bare-``os.replace`` path, which admitted multiple simultaneous winners.
+        A self-expiring reclaim lock is a follow-on hardening, not needed here.
+        """
+        lock = path.parent / f".{path.name}.lock"
+        try:
+            lock_fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+        except FileExistsError:
+            raise ClaimError(f"lost the race to reclaim expired task {new.task_id!r}") from None
+        try:
+            os.close(lock_fd)
+            # Re-check under the lock: another reclaimer may have already taken
+            # it, in which case its (now unexpired) claim wins.
+            now = self._clock.now()
+            current = self._read(path)
+            if current is not None and not current.is_expired(now):
+                raise ClaimError(
+                    f"task {new.task_id!r} is actively claimed by "
+                    f"{current.node_id!r} until {current.expires_at}"
+                ) from None
             tmp = path.parent / (path.name + f".{new.claim_id}.tmp")
             tmp.write_text(json.dumps(new.to_dict()))
             os.replace(tmp, path)
-            # Re-read to confirm we are the holder (last-writer-wins on replace).
-            confirmed = self._read(path)
-            if confirmed is None or confirmed.claim_id != new.claim_id:
-                raise ClaimError(f"lost the race to reclaim expired task {task_id!r}") from None
-            return confirmed
+            return new
+        finally:
+            os.unlink(lock)
 
     def active_claim(self, task_id: str) -> Claim | None:
         """Return the current UNEXPIRED claim, or None (an expired claim reads
