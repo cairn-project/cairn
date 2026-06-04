@@ -119,6 +119,81 @@ def test_concurrent_fresh_claim_has_exactly_one_winner(tmp_path):
     assert active is not None and active.node_id == winners[0]
 
 
+def test_fresh_claim_empty_file_window_admits_one_winner(tmp_path, monkeypatch):
+    # Deterministic regression for the empty-file race (the real defect this PR
+    # found). O_EXCL create and the record write are two syscalls; a losing racer
+    # can observe the winner's claim file AFTER the create but BEFORE the write —
+    # i.e. EMPTY. The old code read that empty file as None and routed the loser
+    # into the expired-reclaim path, which overwrote the winner and produced TWO
+    # winners on one fresh task.
+    #
+    # This pins the window deterministically: the winner's write is HELD until a
+    # single loser has run all the way through claim() against the empty file. On
+    # the buggy code the loser reclaims and wins (two winners); the fix rejects an
+    # unreadable existing file as an in-flight claim, so the loser raises
+    # ClaimError and exactly one winner survives.
+    import json
+    import os
+
+    clock = FixedClock(start=0.0)
+    reg = ClaimRegistry(tmp_path, clock)
+
+    file_created = threading.Event()  # set once the empty file exists
+    loser_done = threading.Event()  # set once the loser has finished claim()
+
+    def windowed_write_atomic(self, path, claim):
+        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+        try:
+            file_created.set()
+            # Hold the JSON write until the loser has fully run against the empty
+            # file, so the window is open for the loser's entire claim() call.
+            loser_done.wait(timeout=5)
+            os.write(fd, json.dumps(claim.to_dict()).encode("utf-8"))
+        finally:
+            os.close(fd)
+
+    monkeypatch.setattr(ClaimRegistry, "_write_atomic", windowed_write_atomic)
+
+    winners: list[str] = []
+    errors: list[Exception] = []
+    wlock = threading.Lock()
+
+    def winner_worker() -> None:
+        try:
+            c = reg.claim("hot-task", node_id="node-winner", lease_seconds=60)
+        except ClaimError as exc:
+            with wlock:
+                errors.append(exc)
+        else:
+            with wlock:
+                winners.append(c.node_id)
+
+    def loser_worker() -> None:
+        file_created.wait(timeout=5)  # race only once the empty file is present
+        try:
+            c = reg.claim("hot-task", node_id="node-loser", lease_seconds=60)
+        except ClaimError as exc:
+            with wlock:
+                errors.append(exc)
+        else:
+            with wlock:
+                winners.append(c.node_id)
+        finally:
+            loser_done.set()  # release the winner's held write
+
+    w = threading.Thread(target=winner_worker)
+    loser = threading.Thread(target=loser_worker)
+    w.start()
+    loser.start()
+    w.join()
+    loser.join()
+
+    assert winners == ["node-winner"], f"empty-file window admitted extra winners: {winners}"
+    assert [type(e).__name__ for e in errors] == ["ClaimError"]
+    active = reg.active_claim("hot-task")
+    assert active is not None and active.node_id == "node-winner"
+
+
 def test_concurrent_expired_reclaim_has_exactly_one_winner(tmp_path):
     # An expired lease exists on disk; N threads race to RECLAIM it. This drives
     # the detect-and-retry path (O_EXCL fails -> os.replace + claim_id confirm),

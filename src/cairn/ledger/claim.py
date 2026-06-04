@@ -11,8 +11,12 @@ server, no consensus round.
 The two claim paths have DIFFERENT guarantees, and the docstring is precise
 about which is which:
 
-  * **Fresh claim** — exclusion-atomic. ``O_EXCL`` guarantees at most one winner
-    at the kernel level; there is no read-then-write window to lose.
+  * **Fresh claim** — exclusion-atomic. ``O_EXCL`` guarantees at most one creator
+    at the kernel level. The create and the record-write are two syscalls, so a
+    loser can momentarily observe the winner's file as EMPTY; the claim path
+    treats an unreadable existing file as an in-flight claim and REJECTS rather
+    than reclaiming it, so that empty-file window can never promote a loser to a
+    second winner. Reclaim is reserved for a successfully-read, expired claim.
   * **Expired-lease reclaim** — exclusion-atomic via a sidecar lock. When the
     ``O_EXCL`` create fails on an existing-but-expired claim, the reclaimer must
     first acquire a per-task ``O_EXCL`` lock file. Only one racer wins that lock;
@@ -143,14 +147,24 @@ class ClaimRegistry:
             self._write_atomic(path, new)
             return new
         except FileExistsError:
-            # Someone holds the ref. Reclaim ONLY if their lease has expired,
-            # and serialise the whole check-then-overwrite under an O_EXCL lock
-            # so at most one reclaimer can act at a time.
+            # Someone holds the ref. Reclaim ONLY if their lease has DEFINITELY
+            # expired — i.e. we read a parseable claim and it is past expiry.
+            #
+            # CRITICAL: an empty or unparseable file is NOT "fresh/stale" — it is
+            # a claim being written RIGHT NOW. The O_EXCL winner creates the file
+            # (empty) and only then writes its JSON; between those two syscalls a
+            # losing racer can observe the file as empty. Treating that as
+            # reclaimable (the old behaviour) let the loser overwrite the winner
+            # via the reclaim path and produced TWO winners on one fresh task.
+            # So: read None (missing/empty/corrupt) => assume an in-flight claim
+            # holds the ref and reject. Reclaim is reserved for a claim we could
+            # read AND that is genuinely expired.
             existing = self._read(path)
-            if existing is not None and not existing.is_expired(now):
+            if existing is None or not existing.is_expired(now):
+                holder = "an in-flight claimant" if existing is None else repr(existing.node_id)
+                until = "" if existing is None else f" until {existing.expires_at}"
                 raise ClaimError(
-                    f"task {task_id!r} is actively claimed by "
-                    f"{existing.node_id!r} until {existing.expires_at}"
+                    f"task {task_id!r} is actively claimed by {holder}{until}"
                 ) from None
             return self._reclaim_expired(path, new)
 
