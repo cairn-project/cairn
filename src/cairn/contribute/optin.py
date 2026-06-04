@@ -14,8 +14,6 @@ extended to consent). It forks nothing.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from ..cause.registry import CauseRegistry
 from ..ledger.ledger import Ledger
 from ..ledger.translog import KIND_CONSENT_RECORDED, KIND_CONSENT_REVOKED
@@ -36,8 +34,8 @@ class OptInRegistry:
     def __init__(self, ledger: Ledger, cause_registry: CauseRegistry) -> None:
         self._ledger = ledger
         self._causes = cause_registry
-        self._clock = ledger._clock  # noqa: SLF001
-        self._index_dir = Path(ledger._root) / "consents"  # noqa: SLF001
+        self._clock = ledger.clock
+        self._index_dir = ledger.root / "consents"
         self._index_dir.mkdir(parents=True, exist_ok=True)
 
     # --- opt in --------------------------------------------------------------

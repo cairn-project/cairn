@@ -252,7 +252,7 @@ class PublicTransparency:
         payload. The chain is still independently verifiable via ``public_verify_log``
         (which reads the full bytes); this redacted view is for human inspection.
         """
-        log = TransparencyLog(self._translog_path(), self._ledger._clock)  # noqa: SLF001
+        log = TransparencyLog(self._translog_path(), self._ledger.clock)
         return [
             PublicLogEntryView(
                 index=e.index,
@@ -267,7 +267,7 @@ class PublicTransparency:
     # --- helpers -------------------------------------------------------------
 
     def _translog_path(self) -> Any:
-        return self._ledger.translog._path  # noqa: SLF001
+        return self._ledger.translog.path
 
 
 # --- module-level convenience entry points (the public-read API) -------------

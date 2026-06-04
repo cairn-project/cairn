@@ -39,9 +39,9 @@ class CauseRegistry:
 
     def __init__(self, ledger: Ledger) -> None:
         self._ledger = ledger
-        self._index_dir = Path(ledger._root) / "causes"  # noqa: SLF001
+        self._index_dir = ledger.root / "causes"
         self._index_dir.mkdir(parents=True, exist_ok=True)
-        self._clock = ledger._clock  # noqa: SLF001
+        self._clock = ledger.clock
 
     # --- intake --------------------------------------------------------------
 
@@ -174,7 +174,7 @@ class CauseRegistry:
         holds over cause requests + decisions exactly as it does over detection
         entries (the SAME chain).
         """
-        return verify_log(self._ledger.translog._path)  # noqa: SLF001
+        return verify_log(self._ledger.translog.path)
 
     # --- persistence helpers -------------------------------------------------
 

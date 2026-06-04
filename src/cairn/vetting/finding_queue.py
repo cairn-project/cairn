@@ -83,8 +83,8 @@ class FindingVetQueue:
 
     def __init__(self, ledger: Ledger) -> None:
         self._ledger = ledger
-        self._clock = ledger._clock  # noqa: SLF001
-        self._index_dir = Path(ledger._root) / "finding_vet_queue"  # noqa: SLF001
+        self._clock = ledger.clock
+        self._index_dir = ledger.root / "finding_vet_queue"
         self._index_dir.mkdir(parents=True, exist_ok=True)
 
     # --- flag/enqueue ---------------------------------------------

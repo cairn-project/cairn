@@ -18,8 +18,6 @@ and reuses the cause layer (a packet may carry a ``cause_id``). Forks nothing.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from ..ledger.ledger import Ledger
 from ..ledger.translog import KIND_PACKET_CAPTURED
 from .gate import CaptureGate
@@ -72,7 +70,7 @@ def capture_packet(
     packet = ExaminationPacket.create(
         target_ref=port.target_ref,
         observations=observations,
-        captured_at=ledger._clock.now(),  # noqa: SLF001
+        captured_at=ledger.clock.now(),
         captured_by=node_id,
         capture_method=port.method,
         cause_id=cause_id,
@@ -85,7 +83,7 @@ def capture_packet(
     assert blob_key == packet.packet_hash  # content-address invariant
 
     # Index the packet under packets/<packet_hash> for discovery.
-    packets_dir = Path(ledger._root) / "packets"  # noqa: SLF001
+    packets_dir = ledger.root / "packets"
     packets_dir.mkdir(parents=True, exist_ok=True)
     (packets_dir / packet.packet_hash).write_text(blob_key)
 

@@ -15,7 +15,6 @@ nothing.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from ..ledger.ledger import Ledger
@@ -69,8 +68,8 @@ class CaptureGate:
 
     def __init__(self, ledger: Ledger) -> None:
         self._ledger = ledger
-        self._clock = ledger._clock  # noqa: SLF001
-        self._index_dir = Path(ledger._root) / "capture_grants"  # noqa: SLF001
+        self._clock = ledger.clock
+        self._index_dir = ledger.root / "capture_grants"
         self._index_dir.mkdir(parents=True, exist_ok=True)
 
     # --- grant ---------------------------------------------------------------
