@@ -141,12 +141,25 @@ def test_public_causes_pretty_over_pilot_ledger(tmp_path, capsys):
     assert "published causes" in capsys.readouterr().out
 
 
-# --- top-level: no subcommand is an argparse usage error --------------------
+# --- top-level: no subcommand prints help (friendly CLI), exits 0 -----------
 
 
-def test_no_subcommand_is_usage_error(capsys):
-    # The subcommand is required; argparse exits with status 2 + a usage message.
+def test_no_subcommand_prints_help_and_exits_0(capsys):
+    # Bare `cairn` is the friendly-CLI convention: print the top-level help and
+    # exit 0, rather than the argparse "required: command" usage error.
+    rc = main([])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "usage: cairn" in out
+    assert "pilot" in out
+
+
+def test_version_flag_exits_0_and_prints_version(capsys):
+    # `cairn --version` exits 0 via argparse's `version` action and prints the
+    # installed package version, not a "required: command" error.
+    from importlib.metadata import version as _pkg_version
+
     with pytest.raises(SystemExit) as exc:
-        main([])
-    assert exc.value.code == 2
-    assert "required" in capsys.readouterr().err
+        main(["--version"])
+    assert exc.value.code == 0
+    assert _pkg_version("cairn") in capsys.readouterr().out

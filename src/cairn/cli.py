@@ -71,8 +71,11 @@ import os
 import sys
 import tempfile
 from collections.abc import Sequence
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
 from pathlib import Path
 
+from . import __version__ as _DUNDER_VERSION
 from .cause import (
     CauseError,
     CauseRegistry,
@@ -90,6 +93,22 @@ from .public import PublicTransparency
 # Fixed, NON-SECRET signing key for the offline pilot/CLI demo. This is NOT a
 # production secret — it is a public demo key so the attestation seam is exercised.
 _DEMO_KEY = b"cairn-pilot-demo-key-not-secret"
+
+
+def _resolve_version() -> str:
+    """Resolve the package version for ``cairn --version``.
+
+    Prefer the INSTALLED distribution metadata (the canonical answer for a
+    ``pip install``ed package); fall back to the package ``__version__`` when
+    the distribution is not installed (e.g. running straight from ``src/`` via
+    ``PYTHONPATH``). Both sources are kept in sync (``pyproject [project]
+    version`` == ``cairn.__version__``).
+    """
+    try:
+        return _pkg_version("cairn")
+    except PackageNotFoundError:
+        return _DUNDER_VERSION
+
 
 # Help text for the cause-flow ``--ledger`` flag (shared by every cause-layer
 # subparser so the persisted-default resolution order stays documented in one place).
@@ -481,7 +500,17 @@ def _build_parser() -> argparse.ArgumentParser:
         prog="cairn",
         description="cairn — distributed cause-coordination engine CLI.",
     )
-    sub = parser.add_subparsers(dest="command", required=True)
+    parser.add_argument(
+        "-V",
+        "--version",
+        action="version",
+        version=f"cairn {_resolve_version()}",
+        help="print the cairn version and exit",
+    )
+    # The subcommand is OPTIONAL: bare `cairn` prints top-level help and exits 0
+    # (the friendly-CLI convention) rather than an argparse usage error. main()
+    # handles the no-subcommand case.
+    sub = parser.add_subparsers(dest="command", required=False)
 
     p_pilot = sub.add_parser(
         "pilot", help="run the benign pilot cause end-to-end on a fresh ledger"
@@ -648,6 +677,12 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
+    # Bare `cairn` (no subcommand) is not an error: print top-level help and
+    # exit 0, the friendly-CLI convention. (`--version` / `-h` already exit via
+    # their argparse actions before reaching here.)
+    if getattr(args, "func", None) is None:
+        parser.print_help()
+        return 0
     return args.func(args)
 
 
