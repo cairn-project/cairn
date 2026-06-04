@@ -89,6 +89,8 @@ from .ledger import FixedClock, Ledger, verify_log
 from .ledger.translog import KIND_RESULT_RECORDED, KIND_VERDICT_RECORDED, TransparencyLog
 from .pilot import live_smoke, run_pilot
 from .public import PublicTransparency
+from .scenario import list_scenario, review_scenario, run_scenario
+from .vetting.review import VettingError
 
 # Fixed, NON-SECRET signing key for the offline pilot/CLI demo. This is NOT a
 # production secret — it is a public demo key so the attestation seam is exercised.
@@ -188,6 +190,68 @@ def _cmd_live_smoke(args: argparse.Namespace) -> int:
         print("LIVE SMOKE — one node is a real Claude via isolated `claude -p`\n")
         print(summary.pretty())
         print(f"ledger dir: {ledger_dir}")
+    return 0
+
+
+def _cmd_scenario_run(args: argparse.Namespace) -> int:
+    # The scenario coordinates state across run/review/list, so it uses a
+    # PERSISTED ledger (like the cause-flow commands), not a one-shot temp dir.
+    ledger_dir = resolve_ledger_dir(args.ledger)
+    review_dir = Path(args.review_dir) if args.review_dir else ledger_dir.parent / "scenario-review"
+    clock = FixedClock(start=0.0)
+    ledger = Ledger(ledger_dir, clock, signing_key=_DEMO_KEY)
+
+    summary = run_scenario(
+        ledger,
+        review_dir=review_dir,
+        offline=args.offline,
+        model=args.model,
+        timeout=args.timeout,
+    )
+    if args.json:
+        out = summary.to_dict()
+        out["ledger_dir"] = str(ledger_dir)
+        print(json.dumps(out, indent=2, sort_keys=True))
+    else:
+        print(summary.pretty())
+        print(f"ledger dir: {ledger_dir}")
+    return 0
+
+
+def _cmd_scenario_review(args: argparse.Namespace) -> int:
+    ledger_dir = resolve_ledger_dir(args.ledger)
+    ledger = Ledger(ledger_dir, FixedClock(start=0.0), signing_key=_DEMO_KEY)
+    try:
+        result = review_scenario(
+            ledger,
+            args.finding_hash,
+            routable=args.routable,
+            reason=args.reason,
+            reviewer_id=args.by,
+        )
+    except VettingError as exc:
+        print(f"REVIEW REFUSED: {exc}")
+        return 1
+    if args.json:
+        print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+    else:
+        print(f"recorded {result.decision.upper()} verdict for {result.finding_hash}")
+        print(f"  state now: {result.state}")
+        print(f"  reason: {result.reason}")
+        print("Nothing was sent — a ROUTABLE verdict only changes the gate state.")
+    return 0
+
+
+def _cmd_scenario_list(args: argparse.Namespace) -> int:
+    ledger_dir = resolve_ledger_dir(args.ledger)
+    ledger = Ledger(ledger_dir, FixedClock(start=0.0), signing_key=_DEMO_KEY)
+    rows = [s.to_dict() for s in list_scenario(ledger)]
+    if args.json:
+        print(json.dumps(rows, indent=2, sort_keys=True))
+    else:
+        print(f"scenario findings: {len(rows)}")
+        for r in rows:
+            print(f"  {str(r['state']):9} {str(r['finding_hash'])[:16]}")
     return 0
 
 
@@ -539,6 +603,62 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_live.add_argument("--json", action="store_true", help="emit JSON summary")
     p_live.set_defaults(func=_cmd_live_smoke)
+
+    # --- scenario (value-demo) commands: dump-for-review, NEVER send ---
+    p_scn = sub.add_parser(
+        "scenario",
+        help="value-demo: real detect→analyze→find-org→human-gate→DUMP (sends nothing)",
+    )
+    scn_sub = p_scn.add_subparsers(dest="scenario_command", required=True)
+
+    scn_run = scn_sub.add_parser(
+        "run",
+        help="run the seeded open-data-feed value loop and write a review dump (no send)",
+    )
+    scn_run.add_argument("--ledger", default=None, help=_LEDGER_HELP)
+    scn_run.add_argument(
+        "--review-dir",
+        dest="review_dir",
+        default=None,
+        help="where per-finding review dumps are written (default: <ledger>/../scenario-review)",
+    )
+    scn_run.add_argument(
+        "--offline",
+        action="store_true",
+        help="hermetic run: deterministic analysis nodes, no claude -p, no network",
+    )
+    scn_run.add_argument("--model", default="sonnet", help="live model tier (default: sonnet)")
+    scn_run.add_argument(
+        "--timeout",
+        type=float,
+        default=120.0,
+        help="per-call claude -p subprocess timeout in seconds (default: 120)",
+    )
+    scn_run.add_argument("--json", action="store_true", help="emit JSON summary")
+    scn_run.set_defaults(func=_cmd_scenario_run)
+
+    scn_rev = scn_sub.add_parser(
+        "review",
+        help="record the HUMAN Gate-2 verdict on a scenario finding (still sends nothing)",
+    )
+    scn_rev.add_argument("finding_hash", help="the finding hash to record a verdict for")
+    rev_grp = scn_rev.add_mutually_exclusive_group(required=True)
+    rev_grp.add_argument("--routable", action="store_true", help="mark routable (human approve)")
+    rev_grp.add_argument(
+        "--reject", dest="routable", action="store_false", help="reject (reason required)"
+    )
+    scn_rev.add_argument(
+        "--reason", required=True, help="the recorded verdict reason (no silent rejection)"
+    )
+    scn_rev.add_argument("--by", required=True, help="the human reviewer id")
+    scn_rev.add_argument("--ledger", default=None, help=_LEDGER_HELP)
+    scn_rev.add_argument("--json", action="store_true", help="emit JSON summary")
+    scn_rev.set_defaults(func=_cmd_scenario_review)
+
+    scn_list = scn_sub.add_parser("list", help="list scenario findings + their gate state")
+    scn_list.add_argument("--ledger", default=None, help=_LEDGER_HELP)
+    scn_list.add_argument("--json", action="store_true", help="emit JSON rows")
+    scn_list.set_defaults(func=_cmd_scenario_list)
 
     # --- cause-layer commands ---
     p_causes = sub.add_parser(

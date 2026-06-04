@@ -1,0 +1,62 @@
+[
+  {
+    "record_id": "city-bike-counts-2019-2023",
+    "dataset_title": "Municipal Bike-Count Sensors (2019-2023)",
+    "steward": "data.gov",
+    "steward_label": "Data.gov open-data catalogue",
+    "target_ref": "synthetic-doc/open-data-feed/city-bike-counts-2019-2023",
+    "rendered_text": "Open Data Catalogue Entry\n\nTitle: Municipal Bike-Count Sensors (2019-2023)\nMaintainer: City Open Data Office\nDescription: Hourly bicycle counts from fixed roadside sensors, published as CSV.\nLicence: Creative Commons Attribution 4.0 (CC-BY-4.0)\nDownload: catalogue-listed CSV distribution.\nStatus: This catalogue page is a synthetic, local test fixture; it is not fetched over a network.",
+    "registration_metadata": {
+      "record_kind": "synthetic-catalogue-entry",
+      "license_field": "CC-BY-4.0",
+      "download_status": 200,
+      "last_checked": "synthetic; no live request was made"
+    },
+    "planted_defect": null
+  },
+  {
+    "record_id": "regional-air-quality-hourly",
+    "dataset_title": "Regional Air-Quality Hourly Index",
+    "steward": "data.gov",
+    "steward_label": "Data.gov open-data catalogue",
+    "target_ref": "synthetic-doc/open-data-feed/regional-air-quality-hourly",
+    "rendered_text": "Open Data Catalogue Entry\n\nTitle: Regional Air-Quality Hourly Index\nMaintainer: State Environmental Data Office\nDescription: Hourly air-quality index readings, published as a downloadable CSV feed.\nLicence: Creative Commons Attribution 4.0 (CC-BY-4.0)\nDownload: the catalogue's listed download link returns HTTP 404 (recorded in the fixture metadata; no live request was made).\nStatus: synthetic, local test fixture; not fetched over a network.",
+    "registration_metadata": {
+      "record_kind": "synthetic-catalogue-entry",
+      "license_field": "CC-BY-4.0",
+      "download_status": 404,
+      "last_checked": "synthetic; no live request was made"
+    },
+    "planted_defect": "broken_download_link"
+  },
+  {
+    "record_id": "transit-gtfs-feed",
+    "dataset_title": "Metro Transit GTFS Schedule Feed",
+    "steward": "data.gov",
+    "steward_label": "Data.gov open-data catalogue",
+    "target_ref": "synthetic-doc/open-data-feed/transit-gtfs-feed",
+    "rendered_text": "Open Data Catalogue Entry\n\nTitle: Metro Transit GTFS Schedule Feed\nMaintainer: Metropolitan Transit Authority\nDescription: General Transit Feed Specification schedule data, published for public reuse.\nLicence field: the catalogue's machine-readable license field is empty / malformed (recorded in the fixture metadata).\nStatus: synthetic, local test fixture; not fetched over a network.",
+    "registration_metadata": {
+      "record_kind": "synthetic-catalogue-entry",
+      "license_field": "",
+      "download_status": 200,
+      "last_checked": "synthetic; no live request was made"
+    },
+    "planted_defect": "malformed_license_metadata"
+  },
+  {
+    "record_id": "orphan-weather-stations",
+    "dataset_title": "Decommissioned Weather Stations Registry",
+    "steward": "unknown",
+    "steward_label": "(no public steward contact recorded)",
+    "target_ref": "synthetic-doc/open-data-feed/orphan-weather-stations",
+    "rendered_text": "Open Data Catalogue Entry\n\nTitle: Decommissioned Weather Stations Registry\nMaintainer: (not recorded)\nDescription: Registry of decommissioned weather stations.\nLicence: Creative Commons Attribution 4.0 (CC-BY-4.0)\nDownload: the catalogue's listed download link returns HTTP 404 (recorded in the fixture metadata; no live request was made).\nStatus: synthetic, local test fixture; not fetched over a network. This record deliberately carries NO resolvable public steward contact to exercise the fail-closed path.",
+    "registration_metadata": {
+      "record_kind": "synthetic-catalogue-entry",
+      "license_field": "CC-BY-4.0",
+      "download_status": 404,
+      "last_checked": "synthetic; no live request was made"
+    },
+    "planted_defect": "broken_download_link"
+  }
+]

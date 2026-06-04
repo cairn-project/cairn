@@ -98,6 +98,37 @@ the same chain, run [`examples/demo.sh`](../examples/demo.sh).
 > the pilot with one node driven by a real Claude via an isolated
 > `claude -p` subprocess. Every other command stays fully offline.
 
+## The value-demo scenario (dump-for-review, never sent)
+
+`cairn scenario` drives the **whole value loop** over a benign, public,
+non-person topic — stale/broken public open-data feed records — and **dumps** a
+human-review packet per finding instead of sending anything:
+
+```sh
+# hermetic run (no credentials, no network): deterministic analysis nodes
+.venv/bin/cairn scenario run --offline --ledger /tmp/cairn-demo \
+    --review-dir /tmp/cairn-demo-review
+
+# the default real run analyses each record with a live Claude via isolated
+# `claude -p`, graded by the real verify quorum (drop --offline)
+.venv/bin/cairn scenario run --ledger /tmp/cairn-demo \
+    --review-dir /tmp/cairn-demo-review
+
+# each finding is left PENDING in the REAL human-vetting gate; record the
+# human verdict (a finding is ROUTABLE only via a recorded human verdict)
+.venv/bin/cairn scenario list --ledger /tmp/cairn-demo
+.venv/bin/cairn scenario review <finding_hash> --routable \
+    --reason "verified benign" --by reviewer --ledger /tmp/cairn-demo
+```
+
+Every dumped artefact (`packet.md` / `packet.json` / `provenance.txt`) carries a
+`FOR REVIEW — NOT SENT — demonstration scenario, not a live cause` banner. The
+scenario has **no egress code path** — it resolves the real public reporting org
+(e.g. the documented Data.gov `DataGovHelp@gsa.gov` fallback), builds an evidence
+packet, routes through the real human gate, and **sends nothing**. The
+reporting-org finder fails closed on an unresolvable contact rather than guess a
+recipient.
+
 ## Run the tests
 
 The project uses pytest, configured in `pyproject.toml` (`testpaths =

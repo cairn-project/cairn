@@ -7,6 +7,43 @@ versions may include breaking changes; patch versions are fixes.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-04
+
+### Added
+- **`cairn scenario` — the value-demo scenario (dump-for-review, NEVER send).**
+  A new command group (`run` / `review` / `list`) that drives the REAL engine
+  end-to-end over a benign, public, NON-PERSON topic — stale/broken public
+  open-data feed records — and **dumps** a human-review packet per finding
+  instead of sending anything. It closes the credibility gap the `pilot` left
+  open: `pilot` exercises only the verify backbone and SKIPS the human-vetting
+  gate; `scenario` shows the full value loop AND routes through the real gate.
+  - **Real where it claims to be real, simulated where it says so.** Detection is
+    openly SIMULATED (a curated set of inert open-data seed records, some with a
+    planted quality defect — a broken download link or malformed license
+    metadata; no scraping, no network). Analysis is REAL: the seeded record's
+    metadata is judged by the live `ClaudeCliAdapter` (isolated `claude -p`) plus
+    a distinct deterministic reference node, graded by the REAL verify quorum +
+    honeypot. The reporting-organization lookup is REAL: a public, read-only
+    resolution of the actual data-steward inbox (e.g. the documented Data.gov
+    fallback `DataGovHelp@gsa.gov`). The human-vetting gate is REAL: each finding
+    is left PENDING in `FindingVetQueue`, and `scenario review` records the human
+    Gate-2 verdict (a finding is ROUTABLE only via a recorded human verdict). The
+    transparency log is the REAL audit log, independently `verify-log`-checkable.
+  - **It sends nothing.** The scenario has NO egress code path: it writes a
+    banner-labeled review dump (`packet.md` / `packet.json` / `provenance.txt`,
+    each stamped `FOR REVIEW — NOT SENT — demonstration scenario, not a live
+    cause`) and stops at "human-vetted + dumped". A structural test asserts no
+    scenario module references any network-send surface.
+  - **Safety guardrails (designed in + tested):** public-info-only, read-only
+    org lookups; the subject is always a dataset record (a thing), never a
+    person; every dumped artefact carries the demonstration banner; the org
+    finder FAILS CLOSED on an unresolvable contact (no guessed recipient); the
+    real human gate is never skipped.
+  - **`--offline`** swaps the live analysis for deterministic reference nodes so
+    the scenario runs with zero credentials and zero network (the hermetic / CI
+    path); the default real `claude -p` analysis is the subscription path (no
+    Anthropic API key).
+
 ## [0.2.0] - 2026-06-04
 
 First tagged release. The initial pre-1.0 engine (Layer A) — the reusable,
