@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 # "cairn" is mission-neutral by design — the engine is general and multi-cause.
 name = "cairn"
-version = "0.1.0"
+version = "0.2.0"
 description = "Cause-coordination engine (Layer A) built to be distributed — a mission-neutral, model-agnostic detection-and-analysis engine, aiming for a decentralized volunteer network, with cross-model verification, human-in-the-loop vetting, and a tamper-evident transparency log (single-operator offline pilot today; distributed deployment is a deferred phase)."
 readme = "README.md"
 requires-python = ">=3.11"
