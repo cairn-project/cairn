@@ -10,8 +10,8 @@ abstract: >-
 type: software
 authors:
   - name: "[AUTHOR — owner to fill]"
-repository-code: "https://github.com/lukeivers/cairn"
-url: "https://github.com/lukeivers/cairn"
+repository-code: "https://github.com/cairn-project/cairn"
+url: "https://github.com/cairn-project/cairn"
 license: MIT
 version: "0.1.0"
 keywords:

@@ -8,7 +8,7 @@ auditability, and honest limitations is high, and contributions are reviewed
 against that bar.
 
 > **Name.** "Cairn" is mission-neutral by design. The repository lives at
-> <https://github.com/lukeivers/cairn>.
+> <https://github.com/cairn-project/cairn>.
 
 By contributing you agree that your contributions are licensed under the
 project's [MIT License](LICENSE), and you agree to abide by our
@@ -65,7 +65,7 @@ discovers.
 `main` is protected. **All changes land through pull requests; no one pushes
 directly to `main`.**
 
-1. **Fork** the repository (<https://github.com/lukeivers/cairn>).
+1. **Fork** the repository (<https://github.com/cairn-project/cairn>).
 2. **Branch** from `main` with a descriptive name
    (`fix/lease-expiry-off-by-one`, `feat/honeypot-density-knob`).
 3. **Make your change** with tests. New behavior requires a test; a bug fix
@@ -128,7 +128,7 @@ test(pilot): cover bad-node honeypot-catch path
 
 - **General questions / design discussion:** open a
   [discussion or issue](.github/ISSUE_TEMPLATE/) on the repository
-  (<https://github.com/lukeivers/cairn>).
+  (<https://github.com/cairn-project/cairn>).
 - **Security / trust-integrity vulnerabilities:** **private** channel only —
   [SECURITY.md](SECURITY.md).
 - **Conduct concerns:** see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

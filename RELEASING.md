@@ -83,7 +83,7 @@ No publish target is configured in the repo, so pick one explicitly:
   ```
 
 - **GitHub release** against the pushed tag (remote is
-  `github.com/lukeivers/cairn`), attaching the `dist/` artifacts:
+  `github.com/cairn-project/cairn`), attaching the `dist/` artifacts:
 
   ```sh
   gh release create v0.2.0 dist/* --title "cairn v0.2.0" --notes "..."

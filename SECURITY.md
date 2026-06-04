@@ -8,7 +8,7 @@ coordinated disclosure.
 **Do not open a public issue for security vulnerabilities.**
 
 - Preferred: use GitHub's **private security advisories** ("Report a vulnerability"
-  on the [Security tab](https://github.com/lukeivers/cairn/security)) once the
+  on the [Security tab](https://github.com/cairn-project/cairn/security)) once the
   repository is public.
 - Or use GitHub's private vulnerability reporting: the repository's **Security** tab → **Report a vulnerability**.
 
