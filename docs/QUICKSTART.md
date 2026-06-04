@@ -10,6 +10,15 @@ running the tests. For the field-by-field work-unit spec see
 `src/cairn/spec/SPEC.md`; for the full scope and deferral list see
 `README.md`.
 
+> **What runs today.** The runnable scope is the benign, fully-offline
+> *worked example* — the pilot cause and the end-to-end cause flow in
+> `docs/WALKTHROUGH.md`. Live capture (visiting a real URL/target) and live
+> recipient delivery (egress to a real institution) are deliberately deferred,
+> offline-by-design waves: the capture and routing seams ship only their
+> local/in-memory adapters, with **no network egress**. So `cairn` coordinates a
+> *worked example* end-to-end today, not live causes — see the maturity block in
+> `README.md` and `docs/THREAT-MODEL.md` for the full deferral list.
+
 ## Requirements
 
 - Python 3.11 or newer.
@@ -76,6 +85,12 @@ command set, which also includes the cause-layer commands (`causes`,
 `cause-request`, `cause-decide`, `contribute`) and the read-only `public`
 surfaces (`public causes`, `public outcomes`, `public verify-log`,
 `public log`).
+
+To run the **full cause loop** — request a cause, approve it through the
+five-frame safety gate, contribute work, and read the public transparency
+surfaces — as one copy-paste session, follow
+[`docs/WALKTHROUGH.md`](WALKTHROUGH.md). For a single-command runnable demo of
+the same chain, run [`examples/demo.sh`](../examples/demo.sh).
 
 > `cairn live-smoke` is the only command that touches a real model — it runs
 > the pilot with one node driven by a real Claude via an isolated
