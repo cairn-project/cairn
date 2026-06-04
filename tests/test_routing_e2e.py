@@ -47,7 +47,9 @@ def _routable_finding(queue, packet_hash, *, confidence):
         cause_id="cause-x",
     )
     queue.record_verdict(
-        finding.finding_hash, routable=True, reason="human finding-vetter confirms",
+        finding.finding_hash,
+        routable=True,
+        reason="human finding-vetter confirms",
         reviewer_id="finding-vetter",
     )
     return finding
@@ -61,8 +63,11 @@ def test_routing_spine_full_loop_end_to_end(tmp_path):
     cgate = CaptureGate(ledger)
     cgate.grant("operator-1", granted_by="anchor", scope_summary="benign fixtures")
     packet = capture_packet(
-        StaticDocumentCapturePort(), gate=cgate, ledger=ledger,
-        node_id="operator-1", cause_id="cause-x",
+        StaticDocumentCapturePort(),
+        gate=cgate,
+        ledger=ledger,
+        node_id="operator-1",
+        cause_id="cause-x",
     )
 
     queue = FindingVetQueue(ledger)
@@ -70,20 +75,28 @@ def test_routing_spine_full_loop_end_to_end(tmp_path):
     registry = RecipientRegistry()
     registry.add(
         Recipient.create(
-            "recipient-region-a", locality={"region-a"}, domain={"kind-x"},
+            "recipient-region-a",
+            locality={"region-a"},
+            domain={"kind-x"},
             channel=channel,
         )
     )
     registry.set_fallback(
         Recipient.create(
-            "escalation-default", locality=set(), domain=set(), channel=channel,
+            "escalation-default",
+            locality=set(),
+            domain=set(),
+            channel=channel,
         )
     )
 
     # === (a) MATCHED route — the recorded action ============================
     f1 = _routable_finding(queue, packet.packet_hash, confidence=0.91)
     rec1 = dispatch_routable_finding(
-        f1.finding_hash, ledger=ledger, finding_queue=queue, registry=registry,
+        f1.finding_hash,
+        ledger=ledger,
+        finding_queue=queue,
+        registry=registry,
         attributes=FindingRoutingAttributes.of(locality={"region-a"}, domain={"kind-x"}),
     )
     assert rec1.recipient_id == "recipient-region-a"
@@ -94,7 +107,10 @@ def test_routing_spine_full_loop_end_to_end(tmp_path):
     # === (b) NO-MATCH route — explicit escalation, no silent drop ==========
     f2 = _routable_finding(queue, packet.packet_hash, confidence=0.77)
     rec2 = dispatch_routable_finding(
-        f2.finding_hash, ledger=ledger, finding_queue=queue, registry=registry,
+        f2.finding_hash,
+        ledger=ledger,
+        finding_queue=queue,
+        registry=registry,
         attributes=FindingRoutingAttributes.of(locality={"region-z"}, domain={"kind-z"}),
     )
     assert rec2.recipient_id == "escalation-default"
@@ -104,15 +120,17 @@ def test_routing_spine_full_loop_end_to_end(tmp_path):
     f3 = queue.flag(
         packet_hash=packet.packet_hash,
         automated_verdict=AutomatedVerdict(flag_label="flagged", confidence=0.5),
-        flagged_by="node-1", cause_id="cause-x",
+        flagged_by="node-1",
+        cause_id="cause-x",
     )
-    queue.record_verdict(
-        f3.finding_hash, routable=False, reason="human rejects", reviewer_id="v2"
-    )
+    queue.record_verdict(f3.finding_hash, routable=False, reason="human rejects", reviewer_id="v2")
     before = len(ledger.translog.entries())
     with pytest.raises(RoutingRefused):
         dispatch_routable_finding(
-            f3.finding_hash, ledger=ledger, finding_queue=queue, registry=registry,
+            f3.finding_hash,
+            ledger=ledger,
+            finding_queue=queue,
+            registry=registry,
             attributes=FindingRoutingAttributes.of(locality={"region-a"}, domain={"kind-x"}),
         )
     # Refused => no routing entries were appended for it.
@@ -123,9 +141,7 @@ def test_routing_spine_full_loop_end_to_end(tmp_path):
     acks = [e for e in ledger.translog.entries() if e.kind == KIND_ROUTE_ACK_RECORDED]
     assert len(routed) == 2
     assert len(acks) == 2
-    assert {e.payload["finding_hash"] for e in routed} == {
-        f1.finding_hash, f2.finding_hash
-    }
+    assert {e.payload["finding_hash"] for e in routed} == {f1.finding_hash, f2.finding_hash}
 
     # === (d) TRANSPARENCY ==================================================
     assert verify_log(ledger.translog._path).ok  # noqa: SLF001

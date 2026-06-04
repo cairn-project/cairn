@@ -15,7 +15,6 @@ extended to consent). It forks nothing.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from ..cause.registry import CauseRegistry
 from ..ledger.ledger import Ledger
@@ -43,9 +42,7 @@ class OptInRegistry:
 
     # --- opt in --------------------------------------------------------------
 
-    def opt_in(
-        self, node_id: str, cause_id: str, agreed_summary: str
-    ) -> ConsentRecord:
+    def opt_in(self, node_id: str, cause_id: str, agreed_summary: str) -> ConsentRecord:
         """Record consent for ``node_id`` to work ``cause_id``.
 
         REFUSES (``OptInRefused``) if the cause is not publicly listable — a
@@ -89,9 +86,7 @@ class OptInRegistry:
         """
         existing = self.get_consent(node_id, cause_id)
         if existing is None:
-            raise OptInError(
-                f"no consent to revoke for node {node_id!r} on cause {cause_id!r}"
-            )
+            raise OptInError(f"no consent to revoke for node {node_id!r} on cause {cause_id!r}")
         revoked = ConsentRecord(
             node_id=existing.node_id,
             cause_id=existing.cause_id,
@@ -113,9 +108,7 @@ class OptInRegistry:
         record = self.get_consent(node_id, cause_id)
         return record is not None and record.active
 
-    def get_consent(
-        self, node_id: str, cause_id: str
-    ) -> Optional[ConsentRecord]:
+    def get_consent(self, node_id: str, cause_id: str) -> ConsentRecord | None:
         ref = self._index_dir / self._key(node_id, cause_id)
         if not ref.exists():
             return None
@@ -132,6 +125,4 @@ class OptInRegistry:
 
     def _persist(self, record: ConsentRecord) -> None:
         blob_key = self._ledger.blobs.put_json(record.to_dict())
-        (self._index_dir / self._key(record.node_id, record.cause_id)).write_text(
-            blob_key
-        )
+        (self._index_dir / self._key(record.node_id, record.cause_id)).write_text(blob_key)

@@ -18,10 +18,10 @@ output. No scam/sensitive/detection logic exists in this module by construction.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
-from ..vetting import AutomatedVerdict
 from ..verify import VerifyVerdict
+from ..vetting import AutomatedVerdict
 
 
 @dataclass(frozen=True)
@@ -35,15 +35,15 @@ class FlagDecision:
     """
 
     flagged: bool
-    automated_verdict: Optional[AutomatedVerdict]
+    automated_verdict: AutomatedVerdict | None
     reason: str
 
     @staticmethod
-    def flag(automated_verdict: AutomatedVerdict, reason: str) -> "FlagDecision":
+    def flag(automated_verdict: AutomatedVerdict, reason: str) -> FlagDecision:
         return FlagDecision(flagged=True, automated_verdict=automated_verdict, reason=reason)
 
     @staticmethod
-    def no_flag(reason: str) -> "FlagDecision":
+    def no_flag(reason: str) -> FlagDecision:
         return FlagDecision(flagged=False, automated_verdict=None, reason=reason)
 
 
@@ -98,21 +98,15 @@ class ThresholdFlagPolicy:
 
         output = verdict.accepted_output
         if not isinstance(output, dict) or self.score_field not in output:
-            return FlagDecision.no_flag(
-                f"no {self.score_field!r} in accepted output"
-            )
+            return FlagDecision.no_flag(f"no {self.score_field!r} in accepted output")
 
         raw = output[self.score_field]
         if isinstance(raw, bool) or not isinstance(raw, (int, float)):
-            return FlagDecision.no_flag(
-                f"{self.score_field!r} is not numeric"
-            )
+            return FlagDecision.no_flag(f"{self.score_field!r} is not numeric")
 
         score = _clamp_unit(float(raw))
         if score < self.min_confidence:
-            return FlagDecision.no_flag(
-                f"score {score} below threshold {self.min_confidence}"
-            )
+            return FlagDecision.no_flag(f"score {score} below threshold {self.min_confidence}")
 
         return FlagDecision.flag(
             AutomatedVerdict(flag_label=self.flag_label, confidence=score),

@@ -24,7 +24,6 @@ explicit ``model_diversity = 1`` (deliberately configured) disables it for a ben
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from ..types import RedundancyPolicy
 from .agreement import Cluster
@@ -58,7 +57,7 @@ class QuorumResult:
     status: str
     nresults: int
     clusters: list[Cluster] = field(default_factory=list)
-    winning_cluster: Optional[Cluster] = None
+    winning_cluster: Cluster | None = None
     required_quorum: int = 0
     required_diversity: int = 0
     detail: str = ""
@@ -68,9 +67,7 @@ class QuorumResult:
         return self.status == STATUS_ACCEPTED
 
 
-def decide_quorum(
-    clusters: list[Cluster], policy: RedundancyPolicy
-) -> QuorumResult:
+def decide_quorum(clusters: list[Cluster], policy: RedundancyPolicy) -> QuorumResult:
     """Decide a quorum status from agreement clusters + the redundancy policy.
 
     Acceptance requires BOTH size (``>= min_quorum``) AND diversity
@@ -81,9 +78,7 @@ def decide_quorum(
     need_div = required_diversity(policy)
 
     # Largest cluster first (ties broken by more model families, then key).
-    ranked = sorted(
-        clusters, key=lambda c: (c.size, len(c.model_families), c.key), reverse=True
-    )
+    ranked = sorted(clusters, key=lambda c: (c.size, len(c.model_families), c.key), reverse=True)
 
     size_qualified = [c for c in ranked if c.size >= min_quorum]
 
@@ -131,8 +126,7 @@ def decide_quorum(
     else:
         status = STATUS_NO_QUORUM
         detail = (
-            f"no cluster reached quorum {min_quorum} "
-            f"(largest {ranked[0].size if ranked else 0})"
+            f"no cluster reached quorum {min_quorum} (largest {ranked[0].size if ranked else 0})"
         )
 
     return QuorumResult(

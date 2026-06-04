@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from ..ledger.ledger import Ledger
 from ..ledger.translog import (
@@ -54,7 +54,7 @@ class CaptureGrant:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "CaptureGrant":
+    def from_dict(cls, d: dict[str, Any]) -> CaptureGrant:
         return cls(
             node_id=d["node_id"],
             granted_by=d["granted_by"],
@@ -75,9 +75,7 @@ class CaptureGate:
 
     # --- grant ---------------------------------------------------------------
 
-    def grant(
-        self, node_id: str, granted_by: str, scope_summary: str
-    ) -> CaptureGrant:
+    def grant(self, node_id: str, granted_by: str, scope_summary: str) -> CaptureGrant:
         """Grant the CAPTURE role to ``node_id``; log ``CAPTURE_ROLE_GRANTED``."""
         grant = CaptureGrant(
             node_id=node_id,
@@ -106,9 +104,7 @@ class CaptureGate:
         """
         existing = self.get_grant(node_id)
         if existing is None:
-            raise CaptureGateError(
-                f"no capture-role grant to revoke for node {node_id!r}"
-            )
+            raise CaptureGateError(f"no capture-role grant to revoke for node {node_id!r}")
         revoked = CaptureGrant(
             node_id=existing.node_id,
             granted_by=existing.granted_by,
@@ -117,9 +113,7 @@ class CaptureGate:
             active=False,
         )
         self._persist(revoked)
-        self._ledger.translog.append(
-            KIND_CAPTURE_ROLE_REVOKED, {"node_id": node_id}
-        )
+        self._ledger.translog.append(KIND_CAPTURE_ROLE_REVOKED, {"node_id": node_id})
         return revoked
 
     # --- query ---------------------------------------------------------------
@@ -129,7 +123,7 @@ class CaptureGate:
         grant = self.get_grant(node_id)
         return grant is not None and grant.active
 
-    def get_grant(self, node_id: str) -> Optional[CaptureGrant]:
+    def get_grant(self, node_id: str) -> CaptureGrant | None:
         ref = self._index_dir / self._key(node_id)
         if not ref.exists():
             return None

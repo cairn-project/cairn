@@ -28,9 +28,5 @@ def load_fixture(name: str) -> dict[str, Any]:
     """Load an example work unit by name (e.g. ``"benign_pilot"``)."""
     if name not in _FIXTURE_NAMES:
         raise KeyError(f"unknown fixture {name!r}; available: {list(_FIXTURE_NAMES)}")
-    text = (
-        resources.files("cairn.fixtures")
-        .joinpath(f"{name}.json")
-        .read_text(encoding="utf-8")
-    )
+    text = resources.files("cairn.fixtures").joinpath(f"{name}.json").read_text(encoding="utf-8")
     return json.loads(text)

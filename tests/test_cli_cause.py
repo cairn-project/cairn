@@ -23,13 +23,14 @@ def _run_cli(args):
     env["PYTHONPATH"] = _SRC + os.pathsep + env.get("PYTHONPATH", "")
     return subprocess.run(
         [sys.executable, "-m", "cairn.cli", *args],
-        capture_output=True, text=True, env=env,
+        capture_output=True,
+        text=True,
+        env=env,
     )
 
 
 def _request_id(ledger_dir):
-    proc = _run_cli(["cause-request", _BENIGN_DRAFT, "--ledger", str(ledger_dir),
-                     "--json"])
+    proc = _run_cli(["cause-request", _BENIGN_DRAFT, "--ledger", str(ledger_dir), "--json"])
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)["cause_id"], proc
 
@@ -48,14 +49,28 @@ def test_cli_cause_approve_then_listed(tmp_path):
     ledger_dir = tmp_path / "ledger"
     cause_id, _ = _request_id(ledger_dir)
     frames = []
-    for f in ("works", "doesnt_target_good_people", "legal",
-              "court_grade_auditable", "human_verified"):
+    for f in (
+        "works",
+        "doesnt_target_good_people",
+        "legal",
+        "court_grade_auditable",
+        "human_verified",
+    ):
         frames += ["--frame-pass", f]
-    proc = _run_cli([
-        "cause-decide", cause_id, "--approve", "--reason",
-        "benign; passes all five frames", "--by", "anchor",
-        "--ledger", str(ledger_dir), *frames,
-    ])
+    proc = _run_cli(
+        [
+            "cause-decide",
+            cause_id,
+            "--approve",
+            "--reason",
+            "benign; passes all five frames",
+            "--by",
+            "anchor",
+            "--ledger",
+            str(ledger_dir),
+            *frames,
+        ]
+    )
     assert proc.returncode == 0, proc.stderr
     # Now it shows up in the public list.
     proc = _run_cli(["causes", "--ledger", str(ledger_dir), "--json"])
@@ -68,14 +83,28 @@ def test_cli_cause_reject_stays_unlisted_and_log_verifies(tmp_path):
     ledger_dir = tmp_path / "ledger"
     cause_id, _ = _request_id(ledger_dir)
     frames = []
-    for f in ("works", "doesnt_target_good_people", "legal",
-              "court_grade_auditable", "human_verified"):
+    for f in (
+        "works",
+        "doesnt_target_good_people",
+        "legal",
+        "court_grade_auditable",
+        "human_verified",
+    ):
         frames += ["--frame-pass", f]
-    proc = _run_cli([
-        "cause-decide", cause_id, "--reject", "--reason",
-        "rejected for the record", "--by", "anchor",
-        "--ledger", str(ledger_dir), *frames,
-    ])
+    proc = _run_cli(
+        [
+            "cause-decide",
+            cause_id,
+            "--reject",
+            "--reason",
+            "rejected for the record",
+            "--by",
+            "anchor",
+            "--ledger",
+            str(ledger_dir),
+            *frames,
+        ]
+    )
     assert proc.returncode == 0, proc.stderr
     # Rejected cause stays out of the public list.
     proc = _run_cli(["causes", "--ledger", str(ledger_dir), "--json"])
@@ -89,13 +118,28 @@ def test_cli_cause_decide_empty_reason_fails(tmp_path):
     ledger_dir = tmp_path / "ledger"
     cause_id, _ = _request_id(ledger_dir)
     frames = []
-    for f in ("works", "doesnt_target_good_people", "legal",
-              "court_grade_auditable", "human_verified"):
+    for f in (
+        "works",
+        "doesnt_target_good_people",
+        "legal",
+        "court_grade_auditable",
+        "human_verified",
+    ):
         frames += ["--frame-pass", f]
-    proc = _run_cli([
-        "cause-decide", cause_id, "--approve", "--reason", "  ", "--by", "anchor",
-        "--ledger", str(ledger_dir), *frames,
-    ])
+    proc = _run_cli(
+        [
+            "cause-decide",
+            cause_id,
+            "--approve",
+            "--reason",
+            "  ",
+            "--by",
+            "anchor",
+            "--ledger",
+            str(ledger_dir),
+            *frames,
+        ]
+    )
     assert proc.returncode == 1  # no silent decision
     assert "DECISION REJECTED" in proc.stdout
 
@@ -106,10 +150,21 @@ def test_cli_cause_decide_unknown_frame_fails(tmp_path):
     # UNKNOWN frame key (a typo) rather than letting it slip silently.
     ledger_dir = tmp_path / "ledger"
     cause_id, _ = _request_id(ledger_dir)
-    proc = _run_cli([
-        "cause-decide", cause_id, "--approve", "--reason", "ok", "--by", "anchor",
-        "--ledger", str(ledger_dir), "--frame-pass", "not_a_real_frame",
-    ])
+    proc = _run_cli(
+        [
+            "cause-decide",
+            cause_id,
+            "--approve",
+            "--reason",
+            "ok",
+            "--by",
+            "anchor",
+            "--ledger",
+            str(ledger_dir),
+            "--frame-pass",
+            "not_a_real_frame",
+        ]
+    )
     assert proc.returncode == 2  # unknown frame rejected
     assert "unknown frame" in proc.stdout
 
@@ -119,13 +174,31 @@ def test_cli_outcome_altitude_request_decide_list_subprocess(tmp_path):
     ledger_dir = tmp_path / "ledger"
     cause_id, _ = _request_id(ledger_dir)
     frames = []
-    for f in ("works", "doesnt_target_good_people", "legal",
-              "court_grade_auditable", "human_verified"):
+    for f in (
+        "works",
+        "doesnt_target_good_people",
+        "legal",
+        "court_grade_auditable",
+        "human_verified",
+    ):
         frames += ["--frame-pass", f]
-    assert _run_cli([
-        "cause-decide", cause_id, "--approve", "--reason", "ok", "--by", "anchor",
-        "--ledger", str(ledger_dir), *frames,
-    ]).returncode == 0
+    assert (
+        _run_cli(
+            [
+                "cause-decide",
+                cause_id,
+                "--approve",
+                "--reason",
+                "ok",
+                "--by",
+                "anchor",
+                "--ledger",
+                str(ledger_dir),
+                *frames,
+            ]
+        ).returncode
+        == 0
+    )
     proc = _run_cli(["causes", "--ledger", str(ledger_dir)])
     assert proc.returncode == 0
     assert cause_id[:12] in proc.stdout

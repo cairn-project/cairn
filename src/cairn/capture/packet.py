@@ -30,7 +30,7 @@ blob content key the packet is stored under (``store.py``).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from ..ledger.blobstore import canonical_json, content_key
 
@@ -65,9 +65,7 @@ def _is_plain_json(value: Any) -> bool:
     if isinstance(value, list):
         return all(_is_plain_json(v) for v in value)
     if isinstance(value, dict):
-        return all(
-            isinstance(k, str) and _is_plain_json(v) for k, v in value.items()
-        )
+        return all(isinstance(k, str) and _is_plain_json(v) for k, v in value.items())
     return False
 
 
@@ -85,7 +83,7 @@ class Observation:
     content_hash: str
 
     @staticmethod
-    def create(kind: str, content: Any) -> "Observation":
+    def create(kind: str, content: Any) -> Observation:
         """Build an observation, computing its content hash and enforcing inertness.
 
         Raises ``ValueError`` on an unknown kind or non-JSON (potentially
@@ -93,8 +91,7 @@ class Observation:
         """
         if kind not in OBSERVATION_KINDS:
             raise ValueError(
-                f"unknown observation kind {kind!r}; "
-                f"valid: {sorted(OBSERVATION_KINDS)}"
+                f"unknown observation kind {kind!r}; valid: {sorted(OBSERVATION_KINDS)}"
             )
         if not _is_plain_json(content):
             raise ValueError(
@@ -115,25 +112,21 @@ class Observation:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Observation":
+    def from_dict(cls, d: dict[str, Any]) -> Observation:
         # Reconstruct AND re-verify the content hash from the stored content, so a
         # tampered observation is caught on load (content-addressing integrity).
         recomputed = content_key(canonical_json(d["content"]))
         if recomputed != d["content_hash"]:
-            raise ValueError(
-                "observation content_hash mismatch (tampered observation)"
-            )
+            raise ValueError("observation content_hash mismatch (tampered observation)")
         if not _is_plain_json(d["content"]):
             raise ValueError("observation content is not plain JSON (not inert)")
-        return cls(
-            kind=d["kind"], content=d["content"], content_hash=d["content_hash"]
-        )
+        return cls(kind=d["kind"], content=d["content"], content_hash=d["content_hash"])
 
 
 def _packet_material(
     *,
     target_ref: str,
-    cause_id: Optional[str],
+    cause_id: str | None,
     observations: tuple[Observation, ...],
     captured_at: float,
     captured_by: str,
@@ -162,7 +155,7 @@ class ExaminationPacket:
     """
 
     target_ref: str
-    cause_id: Optional[str]
+    cause_id: str | None
     observations: tuple[Observation, ...]
     captured_at: float
     captured_by: str
@@ -177,8 +170,8 @@ class ExaminationPacket:
         captured_at: float,
         captured_by: str,
         capture_method: str,
-        cause_id: Optional[str] = None,
-    ) -> "ExaminationPacket":
+        cause_id: str | None = None,
+    ) -> ExaminationPacket:
         """Build a packet, computing its content-address ``packet_hash``."""
         material = _packet_material(
             target_ref=target_ref,
@@ -211,7 +204,7 @@ class ExaminationPacket:
         return d
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "ExaminationPacket":
+    def from_dict(cls, d: dict[str, Any]) -> ExaminationPacket:
         """Reconstruct a packet, RE-DERIVING ``packet_hash`` from its material.
 
         Accepts either the stored MATERIAL form (no ``packet_hash`` key — the form
@@ -271,14 +264,14 @@ class AnalysisView:
 
     packet_hash: str
     target_ref: str
-    cause_id: Optional[str]
+    cause_id: str | None
     captured_at: float
     captured_by: str
     capture_method: str
     observations: tuple[Observation, ...]
 
     @classmethod
-    def of(cls, packet: ExaminationPacket) -> "AnalysisView":
+    def of(cls, packet: ExaminationPacket) -> AnalysisView:
         return cls(
             packet_hash=packet.packet_hash,
             target_ref=packet.target_ref,
@@ -293,7 +286,7 @@ class AnalysisView:
         """All frozen observations of a given kind (read-only)."""
         return tuple(o for o in self.observations if o.kind == kind)
 
-    def rendered_text(self) -> Optional[str]:
+    def rendered_text(self) -> str | None:
         """The captured rendered-text snapshot, if one was recorded (read-only)."""
         for obs in self.observations_of_kind(OBS_RENDERED_TEXT):
             content = obs.content

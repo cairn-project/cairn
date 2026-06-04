@@ -14,11 +14,11 @@ import json
 import pytest
 
 from cairn.execute.claude_adapter import (
+    _EMPTY_MCP_CONFIG,
+    _STRICT_MCP_FLAG,
     ClaudeCliAdapter,
     ClaudeCliError,
     _build_claude_argv,
-    _EMPTY_MCP_CONFIG,
-    _STRICT_MCP_FLAG,
 )
 from cairn.pilot.cause import build_pilot_units, classify_license, load_snippets
 from cairn.types import WorkUnit
@@ -204,8 +204,6 @@ def test_real_claude_print_raises_on_nonzero_exit(monkeypatch):
 def test_produced_at_uses_injected_clock():
     unit = _first_pilot_unit()
     answer = _correct_answer_for(unit)
-    adapter = ClaudeCliAdapter(
-        transcript_fn=lambda p: json.dumps(answer), clock_fn=_fixed_clock
-    )
+    adapter = ClaudeCliAdapter(transcript_fn=lambda p: json.dumps(answer), clock_fn=_fixed_clock)
     cand = adapter.produce(unit)
     assert cand.produced_at == _FIXED_TS  # NOT the wall clock

@@ -44,11 +44,7 @@ _LICENSE_RULES: list[tuple[str, bool, str]] = [
 
 def load_snippets() -> list[dict[str, Any]]:
     """Load the bundled benign input snippets (no network)."""
-    text = (
-        resources.files("cairn.fixtures")
-        .joinpath(_SNIPPETS_FIXTURE)
-        .read_text(encoding="utf-8")
-    )
+    text = resources.files("cairn.fixtures").joinpath(_SNIPPETS_FIXTURE).read_text(encoding="utf-8")
     return json.loads(text)
 
 

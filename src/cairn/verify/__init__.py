@@ -20,13 +20,13 @@ trusted-core membership governance (B.4).
 
 from __future__ import annotations
 
+from .aggregate import VerifyVerdict, verify_unit
 from .agreement import (
     AgreementFunction,
     Cluster,
     ObjectiveAgreement,
     SubjectiveAgreement,
 )
-from .aggregate import VerifyVerdict, verify_unit
 from .honeypot import Honeypot, HoneypotScore
 from .judge import Judge, MockJudge
 from .quorum import (

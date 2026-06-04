@@ -19,7 +19,6 @@ five-frame gate-check (structure enforced — ``gate.py``).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from ..ledger.ledger import Ledger
 from ..ledger.translog import (
@@ -112,8 +111,7 @@ class CauseRegistry:
         Only approval flips the cause publicly listable (the gate).
         """
         if not reason or not reason.strip():
-            raise CauseError("a cause decision requires a non-empty reason "
-                             "(no silent decision)")
+            raise CauseError("a cause decision requires a non-empty reason (no silent decision)")
         if not gate_result.complete:
             raise CauseError(
                 "the five-frame gate-check is incomplete "
@@ -148,9 +146,7 @@ class CauseRegistry:
 
     # --- public list ---------------------------------------------------------
 
-    def list_causes(
-        self, status_filter: Optional[CauseStatus] = None
-    ) -> list[Cause]:
+    def list_causes(self, status_filter: CauseStatus | None = None) -> list[Cause]:
         """List causes.
 
         Default (no filter): ONLY publicly-listable causes (APPROVED / LIVE) —
@@ -158,8 +154,7 @@ class CauseRegistry:
         request/decision history view for that status (visible, but a REQUESTED
         or REJECTED cause is NOT "accepting compute").
         """
-        causes = [self._load(p) for p in sorted(self._index_dir.iterdir())
-                  if p.is_file()]
+        causes = [self._load(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()]
         if status_filter is None:
             return [c for c in causes if c.is_publicly_listable]
         return [c for c in causes if c.status == status_filter]

@@ -20,8 +20,9 @@ from cairn.ledger import (
 def _seed_log(path, clock):
     log = TransparencyLog(path, clock)
     log.append(KIND_RESULT_RECORDED, {"task_id": "t1", "result_key": "aaa"})
-    log.append(KIND_CAUSE_DECISION, {"cause_id": "c1", "decision": "approved",
-                                     "reason": "meets criteria"})
+    log.append(
+        KIND_CAUSE_DECISION, {"cause_id": "c1", "decision": "approved", "reason": "meets criteria"}
+    )
     log.append(KIND_RESULT_RECORDED, {"task_id": "t2", "result_key": "bbb"})
     return log
 

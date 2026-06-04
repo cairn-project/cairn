@@ -85,9 +85,7 @@ def test_does_not_flag_below_threshold():
 
 def test_configurable_score_field_is_honoured():
     v = _accepted_verdict({"label": "cc-by", "match_score": 0.8})
-    decision = ThresholdFlagPolicy(
-        "flagged", 0.5, score_field="match_score"
-    ).decide(v)
+    decision = ThresholdFlagPolicy("flagged", 0.5, score_field="match_score").decide(v)
     assert decision.flagged
     assert decision.automated_verdict.confidence == pytest.approx(0.8)
 

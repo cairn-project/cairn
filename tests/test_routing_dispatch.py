@@ -31,16 +31,8 @@ def _fresh(tmp_path):
 
 def _registry(channel):
     reg = RecipientRegistry()
-    reg.add(
-        Recipient.create(
-            "r1", locality={"region-a"}, domain={"kind-x"}, channel=channel
-        )
-    )
-    reg.set_fallback(
-        Recipient.create(
-            "fallback", locality=set(), domain=set(), channel=channel
-        )
-    )
+    reg.add(Recipient.create("r1", locality={"region-a"}, domain={"kind-x"}, channel=channel))
+    reg.set_fallback(Recipient.create("fallback", locality=set(), domain=set(), channel=channel))
     return reg
 
 
@@ -127,16 +119,12 @@ def test_routable_finding_is_delivered_and_recorded(tmp_path):
     assert KIND_FINDING_ROUTED in kinds
     assert KIND_ROUTE_ACK_RECORDED in kinds
 
-    routed = next(
-        e for e in ledger.translog.entries() if e.kind == KIND_FINDING_ROUTED
-    )
+    routed = next(e for e in ledger.translog.entries() if e.kind == KIND_FINDING_ROUTED)
     assert routed.payload["recipient_id"] == "r1"
     assert routed.payload["route_reason"] == "matched"
     assert routed.payload["finding_hash"] == finding.finding_hash
 
-    ack = next(
-        e for e in ledger.translog.entries() if e.kind == KIND_ROUTE_ACK_RECORDED
-    )
+    ack = next(e for e in ledger.translog.entries() if e.kind == KIND_ROUTE_ACK_RECORDED)
     assert ack.payload["accepted"] is True
     assert ack.payload["ack_ref"] == record.ack.ack_ref
 
@@ -162,9 +150,7 @@ def test_no_match_finding_escalates_to_fallback_recorded_no_drop(tmp_path):
     )
     assert record.recipient_id == "fallback"
     assert record.route_reason == "escalated_to_fallback"
-    routed = next(
-        e for e in ledger.translog.entries() if e.kind == KIND_FINDING_ROUTED
-    )
+    routed = next(e for e in ledger.translog.entries() if e.kind == KIND_FINDING_ROUTED)
     assert routed.payload["route_reason"] == "escalated_to_fallback"
 
 

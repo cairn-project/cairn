@@ -89,8 +89,7 @@ class RecipientChannel(Protocol):
 
     name: str
 
-    def deliver(self, dispatch: RoutingDispatch, *, acknowledged_at: float) -> DispatchAck:
-        ...
+    def deliver(self, dispatch: RoutingDispatch, *, acknowledged_at: float) -> DispatchAck: ...
 
 
 class InMemoryRecipientChannel:
@@ -112,9 +111,7 @@ class InMemoryRecipientChannel:
         """Every dispatch this channel has delivered, in order (inspection only)."""
         return tuple(self._dispatched)
 
-    def deliver(
-        self, dispatch: RoutingDispatch, *, acknowledged_at: float
-    ) -> DispatchAck:
+    def deliver(self, dispatch: RoutingDispatch, *, acknowledged_at: float) -> DispatchAck:
         """Record the dispatch + return a deterministic synthetic acknowledgement."""
         self._dispatched.append(dispatch)
         ack_ref = content_key(canonical_json(dispatch.material_dict()))

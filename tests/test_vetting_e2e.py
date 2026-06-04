@@ -36,16 +36,13 @@ from cairn.vetting import (
 )
 
 _KEY = b"vetting-e2e-key-not-secret"
-_DRAFT = (
-    Path(__file__).resolve().parents[1]
-    / "src/cairn/fixtures/cause_draft_benign.json"
-)
+_DRAFT = Path(__file__).resolve().parents[1] / "src/cairn/fixtures/cause_draft_benign.json"
 
 
 def test_two_gate_vetting_end_to_end(tmp_path):
     # Fresh ledger, no pre-arranged state.
     ledger = Ledger(tmp_path / "ledger", FixedClock(start=0.0), signing_key=_KEY)
-    gate_pass = five_frame_gate_check({k: True for k in FRAME_KEYS})
+    gate_pass = five_frame_gate_check(dict.fromkeys(FRAME_KEYS, True))
 
     # === (a) CAUSE GATE =====================================================
     registry = CauseRegistry(ledger)
@@ -62,9 +59,12 @@ def test_two_gate_vetting_end_to_end(tmp_path):
     assert registry.get_cause(cause.cause_id).status == CauseStatus.REQUESTED
 
     # Human verdict recorded → the bridge feeds the EXISTING decision → it lists.
-    cause_queue.record_verdict(cause.cause_id, approve=True,
-                               reason="human cause-vetter approves",
-                               reviewer_id="cause-vetter")
+    cause_queue.record_verdict(
+        cause.cause_id,
+        approve=True,
+        reason="human cause-vetter approves",
+        reviewer_id="cause-vetter",
+    )
     decided = cause_queue.apply_cause_verdict(cause.cause_id, registry, gate_pass)
     assert decided.status == CauseStatus.APPROVED
     assert decided.decided_by == "cause-vetter"
@@ -75,8 +75,11 @@ def test_two_gate_vetting_end_to_end(tmp_path):
     cgate = CaptureGate(ledger)
     cgate.grant("operator-1", granted_by="anchor", scope_summary="benign fixtures")
     packet = capture_packet(
-        StaticDocumentCapturePort(), gate=cgate, ledger=ledger,
-        node_id="operator-1", cause_id=cause.cause_id,
+        StaticDocumentCapturePort(),
+        gate=cgate,
+        ledger=ledger,
+        node_id="operator-1",
+        cause_id=cause.cause_id,
     )
 
     finding_queue = FindingVetQueue(ledger)
@@ -92,9 +95,12 @@ def test_two_gate_vetting_end_to_end(tmp_path):
     assert finding_queue.is_routable(finding.finding_hash) is False
 
     # Human verdict recorded → it becomes ROUTABLE (the human-verified state).
-    finding_queue.record_verdict(finding.finding_hash, routable=True,
-                                 reason="human finding-vetter confirms",
-                                 reviewer_id="finding-vetter")
+    finding_queue.record_verdict(
+        finding.finding_hash,
+        routable=True,
+        reason="human finding-vetter confirms",
+        reviewer_id="finding-vetter",
+    )
     assert finding_queue.is_routable(finding.finding_hash) is True
 
     # === (c) TRANSPARENCY ===================================================

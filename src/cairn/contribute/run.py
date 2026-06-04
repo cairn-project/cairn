@@ -19,8 +19,8 @@ is REFUSED — never waved through. This is the demand-side of the listing gate.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
-from typing import Any, Optional
+from dataclasses import dataclass, replace
+from typing import Any
 
 from ..cause.binding import WorkUnitRegistry
 from ..cause.registry import CauseRegistry
@@ -87,9 +87,7 @@ class CauseRunSummary:
             lines.append(f"  {u.task_id}")
             lines.append(f"      verdict: {verdict}  | quorum families: {fam}")
             if u.honeypot_catches:
-                lines.append(
-                    f"      honeypot caught: {', '.join(u.honeypot_catches)}"
-                )
+                lines.append(f"      honeypot caught: {', '.join(u.honeypot_catches)}")
         lines.append("")
         lines.append(
             f"units accepted: {sum(u.accepted for u in self.units)}/"
@@ -112,8 +110,8 @@ def run_cause(
     work_unit_registry: WorkUnitRegistry,
     ledger: Ledger,
     node_id: str = "contributor",
-    node_families: Optional[list[str]] = None,
-    bad_family: Optional[str] = None,
+    node_families: list[str] | None = None,
+    bad_family: str | None = None,
 ) -> CauseRunSummary:
     """Run an approved cause end-to-end for an opted-in contributor node.
 
@@ -158,17 +156,11 @@ def run_cause(
         candidates: list[CandidateResult] = []
         for family in node_families:
             family_node = f"{node_id}-{family}"
-            wrong = (
-                bad_family is not None
-                and family == bad_family
-                and task_id == hp_task_id
-            )
+            wrong = bad_family is not None and family == bad_family and task_id == hp_task_id
             adapter = PilotNodeAdapter(model_family=family, wrong=wrong)
 
             # Real atomic exclusive claim, held while this node executes.
-            claim = ledger.claim_task(
-                task_id, node_id=family_node, lease_seconds=_LEASE_SECONDS
-            )
+            claim = ledger.claim_task(task_id, node_id=family_node, lease_seconds=_LEASE_SECONDS)
             outcome = run_work_unit(unit_dict, adapter)
             assert outcome.candidate is not None
             cand = replace(outcome.candidate, adapter_name=family_node)
@@ -177,9 +169,7 @@ def run_cause(
             ledger.claims.release(task_id, claim.claim_id)
 
         policy = RedundancyPolicy.from_dict(unit_dict["redundancy_policy"])
-        honeypot = (
-            Honeypot(expected_output=hp_gold) if task_id == hp_task_id else None
-        )
+        honeypot = Honeypot(expected_output=hp_gold) if task_id == hp_task_id else None
         verdict: VerifyVerdict = verify_unit(
             candidates,
             policy,
@@ -191,9 +181,7 @@ def run_cause(
 
         families_in_quorum: list[str] = []
         if verdict.quorum.winning_cluster is not None:
-            families_in_quorum = sorted(
-                verdict.quorum.winning_cluster.model_families
-            )
+            families_in_quorum = sorted(verdict.quorum.winning_cluster.model_families)
         catches = [s.node_id for s in verdict.honeypot_scores if not s.passed]
 
         unit_results.append(
@@ -207,8 +195,7 @@ def run_cause(
         )
 
     reputation = {
-        subject: ledger.reputation.score(subject)
-        for subject in ledger.reputation.known_subjects()
+        subject: ledger.reputation.score(subject) for subject in ledger.reputation.known_subjects()
     }
     kinds = [e.kind for e in ledger.translog.entries()]
 

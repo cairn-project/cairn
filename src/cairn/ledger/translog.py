@@ -84,9 +84,7 @@ KIND_FINDING_ROUTED = "FINDING_ROUTED"
 KIND_ROUTE_ACK_RECORDED = "ROUTE_ACK_RECORDED"
 
 
-def _entry_hash(
-    index: int, kind: str, payload: dict, prev_hash: str, recorded_at: float
-) -> str:
+def _entry_hash(index: int, kind: str, payload: dict, prev_hash: str, recorded_at: float) -> str:
     """Deterministic hash of an entry's committed fields (incl. the prev link)."""
     material = canonical_json(
         {
@@ -125,7 +123,7 @@ class LogEntry:
         )
 
     @classmethod
-    def from_json_line(cls, line: str) -> "LogEntry":
+    def from_json_line(cls, line: str) -> LogEntry:
         d = json.loads(line)
         return cls(
             index=d["index"],
@@ -160,7 +158,7 @@ class TransparencyLog:
         if not self._path.exists():
             return []
         out: list[LogEntry] = []
-        with open(self._path, "r", encoding="utf-8") as fh:
+        with open(self._path, encoding="utf-8") as fh:
             for line in fh:
                 line = line.strip()
                 if line:
@@ -206,7 +204,7 @@ def verify_log(path: str | os.PathLike[str]) -> LogVerification:
     expected_prev = GENESIS_PREV
     length = 0
     head = GENESIS_PREV
-    with open(p, "r", encoding="utf-8") as fh:
+    with open(p, encoding="utf-8") as fh:
         for lineno, raw in enumerate(fh):
             raw = raw.strip()
             if not raw:
@@ -229,8 +227,7 @@ def verify_log(path: str | os.PathLike[str]) -> LogVerification:
                     length=length,
                     head_hash=head,
                     failed_index=lineno,
-                    reason=f"index {entry.index} != position {lineno} "
-                    "(removed or reordered entry)",
+                    reason=f"index {entry.index} != position {lineno} (removed or reordered entry)",
                 )
 
             # 2. chain integrity — prev_hash must match the prior entry's hash.

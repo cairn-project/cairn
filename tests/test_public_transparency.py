@@ -22,8 +22,8 @@ from cairn.public import (
     PublicLogEntryView,
     PublicTransparency,
     PublicVettedOutcomeView,
-    list_published_causes,
     list_public_log,
+    list_published_causes,
     list_vetted_outcomes,
     public_verify_log,
 )
@@ -45,20 +45,21 @@ def _draft(name="Benign cause", by="req"):
         "output_schema_ref": "result_v0",
         "partner_of_record_posture": "maintainer is actor-of-record",
         "created_by": by,
-        "five_frame": {
-            k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS
-        },
+        "five_frame": {k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS},
     }
 
 
 def _complete_gate():
-    return five_frame_gate_check({k: True for k in FRAME_KEYS})
+    return five_frame_gate_check(dict.fromkeys(FRAME_KEYS, True))
 
 
 def _approve(reg: CauseRegistry, name: str) -> str:
     cause = reg.submit_cause_request(_draft(name=name))
     reg.decide_cause(
-        cause.cause_id, approve=True, reason="ok", decider="anchor",
+        cause.cause_id,
+        approve=True,
+        reason="ok",
+        decider="anchor",
         gate_result=_complete_gate(),
     )
     return cause.cause_id
@@ -74,8 +75,9 @@ def test_published_causes_reuse_listing_gate_only_approved(tmp_path):
     # second left requested, third rejected
     reg.submit_cause_request(_draft(name="still-requested"))
     rej = reg.submit_cause_request(_draft(name="rejected-one"))
-    reg.decide_cause(rej.cause_id, approve=False, reason="no", decider="anchor",
-                     gate_result=_complete_gate())
+    reg.decide_cause(
+        rej.cause_id, approve=False, reason="no", decider="anchor", gate_result=_complete_gate()
+    )
 
     views = list_published_causes(ledger)
     assert [v.cause_id for v in views] == [approved_id]
@@ -94,8 +96,14 @@ def test_public_cause_view_omits_internal_provenance_fields(tmp_path):
 
     field_names = {f.name for f in fields(PublicCauseView)}
     # public summary present
-    assert {"cause_id", "name", "description", "status", "five_frame",
-            "partner_of_record_posture"} <= field_names
+    assert {
+        "cause_id",
+        "name",
+        "description",
+        "status",
+        "five_frame",
+        "partner_of_record_posture",
+    } <= field_names
     # internal decision/requester provenance ABSENT by construction
     assert {"decision_reason", "decided_by", "created_by"} & field_names == set()
     assert view.frames_self_passed == len(FRAME_KEYS)
@@ -110,14 +118,14 @@ def test_vetted_outcomes_reuse_verdict_state_pending_excluded(tmp_path):
     queue = FindingVetQueue(ledger)
     av = AutomatedVerdict(flag_label="flagged", confidence=0.9)
 
-    f_routable = queue.flag(packet_hash="aa" * 32, automated_verdict=av,
-                            flagged_by="node-1")
-    queue.record_verdict(f_routable.finding_hash, routable=True, reason="confirmed",
-                         reviewer_id="rev-1")
-    f_reject = queue.flag(packet_hash="bb" * 32, automated_verdict=av,
-                          flagged_by="node-1")
-    queue.record_verdict(f_reject.finding_hash, routable=False, reason="benign",
-                         reviewer_id="rev-2")
+    f_routable = queue.flag(packet_hash="aa" * 32, automated_verdict=av, flagged_by="node-1")
+    queue.record_verdict(
+        f_routable.finding_hash, routable=True, reason="confirmed", reviewer_id="rev-1"
+    )
+    f_reject = queue.flag(packet_hash="bb" * 32, automated_verdict=av, flagged_by="node-1")
+    queue.record_verdict(
+        f_reject.finding_hash, routable=False, reason="benign", reviewer_id="rev-2"
+    )
     # third left pending (no verdict)
     queue.flag(packet_hash="cc" * 32, automated_verdict=av, flagged_by="node-1")
 
@@ -135,15 +143,23 @@ def test_vetted_outcomes_reuse_verdict_state_pending_excluded(tmp_path):
 def test_vetted_outcome_view_redacted_by_construction(tmp_path):
     field_names = {f.name for f in fields(PublicVettedOutcomeView)}
     assert field_names == {
-        "packet_hash", "flag_label", "verdict", "reviewer_of_record", "decided_at",
+        "packet_hash",
+        "flag_label",
+        "verdict",
+        "reviewer_of_record",
+        "decided_at",
     }
     # no field can carry raw content / observation bytes / analysis / PII
     assert field_names & FORBIDDEN_PUBLIC_FIELDS == set()
     # and the dataclass cannot be constructed with such data — no such parameter
     with pytest.raises(TypeError):
         PublicVettedOutcomeView(  # type: ignore[call-arg]
-            packet_hash="aa", flag_label="x", verdict="routable",
-            reviewer_of_record="r", decided_at=0.0, content="SECRET RAW BODY",
+            packet_hash="aa",
+            flag_label="x",
+            verdict="routable",
+            reviewer_of_record="r",
+            decided_at=0.0,
+            content="SECRET RAW BODY",
         )
 
 
@@ -184,13 +200,12 @@ def test_public_log_view_is_chain_skeleton_no_payload(tmp_path):
 def test_public_transparency_is_read_only_no_setter(tmp_path):
     public = PublicTransparency(_ledger(tmp_path))
     public_methods = [
-        m for m in dir(public)
-        if not m.startswith("_") and callable(getattr(public, m))
+        m for m in dir(public) if not m.startswith("_") and callable(getattr(public, m))
     ]
     # every public method is a read (list_* / *_verify_log); none mutates
-    assert all(
-        m.startswith("list_") or m.endswith("_verify_log") for m in public_methods
-    ), public_methods
+    assert all(m.startswith("list_") or m.endswith("_verify_log") for m in public_methods), (
+        public_methods
+    )
 
 
 # --- OUTCOME-ALTITUDE: end-to-end on a fresh ledger + tamper -------
@@ -214,15 +229,20 @@ def test_outcome_altitude_public_surfaces_end_to_end_and_tamper(tmp_path):
 
     # publish a cause through the real gated path
     cause = reg.submit_cause_request(_draft(name="court-grade-cause"))
-    reg.decide_cause(cause.cause_id, approve=True, reason="meets all five frames",
-                     decider="vetter-A", gate_result=_complete_gate())
+    reg.decide_cause(
+        cause.cause_id,
+        approve=True,
+        reason="meets all five frames",
+        decider="vetter-A",
+        gate_result=_complete_gate(),
+    )
 
     # record a human-vetted ROUTABLE finding through the real gate
     av = AutomatedVerdict(flag_label="flagged", confidence=0.97)
-    finding = queue.flag(packet_hash="de" * 32, automated_verdict=av,
-                         flagged_by="node-7")
-    queue.record_verdict(finding.finding_hash, routable=True,
-                         reason="human-confirmed", reviewer_id="vetter-B")
+    finding = queue.flag(packet_hash="de" * 32, automated_verdict=av, flagged_by="node-7")
+    queue.record_verdict(
+        finding.finding_hash, routable=True, reason="human-confirmed", reviewer_id="vetter-B"
+    )
 
     # --- public surfaces show exactly the redacted projection ---
     causes = list_published_causes(ledger)
@@ -238,7 +258,11 @@ def test_outcome_altitude_public_surfaces_end_to_end_and_tamper(tmp_path):
     assert o.reviewer_of_record == "vetter-B"
     # redacted: the outcome dict carries ONLY the redacted keys (no raw content / PII)
     assert set(o.to_dict()) == {
-        "packet_hash", "flag_label", "verdict", "reviewer_of_record", "decided_at",
+        "packet_hash",
+        "flag_label",
+        "verdict",
+        "reviewer_of_record",
+        "decided_at",
     }
 
     # redacted log skeleton: no payload key on any public entry
@@ -246,7 +270,11 @@ def test_outcome_altitude_public_surfaces_end_to_end_and_tamper(tmp_path):
     assert log_views, "expected log entries"
     for v in log_views:
         assert set(v.to_dict()) == {
-            "index", "kind", "entry_hash", "prev_hash", "recorded_at",
+            "index",
+            "kind",
+            "entry_hash",
+            "prev_hash",
+            "recorded_at",
         }
 
     # public verify is OK on the untampered ledger

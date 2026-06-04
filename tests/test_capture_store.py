@@ -67,9 +67,7 @@ def test_revoke_then_capture_re_refuses(tmp_path):
     gate = _granted(ledger)
     gate.revoke("op-1")
     with pytest.raises(CaptureRefused):
-        capture_packet(
-            StaticDocumentCapturePort(), gate=gate, ledger=ledger, node_id="op-1"
-        )
+        capture_packet(StaticDocumentCapturePort(), gate=gate, ledger=ledger, node_id="op-1")
 
 
 def test_load_for_analysis_is_open_and_returns_view(tmp_path):
@@ -77,9 +75,7 @@ def test_load_for_analysis_is_open_and_returns_view(tmp_path):
     # analyst can read + judge from alone.
     ledger = _ledger(tmp_path)
     gate = _granted(ledger)
-    packet = capture_packet(
-        StaticDocumentCapturePort(), gate=gate, ledger=ledger, node_id="op-1"
-    )
+    packet = capture_packet(StaticDocumentCapturePort(), gate=gate, ledger=ledger, node_id="op-1")
 
     # No gate is passed here — analysis is open.
     view = load_packet_for_analysis(packet.packet_hash, ledger=ledger)

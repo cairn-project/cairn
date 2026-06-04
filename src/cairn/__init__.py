@@ -38,8 +38,8 @@ from .public import (
     PublicLogEntryView,
     PublicTransparency,
     PublicVettedOutcomeView,
-    list_published_causes,
     list_public_log,
+    list_published_causes,
     list_vetted_outcomes,
     public_verify_log,
 )

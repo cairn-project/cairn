@@ -84,8 +84,7 @@ class Honeypot:
                     detail=(
                         "matches gold standard"
                         if passed
-                        else "diverges from gold standard (flagged regardless of "
-                        "peer agreement)"
+                        else "diverges from gold standard (flagged regardless of peer agreement)"
                     ),
                 )
             )

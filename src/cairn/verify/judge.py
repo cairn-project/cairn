@@ -21,7 +21,8 @@ from __future__ import annotations
 import json
 import re
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from ..execute.result import CandidateResult
 
@@ -66,7 +67,7 @@ class MockJudge(Judge):
     judge's prompt would encode.
     """
 
-    def __init__(self, normalize_fn: Optional[Callable[[dict], dict]] = None) -> None:
+    def __init__(self, normalize_fn: Callable[[dict], dict] | None = None) -> None:
         self._normalize_fn = normalize_fn
 
     def agreement_key(self, result: CandidateResult) -> str:

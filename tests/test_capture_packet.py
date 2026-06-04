@@ -106,9 +106,9 @@ def test_view_exposes_no_fetch_method():
             if name.startswith("_"):
                 continue
             if callable(member):
-                assert not any(
-                    tok in name.lower() for tok in _FETCH_TOKENS
-                ), f"{type(obj).__name__}.{name} looks like a live-fetch method"
+                assert not any(tok in name.lower() for tok in _FETCH_TOKENS), (
+                    f"{type(obj).__name__}.{name} looks like a live-fetch method"
+                )
 
 
 def test_target_ref_is_opaque_not_a_url():

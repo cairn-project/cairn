@@ -40,9 +40,7 @@ def test_end_to_end_qualified_adapter_accepts(name):
 def test_under_capable_adapter_rejected_on_capability():
     # benign_pilot floor: context_window 4096. Give the node 1024.
     weak = MockAdapter(
-        capabilities=Capabilities(
-            context_window=1024, tools=[], modalities=["text"]
-        )
+        capabilities=Capabilities(context_window=1024, tools=[], modalities=["text"])
     )
     outcome = run_work_unit(load_fixture("benign_pilot"), weak)
     assert outcome.status == STATUS_REJECTED_CAPABILITY
@@ -60,9 +58,7 @@ def test_invalid_unit_rejected_on_validation():
 
 
 def test_corrupt_adapter_produces_but_fails_acceptance():
-    outcome = run_work_unit(
-        load_fixture("benign_pilot"), MockAdapter(corrupt=True)
-    )
+    outcome = run_work_unit(load_fixture("benign_pilot"), MockAdapter(corrupt=True))
     assert outcome.status == STATUS_ACCEPTED_ACCEPTANCE_FAILED
     assert outcome.candidate is not None  # candidate exists
     assert outcome.acceptance is not None and not outcome.acceptance.passed
@@ -70,13 +66,9 @@ def test_corrupt_adapter_produces_but_fails_acceptance():
 
 def test_calibration_probe_rejects_malformed_capabilities():
     bad_caps = MockAdapter(
-        capabilities=Capabilities(
-            context_window=-1, tools=[], modalities=["telepathy"]
-        )
+        capabilities=Capabilities(context_window=-1, tools=[], modalities=["telepathy"])
     )
-    outcome = run_work_unit(
-        load_fixture("benign_pilot"), bad_caps, probe=TrivialCalibrationProbe()
-    )
+    outcome = run_work_unit(load_fixture("benign_pilot"), bad_caps, probe=TrivialCalibrationProbe())
     assert outcome.status == STATUS_REJECTED_CALIBRATION
     assert outcome.candidate is None
     assert outcome.calibration is not None and not outcome.calibration.passed

@@ -31,13 +31,14 @@ def _run_cli(args):
     env["PYTHONPATH"] = _SRC + os.pathsep + env.get("PYTHONPATH", "")
     return subprocess.run(
         [sys.executable, "-m", "cairn.cli", *args],
-        capture_output=True, text=True, env=env,
+        capture_output=True,
+        text=True,
+        env=env,
     )
 
 
 def _request_id(ledger_dir):
-    proc = _run_cli(["cause-request", _BENIGN_DRAFT, "--ledger", str(ledger_dir),
-                     "--json"])
+    proc = _run_cli(["cause-request", _BENIGN_DRAFT, "--ledger", str(ledger_dir), "--json"])
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)["cause_id"]
 
@@ -46,11 +47,20 @@ def _approve(ledger_dir, cause_id):
     frames = []
     for f in _FRAMES:
         frames += ["--frame-pass", f]
-    proc = _run_cli([
-        "cause-decide", cause_id, "--approve", "--reason",
-        "benign; passes all five frames", "--by", "anchor",
-        "--ledger", str(ledger_dir), *frames,
-    ])
+    proc = _run_cli(
+        [
+            "cause-decide",
+            cause_id,
+            "--approve",
+            "--reason",
+            "benign; passes all five frames",
+            "--by",
+            "anchor",
+            "--ledger",
+            str(ledger_dir),
+            *frames,
+        ]
+    )
     assert proc.returncode == 0, proc.stderr
 
 
@@ -58,7 +68,7 @@ def test_contribute_refused_for_unapproved_cause(tmp_path):
     ledger_dir = tmp_path / "ledger"
     cause_id = _request_id(ledger_dir)  # requested, NOT approved
     proc = _run_cli(["contribute", cause_id, "--ledger", str(ledger_dir)])
-    assert proc.returncode == 1 # the gate refuses opt-in
+    assert proc.returncode == 1  # the gate refuses opt-in
     assert "REFUSED" in proc.stdout
 
 
@@ -66,9 +76,7 @@ def test_contribute_unsupported_adapter_exits_2(tmp_path):
     ledger_dir = tmp_path / "ledger"
     cause_id = _request_id(ledger_dir)
     _approve(ledger_dir, cause_id)
-    proc = _run_cli([
-        "contribute", cause_id, "--adapter", "notmock", "--ledger", str(ledger_dir)
-    ])
+    proc = _run_cli(["contribute", cause_id, "--adapter", "notmock", "--ledger", str(ledger_dir)])
     assert proc.returncode == 2
     assert "adapter" in proc.stdout.lower()
 
@@ -80,10 +88,19 @@ def test_contribute_outcome_altitude_e2e_subprocess(tmp_path):
     cause_id = _request_id(ledger_dir)
     _approve(ledger_dir, cause_id)
 
-    proc = _run_cli([
-        "contribute", cause_id, "--adapter", "mock", "--node", "vol-1",
-        "--ledger", str(ledger_dir), "--json",
-    ])
+    proc = _run_cli(
+        [
+            "contribute",
+            cause_id,
+            "--adapter",
+            "mock",
+            "--node",
+            "vol-1",
+            "--ledger",
+            str(ledger_dir),
+            "--json",
+        ]
+    )
     assert proc.returncode == 0, proc.stderr
     summary = json.loads(proc.stdout)
     assert summary["cause_id"] == cause_id

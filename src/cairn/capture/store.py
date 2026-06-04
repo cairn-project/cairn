@@ -19,7 +19,6 @@ and reuses the cause layer (a packet may carry a ``cause_id``). Forks nothing.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from ..ledger.ledger import Ledger
 from ..ledger.translog import KIND_PACKET_CAPTURED
@@ -46,7 +45,7 @@ def capture_packet(
     gate: CaptureGate,
     ledger: Ledger,
     node_id: str,
-    cause_id: Optional[str] = None,
+    cause_id: str | None = None,
 ) -> ExaminationPacket:
     """Freeze a target into an inert packet — GATED, fail-closed.
 
@@ -105,9 +104,7 @@ def capture_packet(
     return packet
 
 
-def load_packet_for_analysis(
-    packet_hash: str, *, ledger: Ledger
-) -> AnalysisView:
+def load_packet_for_analysis(packet_hash: str, *, ledger: Ledger) -> AnalysisView:
     """Load a captured packet BY ITS CONTENT KEY and return an ``AnalysisView``.
 
     OPEN — no gate. This is the ONLY thing the analysis layer consumes: a frozen,

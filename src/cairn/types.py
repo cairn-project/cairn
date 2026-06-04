@@ -13,19 +13,19 @@ already carries.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass(frozen=True)
 class CapabilityFloor:
     """Minimum capability a unit needs."""
 
-    context_window: Optional[int] = None
+    context_window: int | None = None
     tools: list[str] = field(default_factory=list)
     modalities: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "CapabilityFloor":
+    def from_dict(cls, d: dict[str, Any]) -> CapabilityFloor:
         return cls(
             context_window=d.get("context_window"),
             tools=list(d.get("tools", [])),
@@ -42,7 +42,7 @@ class RedundancyPolicy:
     model_diversity: int = 0
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "RedundancyPolicy":
+    def from_dict(cls, d: dict[str, Any]) -> RedundancyPolicy:
         return cls(
             target_nresults=d["target_nresults"],
             min_quorum=d["min_quorum"],
@@ -59,7 +59,7 @@ class ProvenanceRequirements:
     trace: bool = False
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "ProvenanceRequirements":
+    def from_dict(cls, d: dict[str, Any]) -> ProvenanceRequirements:
         return cls(
             model_family=d.get("model_family", False),
             signed_result=d.get("signed_result", False),
@@ -80,7 +80,7 @@ class AcceptancePredicate:
     params: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "AcceptancePredicate":
+    def from_dict(cls, d: dict[str, Any]) -> AcceptancePredicate:
         params = {k: v for k, v in d.items() if k != "kind"}
         return cls(kind=d["kind"], params=params)
 
@@ -92,12 +92,8 @@ class AcceptanceContract:
     predicates: list[AcceptancePredicate] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "AcceptanceContract":
-        return cls(
-            predicates=[
-                AcceptancePredicate.from_dict(p) for p in d.get("predicates", [])
-            ]
-        )
+    def from_dict(cls, d: dict[str, Any]) -> AcceptanceContract:
+        return cls(predicates=[AcceptancePredicate.from_dict(p) for p in d.get("predicates", [])])
 
 
 @dataclass(frozen=True)
@@ -105,7 +101,7 @@ class Lease:
     duration_seconds: int
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Lease":
+    def from_dict(cls, d: dict[str, Any]) -> Lease:
         return cls(duration_seconds=d["duration_seconds"])
 
 
@@ -128,11 +124,11 @@ class WorkUnit:
     capability_floor: CapabilityFloor
     redundancy_policy: RedundancyPolicy
     provenance_requirements: ProvenanceRequirements
-    deadline: Optional[str] = None
-    lease: Optional[Lease] = None
+    deadline: str | None = None
+    lease: Lease | None = None
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "WorkUnit":
+    def from_dict(cls, d: dict[str, Any]) -> WorkUnit:
         """Build a WorkUnit from a raw dict.
 
         This does NOT validate against the schema — call
@@ -149,9 +145,7 @@ class WorkUnit:
             acceptance_contract=AcceptanceContract.from_dict(d["acceptance_contract"]),
             capability_floor=CapabilityFloor.from_dict(d["capability_floor"]),
             redundancy_policy=RedundancyPolicy.from_dict(d["redundancy_policy"]),
-            provenance_requirements=ProvenanceRequirements.from_dict(
-                d["provenance_requirements"]
-            ),
+            provenance_requirements=ProvenanceRequirements.from_dict(d["provenance_requirements"]),
             deadline=d.get("deadline"),
             lease=Lease.from_dict(d["lease"]) if "lease" in d else None,
         )

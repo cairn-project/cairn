@@ -22,9 +22,9 @@ by the unchanged ``verify_log``. Items + verdicts are persisted over
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from ..cause.gate import GateCheckResult
 from ..cause.model import Cause, CauseStatus
@@ -55,8 +55,8 @@ class PendingCauseReview:
     cause_id: str
     status: ReviewStatus
     enqueued_at: float
-    assigned_to: Optional[str] = None
-    verdict: Optional[ReviewVerdict] = None
+    assigned_to: str | None = None
+    verdict: ReviewVerdict | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -68,7 +68,7 @@ class PendingCauseReview:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "PendingCauseReview":
+    def from_dict(cls, d: dict[str, Any]) -> PendingCauseReview:
         v = d.get("verdict")
         return cls(
             cause_id=d["cause_id"],
@@ -103,9 +103,7 @@ class CauseVetQueue:
             )
         existing = self._load(cause.cause_id)
         if existing is not None:
-            raise VettingError(
-                f"cause {cause.cause_id} is already in the cause-vet queue"
-            )
+            raise VettingError(f"cause {cause.cause_id} is already in the cause-vet queue")
         item = PendingCauseReview(
             cause_id=cause.cause_id,
             status=ReviewStatus.AWAITING_REVIEW,
@@ -124,9 +122,7 @@ class CauseVetQueue:
         """Assign a pending item to a reviewer (AWAITING_REVIEW → UNDER_REVIEW)."""
         item = self._require(cause_id)
         if item.status == ReviewStatus.VERDICT_RECORDED:
-            raise VettingError(
-                f"cause {cause_id} already has a recorded verdict; cannot reassign"
-            )
+            raise VettingError(f"cause {cause_id} already has a recorded verdict; cannot reassign")
         updated = PendingCauseReview(
             cause_id=item.cause_id,
             status=ReviewStatus.UNDER_REVIEW,
@@ -153,9 +149,7 @@ class CauseVetQueue:
         """
         item = self._require(cause_id)
         if item.verdict is not None:
-            raise VettingError(
-                f"cause {cause_id} already has a recorded human verdict"
-            )
+            raise VettingError(f"cause {cause_id} already has a recorded human verdict")
         cleaned = require_reason_on_reject(is_reject=not approve, reason=reason)
         verdict = ReviewVerdict(
             reviewer_id=reviewer_id,
@@ -222,16 +216,12 @@ class CauseVetQueue:
 
     def list_pending(self) -> list[PendingCauseReview]:
         """Items still awaiting a human verdict (AWAITING_REVIEW / UNDER_REVIEW)."""
-        return [
-            it
-            for it in self._all()
-            if it.status != ReviewStatus.VERDICT_RECORDED
-        ]
+        return [it for it in self._all() if it.status != ReviewStatus.VERDICT_RECORDED]
 
-    def get(self, cause_id: str) -> Optional[PendingCauseReview]:
+    def get(self, cause_id: str) -> PendingCauseReview | None:
         return self._load(cause_id)
 
-    def get_verdict(self, cause_id: str) -> Optional[ReviewVerdict]:
+    def get_verdict(self, cause_id: str) -> ReviewVerdict | None:
         item = self._load(cause_id)
         return item.verdict if item else None
 
@@ -244,11 +234,9 @@ class CauseVetQueue:
         return item
 
     def _all(self) -> list[PendingCauseReview]:
-        return [
-            self._read(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()
-        ]
+        return [self._read(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()]
 
-    def _load(self, cause_id: str) -> Optional[PendingCauseReview]:
+    def _load(self, cause_id: str) -> PendingCauseReview | None:
         ref = self._index_dir / cause_id
         if not ref.exists():
             return None

@@ -40,7 +40,7 @@ class ConsentRecord:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "ConsentRecord":
+    def from_dict(cls, d: dict[str, Any]) -> ConsentRecord:
         return cls(
             node_id=d["node_id"],
             cause_id=d["cause_id"],

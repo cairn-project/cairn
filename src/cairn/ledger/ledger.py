@@ -88,9 +88,7 @@ class Ledger:
 
     # --- results -------------------------------------------------------------
 
-    def store_result(
-        self, candidate: CandidateResult, *, attest: bool = True
-    ) -> str:
+    def store_result(self, candidate: CandidateResult, *, attest: bool = True) -> str:
         """Store a result blob (+ real attestation) and log a RESULT_RECORDED entry.
 
         Returns the result blob key. The attestation upgrades the
@@ -158,11 +156,7 @@ class Ledger:
                 "status": verdict.status,
                 "accepted": bool(verdict.accepted),
                 "accepted_output_hash": (
-                    content_key(
-                        json.dumps(
-                            verdict.accepted_output, sort_keys=True
-                        ).encode("utf-8")
-                    )
+                    content_key(json.dumps(verdict.accepted_output, sort_keys=True).encode("utf-8"))
                     if verdict.accepted_output is not None
                     else None
                 ),

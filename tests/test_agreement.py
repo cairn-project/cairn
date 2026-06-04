@@ -71,9 +71,7 @@ def test_subjective_mockjudge_clusters_semantically_equal():
             node="b",
             family="openai",
         ),
-        make_result(
-            {"verdict": "benign", "confidence": "low"}, node="c", family="meta"
-        ),
+        make_result({"verdict": "benign", "confidence": "low"}, node="c", family="meta"),
     ]
     clusters = SubjectiveAgreement(MockJudge()).cluster(rs)
     assert len(clusters) == 2
