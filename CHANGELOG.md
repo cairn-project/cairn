@@ -7,10 +7,34 @@ versions may include breaking changes; patch versions are fixes.
 
 ## [Unreleased]
 
-The initial pre-1.0 engine (Layer A) — the reusable, model-agnostic distributed
-detection-and-analysis core.
+## [0.2.0] - 2026-06-04
+
+First tagged release. The initial pre-1.0 engine (Layer A) — the reusable,
+model-agnostic distributed detection-and-analysis core — plus the open-source
+hardening, tooling, and concurrency-correctness work that made it public-ready.
+
+### Fixed
+- **Claim coordination — two real concurrency bugs that could hand one task to
+  two nodes.** (1) The expired-lease reclaim path was a bare `os.replace` +
+  re-read-confirm; non-overlapping reclaimers could each `os.replace` and read
+  back their own claim id, so several believed they held the lease. Fixed by
+  serialising the reclaim's read-check-overwrite behind a per-task `O_EXCL`
+  sidecar lock — exactly one racer wins. (2) `O_EXCL`-create and the JSON
+  record-write are two syscalls; a losing racer could read the winner's claim
+  file in the window after create but before write (still EMPTY), `_read`
+  swallowed the `JSONDecodeError`, and the loser was routed into the
+  expired-reclaim path — producing two winners on one fresh task. Fixed by
+  treating a missing/empty/unparseable read as an in-flight claim and rejecting
+  it. The fresh-claim guarantee is now actually `O_EXCL`-exclusive. Both paths
+  are covered by N-threads-race-one-task single-winner concurrency tests.
 
 ### Added
+- **Tooling + CI** — `ruff` (lint + format) and `mypy`, both gated in GitHub
+  Actions CI alongside `pytest` on Python 3.11 / 3.12 / 3.13.
+- **CLI quality** — a `--version` flag (prints the installed package version)
+  and a friendly no-args help screen.
+- **Usability** — an end-to-end walkthrough, a default-ledger UX, and runnable
+  examples so the engine can be driven and inspected without prior setup.
 - **Work-unit + acceptance-contract spec** — the versioned, runtime-agnostic
   interface (JSON Schema) defining a unit of AI work and its machine-checkable
   acceptance contract.
