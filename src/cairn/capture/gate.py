@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from ..ledger.indexed_store import IndexedBlobStore
 from ..ledger.ledger import Ledger
 from ..ledger.translog import (
     KIND_CAPTURE_ROLE_GRANTED,
@@ -69,8 +70,9 @@ class CaptureGate:
     def __init__(self, ledger: Ledger) -> None:
         self._ledger = ledger
         self._clock = ledger.clock
-        self._index_dir = ledger.root / "capture_grants"
-        self._index_dir.mkdir(parents=True, exist_ok=True)
+        self._store: IndexedBlobStore[CaptureGrant] = IndexedBlobStore(
+            ledger, "capture_grants", CaptureGrant.from_dict
+        )
 
     # --- grant ---------------------------------------------------------------
 
@@ -123,11 +125,7 @@ class CaptureGate:
         return grant is not None and grant.active
 
     def get_grant(self, node_id: str) -> CaptureGrant | None:
-        ref = self._index_dir / self._key(node_id)
-        if not ref.exists():
-            return None
-        blob_key = ref.read_text().strip()
-        return CaptureGrant.from_dict(self._ledger.blobs.get_json(blob_key))
+        return self._store.load(self._key(node_id))
 
     # --- persistence helpers -------------------------------------------------
 
@@ -136,5 +134,4 @@ class CaptureGate:
         return node_id.replace("/", "_").replace(":", "_")
 
     def _persist(self, grant: CaptureGrant) -> None:
-        blob_key = self._ledger.blobs.put_json(grant.to_dict())
-        (self._index_dir / self._key(grant.node_id)).write_text(blob_key)
+        self._store.persist(self._key(grant.node_id), grant.to_dict())

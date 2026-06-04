@@ -2,9 +2,9 @@
 
 ``evaluate_acceptance(result, acceptance_contract)`` runs every predicate in a
 contract against a result dict and returns a conjunctive verdict. Each predicate
-is a pure function over the result — no LLM, no network
-the cheap client-side filter). The semantic / quorum verify layer
-sits ABOVE this and is a later phase.
+is a pure function over the result — no LLM, no network — i.e. the cheap
+client-side filter. The semantic / quorum verify layer sits ABOVE this and is a
+later phase.
 
 Predicate kinds (SPEC.md): required_fields, field_type, value_range, enum,
 non_empty, min_items, regex_match. An unknown kind fails closed (raises).
@@ -16,6 +16,8 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
+
+from ._pathutil import resolve_dotted
 
 _MISSING = object()
 
@@ -44,24 +46,12 @@ class AcceptanceResult:
 
 
 def _resolve(result: Any, dotted: str) -> Any:
-    """Resolve a dotted field path into a nested structure; _MISSING if absent.
+    """Resolve a dotted field path into a nested structure; ``_MISSING`` if absent.
 
-    Dict keys resolve by name; a numeric path segment indexes into a list
-    (e.g. ``citations.0`` -> first citation). Any miss returns _MISSING.
+    Thin wrapper over the shared :func:`cairn._pathutil.resolve_dotted` that
+    pins this layer's "absent" sentinel to ``_MISSING``.
     """
-    cur = result
-    for part in dotted.split("."):
-        if isinstance(cur, dict) and part in cur:
-            cur = cur[part]
-        elif isinstance(cur, list) and part.lstrip("-").isdigit():
-            idx = int(part)
-            if -len(cur) <= idx < len(cur):
-                cur = cur[idx]
-            else:
-                return _MISSING
-        else:
-            return _MISSING
-    return cur
+    return resolve_dotted(result, dotted, missing=_MISSING)
 
 
 # --- predicate checkers: (result, params) -> (passed, detail) ---------------

@@ -23,12 +23,12 @@ by the unchanged ``verify_log``. Items + verdicts are persisted over
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from ..cause.gate import GateCheckResult
 from ..cause.model import Cause, CauseStatus
 from ..cause.registry import CauseRegistry
+from ..ledger.indexed_store import IndexedBlobStore
 from ..ledger.ledger import Ledger
 from ..ledger.translog import (
     KIND_CAUSE_VET_ASSIGNED,
@@ -85,8 +85,9 @@ class CauseVetQueue:
     def __init__(self, ledger: Ledger) -> None:
         self._ledger = ledger
         self._clock = ledger.clock
-        self._index_dir = ledger.root / "cause_vet_queue"
-        self._index_dir.mkdir(parents=True, exist_ok=True)
+        self._store: IndexedBlobStore[PendingCauseReview] = IndexedBlobStore(
+            ledger, "cause_vet_queue", PendingCauseReview.from_dict
+        )
 
     # --- enqueue --------------------------------------------------
 
@@ -234,18 +235,10 @@ class CauseVetQueue:
         return item
 
     def _all(self) -> list[PendingCauseReview]:
-        return [self._read(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()]
+        return self._store.all()
 
     def _load(self, cause_id: str) -> PendingCauseReview | None:
-        ref = self._index_dir / cause_id
-        if not ref.exists():
-            return None
-        return self._read(ref)
-
-    def _read(self, ref: Path) -> PendingCauseReview:
-        blob_key = ref.read_text().strip()
-        return PendingCauseReview.from_dict(self._ledger.blobs.get_json(blob_key))
+        return self._store.load(cause_id)
 
     def _persist(self, item: PendingCauseReview) -> None:
-        blob_key = self._ledger.blobs.put_json(item.to_dict())
-        (self._index_dir / item.cause_id).write_text(blob_key)
+        self._store.persist(item.cause_id, item.to_dict())
