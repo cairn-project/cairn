@@ -32,9 +32,7 @@ def _draft():
         "output_schema_ref": "result_v0",
         "partner_of_record_posture": "maintainer is actor-of-record",
         "created_by": "req",
-        "five_frame": {
-            k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS
-        },
+        "five_frame": {k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS},
     }
 
 
@@ -52,7 +50,7 @@ def _approved_cause(causes):
         approve=True,
         reason="benign; passes all five frames",
         decider="anchor",
-        gate_result=five_frame_gate_check({k: True for k in FRAME_KEYS}),
+        gate_result=five_frame_gate_check(dict.fromkeys(FRAME_KEYS, True)),
     )
     return cause.cause_id
 
@@ -78,7 +76,7 @@ def test_optin_refused_for_rejected_cause(tmp_path):
         approve=False,
         reason="rejected for the record",
         decider="anchor",
-        gate_result=five_frame_gate_check({k: True for k in FRAME_KEYS}),
+        gate_result=five_frame_gate_check(dict.fromkeys(FRAME_KEYS, True)),
     )
     with pytest.raises(OptInRefused):
         optin.opt_in(_NODE, cause.cause_id, "I agree")

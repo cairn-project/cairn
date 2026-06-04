@@ -32,7 +32,7 @@ def test_pilot_units_validate_against_wave1_schema():
 def test_gold_answer_passes_unit_acceptance_contract():
     snippets = load_snippets()
     units = build_pilot_units(snippets)
-    for unit, snippet in zip(units, snippets):
+    for unit, snippet in zip(units, snippets, strict=False):
         gold = gold_answer(snippet)
         acc = evaluate_acceptance(gold, unit["acceptance_contract"])
         assert acc.passed, (unit["task_id"], gold, acc)
@@ -42,7 +42,7 @@ def test_honest_adapter_produces_gold_answer():
     snippets = load_snippets()
     units = build_pilot_units(snippets)
     adapter = PilotNodeAdapter(model_family="claude")
-    for unit_dict, snippet in zip(units, snippets):
+    for unit_dict, snippet in zip(units, snippets, strict=False):
         unit = WorkUnit.from_dict(unit_dict)
         cand = adapter.produce(unit)
         assert cand.output == gold_answer(snippet)
@@ -52,7 +52,7 @@ def test_wrong_adapter_diverges_but_stays_schema_valid():
     snippets = load_snippets()
     units = build_pilot_units(snippets)
     bad = PilotNodeAdapter(model_family="gpt", wrong=True)
-    for unit_dict, snippet in zip(units, snippets):
+    for unit_dict, snippet in zip(units, snippets, strict=False):
         unit = WorkUnit.from_dict(unit_dict)
         cand = bad.produce(unit)
         # diverges from the gold standard...

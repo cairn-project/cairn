@@ -10,8 +10,8 @@ fields in a later phase.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Any
 
 from ..types import ProvenanceRequirements
 
@@ -31,11 +31,9 @@ class CandidateResult:
     model_family: str
     adapter_version: str
     produced_at: str  # ISO-8601 placeholder (real clock/attestation: ledger layer)
-    signature: Optional[str] = None  # placeholder (real signing: ledger layer)
+    signature: str | None = None  # placeholder (real signing: ledger layer)
 
-    def provenance_satisfies(
-        self, requirements: ProvenanceRequirements
-    ) -> dict[str, bool]:
+    def provenance_satisfies(self, requirements: ProvenanceRequirements) -> dict[str, bool]:
         """Report which provenance requirements this candidate currently meets.
 
         Reporting only — NO enforcement here (the verify layer enforces, later
@@ -45,9 +43,7 @@ class CandidateResult:
         when required.
         """
         return {
-            "model_family": (not requirements.model_family)
-            or bool(self.model_family),
-            "signed_result": (not requirements.signed_result)
-            or (self.signature is not None),
+            "model_family": (not requirements.model_family) or bool(self.model_family),
+            "signed_result": (not requirements.signed_result) or (self.signature is not None),
             "trace": not requirements.trace,  # no trace produced this release
         }

@@ -16,7 +16,6 @@ routable finding is NEVER silently dropped.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from .channel import RecipientChannel
 
@@ -50,7 +49,7 @@ class Recipient:
         locality: set[str] | frozenset[str] | list[str],
         domain: set[str] | frozenset[str] | list[str],
         channel: RecipientChannel,
-    ) -> "Recipient":
+    ) -> Recipient:
         return Recipient(
             recipient_id=recipient_id,
             locality=frozenset(locality),
@@ -69,18 +68,16 @@ class RecipientRegistry:
     """
 
     _recipients: dict[str, Recipient] = field(default_factory=dict)
-    fallback: Optional[Recipient] = None
+    fallback: Recipient | None = None
 
-    def add(self, recipient: Recipient) -> "RecipientRegistry":
+    def add(self, recipient: Recipient) -> RecipientRegistry:
         """Register a recipient (by id). Returns self for chaining."""
         if recipient.recipient_id in self._recipients:
-            raise RoutingError(
-                f"recipient {recipient.recipient_id!r} is already registered"
-            )
+            raise RoutingError(f"recipient {recipient.recipient_id!r} is already registered")
         self._recipients[recipient.recipient_id] = recipient
         return self
 
-    def set_fallback(self, recipient: Recipient) -> "RecipientRegistry":
+    def set_fallback(self, recipient: Recipient) -> RecipientRegistry:
         """Designate the explicit fallback (escalation) recipient. Returns self."""
         self.fallback = recipient
         return self

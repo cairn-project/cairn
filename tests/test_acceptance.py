@@ -13,6 +13,7 @@ def _contract(*predicates):
 
 # --- required_fields --------------------------------------------------------
 
+
 def test_required_fields_pass():
     c = _contract({"kind": "required_fields", "fields": ["a", "b"]})
     assert evaluate_acceptance({"a": 1, "b": 2}, c).passed
@@ -31,6 +32,7 @@ def test_required_fields_dotted_path():
 
 # --- field_type -------------------------------------------------------------
 
+
 def test_field_type_pass():
     c = _contract({"kind": "field_type", "field": "n", "json_type": "integer"})
     assert evaluate_acceptance({"n": 5}, c).passed
@@ -47,6 +49,7 @@ def test_field_type_bool_is_not_integer():
 
 
 # --- value_range ------------------------------------------------------------
+
 
 def test_value_range_pass():
     c = _contract({"kind": "value_range", "field": "c", "min": 0, "max": 1})
@@ -65,6 +68,7 @@ def test_value_range_fail_non_numeric():
 
 # --- enum -------------------------------------------------------------------
 
+
 def test_enum_pass():
     c = _contract({"kind": "enum", "field": "cat", "allowed": ["a", "b"]})
     assert evaluate_acceptance({"cat": "a"}, c).passed
@@ -76,6 +80,7 @@ def test_enum_fail():
 
 
 # --- non_empty (refusal-handling) -------------------------------------------
+
 
 def test_non_empty_pass():
     c = _contract({"kind": "non_empty", "field": "answer"})
@@ -94,6 +99,7 @@ def test_non_empty_fail_absent():
 
 # --- min_items (citations-required) -----------------------------------------
 
+
 def test_min_items_pass():
     c = _contract({"kind": "min_items", "field": "citations", "count": 1})
     assert evaluate_acceptance({"citations": ["u1"]}, c).passed
@@ -105,6 +111,7 @@ def test_min_items_fail():
 
 
 # --- regex_match (format) ---------------------------------------------------
+
 
 def test_regex_match_pass():
     c = _contract({"kind": "regex_match", "field": "url", "pattern": "^https?://"})
@@ -124,6 +131,7 @@ def test_dotted_path_indexes_into_array():
 
 
 # --- conjunction + unknown kind --------------------------------------------
+
 
 def test_conjunction_one_failing_predicate_fails_whole_contract():
     c = _contract(
@@ -163,9 +171,9 @@ def test_structured_fixture_contract_fails_on_bad_result():
 
     unit = load_fixture("structured_acceptance")
     bad = {
-        "category": "spaceship",          # not in enum
-        "confidence": 2.0,                # out of range
-        "citations": [],                  # below min_items
-        "rationale": "",                  # empty
+        "category": "spaceship",  # not in enum
+        "confidence": 2.0,  # out of range
+        "citations": [],  # below min_items
+        "rationale": "",  # empty
     }
     assert not evaluate_acceptance(bad, unit["acceptance_contract"]).passed

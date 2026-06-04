@@ -7,7 +7,7 @@ pre-arranged verdict/result/claim state. Offline.
 from __future__ import annotations
 
 from cairn.ledger import FixedClock, Ledger, verify_log
-from cairn.pilot import run_pilot, unit_task_id
+from cairn.pilot import run_pilot
 
 _KEY = b"pilot-runner-test-key"
 
@@ -38,9 +38,7 @@ def test_run_pilot_reaches_accepted_with_diversity(tmp_path):
 
 def test_run_pilot_honeypot_catches_bad_node(tmp_path):
     ledger = _fresh_ledger(tmp_path)
-    summary = run_pilot(
-        ledger, node_families=["claude", "gpt"], bad_family="gpt"
-    )
+    summary = run_pilot(ledger, node_families=["claude", "gpt"], bad_family="gpt")
 
     # The bad node is caught on the honeypot (seeded) unit, regardless of peer
     # agreement —.

@@ -23,7 +23,7 @@ def _candidate(output):
         model_family="mock",
         adapter_version="mock-0.1.0",
         produced_at="1970-01-01T00:00:00Z",
-        signature="mock-sig:placeholder", # placeholder
+        signature="mock-sig:placeholder",  # placeholder
     )
 
 

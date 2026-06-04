@@ -22,7 +22,7 @@ executes, then releases before the next claims — exercising the REAL atomic-cl
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import Any, Optional
+from typing import Any
 
 from ..execute.flow import run_work_unit
 from ..execute.result import CandidateResult
@@ -99,9 +99,7 @@ class PilotRunSummary:
             lines.append(f"  {u.task_id}")
             lines.append(f"      verdict: {verdict}  | quorum families: {fam}")
             if u.honeypot_catches:
-                lines.append(
-                    f"      honeypot caught: {', '.join(u.honeypot_catches)}"
-                )
+                lines.append(f"      honeypot caught: {', '.join(u.honeypot_catches)}")
         lines.append("")
         lines.append(
             f"units accepted: {sum(u.accepted for u in self.units)}/"
@@ -119,8 +117,8 @@ class PilotRunSummary:
 def run_pilot(
     ledger: Ledger,
     *,
-    node_families: Optional[list[str]] = None,
-    bad_family: Optional[str] = None,
+    node_families: list[str] | None = None,
+    bad_family: str | None = None,
 ) -> PilotRunSummary:
     """Run the benign pilot cause end-to-end over a real ``Ledger``.
 
@@ -143,17 +141,13 @@ def run_pilot(
     unit_results: list[UnitRunResult] = []
     result_recorded = 0
 
-    for unit_dict, snippet in zip(units, snippets):
+    for unit_dict, _snippet in zip(units, snippets, strict=False):
         task_id = ledger.define_task(unit_dict)
 
         candidates: list[CandidateResult] = []
         for family in node_families:
             node_id = f"node-{family}"
-            wrong = (
-                bad_family is not None
-                and family == bad_family
-                and task_id == hp_task_id
-            )
+            wrong = bad_family is not None and family == bad_family and task_id == hp_task_id
             adapter = PilotNodeAdapter(model_family=family, wrong=wrong)
 
             # Real atomic exclusive claim, held while this node executes.
@@ -195,8 +189,7 @@ def run_pilot(
         )
 
     reputation = {
-        subject: ledger.reputation.score(subject)
-        for subject in ledger.reputation.known_subjects()
+        subject: ledger.reputation.score(subject) for subject in ledger.reputation.known_subjects()
     }
     kinds = [e.kind for e in ledger.translog.entries()]
 

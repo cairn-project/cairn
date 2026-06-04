@@ -23,9 +23,7 @@ def _draft(name="Benign cause", by="req"):
         "output_schema_ref": "result_v0",
         "partner_of_record_posture": "maintainer is actor-of-record",
         "created_by": by,
-        "five_frame": {
-            k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS
-        },
+        "five_frame": {k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS},
     }
 
 
@@ -93,9 +91,7 @@ def test_id_stable_across_lifecycle_status_change():
 
 
 def test_five_frame_assessment_completeness():
-    full = FiveFrameAssessment(
-        verdicts={k: FrameVerdict(k, "ok", True) for k in FRAME_KEYS}
-    )
+    full = FiveFrameAssessment(verdicts={k: FrameVerdict(k, "ok", True) for k in FRAME_KEYS})
     assert full.is_complete() is True
     partial = FiveFrameAssessment(
         verdicts={k: FrameVerdict(k, "ok", True) for k in list(FRAME_KEYS)[:3]}

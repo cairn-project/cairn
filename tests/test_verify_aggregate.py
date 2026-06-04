@@ -9,11 +9,11 @@ from __future__ import annotations
 
 from cairn.verify import (
     EVENT_HONEYPOT_FAIL,
+    NEUTRAL_PRIOR,
     STATUS_ACCEPTED,
     STATUS_INSUFFICIENT_DIVERSITY,
     Honeypot,
     InMemoryReputation,
-    NEUTRAL_PRIOR,
     verify_unit,
 )
 
@@ -28,7 +28,9 @@ def test_happy_path_two_families_agree_accepted():
     ]
     rep = InMemoryReputation()
     verdict = verify_unit(
-        rs, policy(target_nresults=3, min_quorum=2), reputation=rep,
+        rs,
+        policy(target_nresults=3, min_quorum=2),
+        reputation=rep,
         unit_task_id="u1",
     )
     assert verdict.status == STATUS_ACCEPTED
@@ -61,15 +63,19 @@ def test_honeypot_unit_penalizes_bad_node():
     rep = InMemoryReputation()
     hp = Honeypot(expected_output={"verdict": "predator"})
     verdict = verify_unit(
-        rs, policy(target_nresults=3, min_quorum=2),
-        honeypot=hp, reputation=rep, unit_task_id="hp-1",
+        rs,
+        policy(target_nresults=3, min_quorum=2),
+        honeypot=hp,
+        reputation=rep,
+        unit_task_id="hp-1",
     )
     scores = {s.node_id: s for s in verdict.honeypot_scores}
     assert scores["bad"].passed is False
     assert scores["good"].passed is True
     # The bad node was penalized via a HONEYPOT_FAIL delta.
     fail_events = [
-        d for d in verdict.reputation_updates
+        d
+        for d in verdict.reputation_updates
         if d.subject == "bad" and d.event == EVENT_HONEYPOT_FAIL
     ]
     assert fail_events

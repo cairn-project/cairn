@@ -22,10 +22,8 @@ EXISTING human Gate-2 still governs whether that finding ever routes.
 
 from __future__ import annotations
 
-from typing import Optional
-
-from ..vetting import Finding, FindingVetQueue
 from ..verify import VerifyVerdict
+from ..vetting import Finding, FindingVetQueue
 from .policy import FlagPolicy
 
 
@@ -36,8 +34,8 @@ def flag_from_verdict(
     finding_queue: FindingVetQueue,
     policy: FlagPolicy,
     flagged_by: str,
-    cause_id: Optional[str] = None,
-) -> Optional[Finding]:
+    cause_id: str | None = None,
+) -> Finding | None:
     """Emit a ``Finding`` for ``packet_hash`` iff ``policy`` flags ``verdict``.
 
     Args:

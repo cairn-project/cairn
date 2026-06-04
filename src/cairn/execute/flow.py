@@ -20,7 +20,7 @@ No network, no signing, no quorum here.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from ..acceptance import AcceptanceResult, evaluate_acceptance
 from ..types import WorkUnit
@@ -54,17 +54,17 @@ class ExecuteOutcome:
 
     status: str
     validation: ValidationResult
-    candidate: Optional[CandidateResult] = None
-    acceptance: Optional[AcceptanceResult] = None
-    capability_check: Optional[CapabilityCheck] = None
-    calibration: Optional[CalibrationResult] = None
+    candidate: CandidateResult | None = None
+    acceptance: AcceptanceResult | None = None
+    capability_check: CapabilityCheck | None = None
+    calibration: CalibrationResult | None = None
     detail: str = ""
 
 
 def run_work_unit(
     unit_dict: dict[str, Any],
     adapter: Adapter,
-    probe: Optional[CalibrationProbe] = None,
+    probe: CalibrationProbe | None = None,
 ) -> ExecuteOutcome:
     """Run one work unit on one adapter, returning an ExecuteOutcome.
 
@@ -88,7 +88,7 @@ def run_work_unit(
     unit = WorkUnit.from_dict(unit_dict)
 
     # 2. optional calibration probe of self-declared capabilities
-    calibration: Optional[CalibrationResult] = None
+    calibration: CalibrationResult | None = None
     if probe is not None:
         calibration = probe.verify(adapter.capabilities)
         if not calibration.passed:
@@ -96,8 +96,7 @@ def run_work_unit(
                 status=STATUS_REJECTED_CALIBRATION,
                 validation=validation,
                 calibration=calibration,
-                detail="adapter capabilities failed calibration: "
-                + "; ".join(calibration.reasons),
+                detail="adapter capabilities failed calibration: " + "; ".join(calibration.reasons),
             )
 
     # 3. capability-floor self-selection gate
@@ -108,8 +107,7 @@ def run_work_unit(
             validation=validation,
             calibration=calibration,
             capability_check=capability_check,
-            detail="adapter does not meet capability floor: "
-            + "; ".join(capability_check.reasons),
+            detail="adapter does not meet capability floor: " + "; ".join(capability_check.reasons),
         )
 
     # 4. produce the candidate result

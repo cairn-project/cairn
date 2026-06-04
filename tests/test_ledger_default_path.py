@@ -14,10 +14,6 @@ same environment (the persistence property the cause flow depends on).
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import pytest
-
 from cairn.cli import resolve_ledger_dir
 
 

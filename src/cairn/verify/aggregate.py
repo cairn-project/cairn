@@ -21,7 +21,7 @@ optionally applied to a passed-in ``Reputation``) — persistence is the ledger 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 from ..execute.result import CandidateResult
 from ..types import RedundancyPolicy
@@ -49,7 +49,7 @@ class VerifyVerdict:
     tiebreak: TiebreakDecision
     honeypot_scores: list[HoneypotScore] = field(default_factory=list)
     reputation_updates: list[ReputationDelta] = field(default_factory=list)
-    accepted_output: Optional[dict[str, Any]] = None
+    accepted_output: dict[str, Any] | None = None
 
     @property
     def accepted(self) -> bool:
@@ -74,9 +74,7 @@ def _consensus_deltas(quorum: QuorumResult) -> list[ReputationDelta]:
         event = EVENT_AGREE if in_consensus else EVENT_DISAGREE
         for m in cluster.members:
             deltas.append(ReputationDelta(subject=m.adapter_name, event=event))
-            deltas.append(
-                ReputationDelta(subject=family_subject(m.model_family), event=event)
-            )
+            deltas.append(ReputationDelta(subject=family_subject(m.model_family), event=event))
     return deltas
 
 
@@ -85,9 +83,7 @@ def _honeypot_deltas(scores: list[HoneypotScore]) -> list[ReputationDelta]:
     for s in scores:
         event = EVENT_HONEYPOT_PASS if s.passed else EVENT_HONEYPOT_FAIL
         deltas.append(ReputationDelta(subject=s.node_id, event=event))
-        deltas.append(
-            ReputationDelta(subject=family_subject(s.model_family), event=event)
-        )
+        deltas.append(ReputationDelta(subject=family_subject(s.model_family), event=event))
     return deltas
 
 
@@ -95,9 +91,9 @@ def verify_unit(
     results: list[CandidateResult],
     policy: RedundancyPolicy,
     *,
-    agreement: Optional[AgreementFunction] = None,
-    honeypot: Optional[Honeypot] = None,
-    reputation: Optional[Reputation] = None,
+    agreement: AgreementFunction | None = None,
+    honeypot: Honeypot | None = None,
+    reputation: Reputation | None = None,
     unit_task_id: str = "",
 ) -> VerifyVerdict:
     """Aggregate N candidate results into a trust verdict for one unit.

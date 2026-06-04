@@ -17,8 +17,7 @@ from typing import Protocol, runtime_checkable
 class Clock(Protocol):
     """Time source: epoch seconds as a float."""
 
-    def now(self) -> float:
-        ...
+    def now(self) -> float: ...
 
 
 class SystemClock:

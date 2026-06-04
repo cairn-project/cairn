@@ -31,7 +31,6 @@ def _fake_claude(prompt: str) -> str:
     recoverable here.
     """
     # The neutral prompt embeds inputs as a JSON blob under "INPUTS:".
-    obj_start = prompt.find("{", prompt.find("INPUTS:"))
     # Find the inline.license_text deterministically by parsing the inputs blob.
     # The inputs blob is the INPUTS section up to the next double newline.
     inputs_section = prompt.split("INPUTS:", 1)[1]

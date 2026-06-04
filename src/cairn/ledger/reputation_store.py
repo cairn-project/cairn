@@ -44,7 +44,7 @@ class LedgerReputation(InMemoryReputation):
         self._scores = {}
         if not self._path.exists():
             return
-        with open(self._path, "r", encoding="utf-8") as fh:
+        with open(self._path, encoding="utf-8") as fh:
             for line in fh:
                 line = line.strip()
                 if not line:

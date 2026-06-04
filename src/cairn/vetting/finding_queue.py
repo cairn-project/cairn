@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from ..ledger.ledger import Ledger
 from ..ledger.translog import (
@@ -54,8 +54,8 @@ class PendingFindingReview:
     finding_hash: str
     status: ReviewStatus
     flagged_at: float
-    assigned_to: Optional[str] = None
-    verdict: Optional[ReviewVerdict] = None
+    assigned_to: str | None = None
+    verdict: ReviewVerdict | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -67,7 +67,7 @@ class PendingFindingReview:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "PendingFindingReview":
+    def from_dict(cls, d: dict[str, Any]) -> PendingFindingReview:
         v = d.get("verdict")
         return cls(
             finding_hash=d["finding_hash"],
@@ -95,7 +95,7 @@ class FindingVetQueue:
         packet_hash: str,
         automated_verdict: AutomatedVerdict,
         flagged_by: str,
-        cause_id: Optional[str] = None,
+        cause_id: str | None = None,
     ) -> Finding:
         """Flag a mission-neutral finding into the queue; log ``FINDING_FLAGGED``.
 
@@ -170,9 +170,7 @@ class FindingVetQueue:
         """
         item = self._require(finding_hash)
         if item.verdict is not None:
-            raise VettingError(
-                f"finding {finding_hash} already has a recorded human verdict"
-            )
+            raise VettingError(f"finding {finding_hash} already has a recorded human verdict")
         cleaned = require_reason_on_reject(is_reject=not routable, reason=reason)
         verdict = ReviewVerdict(
             reviewer_id=reviewer_id,
@@ -223,9 +221,7 @@ class FindingVetQueue:
 
     def list_pending(self) -> list[PendingFindingReview]:
         """Findings still awaiting a human verdict (AWAITING_REVIEW / UNDER_REVIEW)."""
-        return [
-            it for it in self._all() if it.status != ReviewStatus.VERDICT_RECORDED
-        ]
+        return [it for it in self._all() if it.status != ReviewStatus.VERDICT_RECORDED]
 
     def list_reviewed(self) -> list[PendingFindingReview]:
         """Findings with a recorded human verdict (the inverse of ``list_pending``).
@@ -235,14 +231,12 @@ class FindingVetQueue:
         ROUTABLE/REJECTED outcome. Consumed by the public read-only vetted-outcomes
         projection (``cairn.public``); the queue itself records nothing here.
         """
-        return [
-            it for it in self._all() if it.status == ReviewStatus.VERDICT_RECORDED
-        ]
+        return [it for it in self._all() if it.status == ReviewStatus.VERDICT_RECORDED]
 
-    def get(self, finding_hash: str) -> Optional[PendingFindingReview]:
+    def get(self, finding_hash: str) -> PendingFindingReview | None:
         return self._load(finding_hash)
 
-    def get_verdict(self, finding_hash: str) -> Optional[ReviewVerdict]:
+    def get_verdict(self, finding_hash: str) -> ReviewVerdict | None:
         item = self._load(finding_hash)
         return item.verdict if item else None
 
@@ -257,17 +251,13 @@ class FindingVetQueue:
     def _require(self, finding_hash: str) -> PendingFindingReview:
         item = self._load(finding_hash)
         if item is None:
-            raise VettingError(
-                f"finding {finding_hash} is not in the finding-vet queue"
-            )
+            raise VettingError(f"finding {finding_hash} is not in the finding-vet queue")
         return item
 
     def _all(self) -> list[PendingFindingReview]:
-        return [
-            self._read(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()
-        ]
+        return [self._read(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()]
 
-    def _load(self, finding_hash: str) -> Optional[PendingFindingReview]:
+    def _load(self, finding_hash: str) -> PendingFindingReview | None:
         ref = self._index_dir / finding_hash
         if not ref.exists():
             return None

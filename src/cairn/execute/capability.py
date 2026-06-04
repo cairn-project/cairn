@@ -33,7 +33,7 @@ class Capabilities:
     model_family_tier: int = 0
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Capabilities":
+    def from_dict(cls, d: dict[str, Any]) -> Capabilities:
         return cls(
             context_window=int(d.get("context_window", 0)),
             tools=list(d.get("tools", [])),
@@ -54,9 +54,7 @@ class CapabilityCheck:
     reasons: list[str] = field(default_factory=list)
 
 
-def meets_floor(
-    capabilities: Capabilities, floor: CapabilityFloor
-) -> CapabilityCheck:
+def meets_floor(capabilities: Capabilities, floor: CapabilityFloor) -> CapabilityCheck:
     """Check a node's declared capabilities against a unit's capability floor.
 
     Floor dimensions (all conjunctive):
@@ -73,17 +71,14 @@ def meets_floor(
     if floor.context_window is not None:
         if capabilities.context_window < floor.context_window:
             reasons.append(
-                "context_window "
-                f"{capabilities.context_window} < floor {floor.context_window}"
+                f"context_window {capabilities.context_window} < floor {floor.context_window}"
             )
 
     missing_tools = [t for t in floor.tools if t not in capabilities.tools]
     if missing_tools:
         reasons.append(f"missing tools: {missing_tools}")
 
-    missing_modalities = [
-        m for m in floor.modalities if m not in capabilities.modalities
-    ]
+    missing_modalities = [m for m in floor.modalities if m not in capabilities.modalities]
     if missing_modalities:
         reasons.append(f"missing modalities: {missing_modalities}")
 

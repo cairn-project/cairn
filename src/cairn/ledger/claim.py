@@ -56,7 +56,7 @@ class Claim:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "Claim":
+    def from_dict(cls, d: dict) -> Claim:
         return cls(
             task_id=d["task_id"],
             node_id=d["node_id"],
@@ -124,7 +124,7 @@ class ClaimRegistry:
                 raise ClaimError(
                     f"task {task_id!r} is actively claimed by "
                     f"{existing.node_id!r} until {existing.expires_at}"
-                )
+                ) from None
             # Expired (or unreadable) → atomically replace via temp + os.replace.
             tmp = path.parent / (path.name + f".{new.claim_id}.tmp")
             tmp.write_text(json.dumps(new.to_dict()))
@@ -132,9 +132,7 @@ class ClaimRegistry:
             # Re-read to confirm we are the holder (last-writer-wins on replace).
             confirmed = self._read(path)
             if confirmed is None or confirmed.claim_id != new.claim_id:
-                raise ClaimError(
-                    f"lost the race to reclaim expired task {task_id!r}"
-                )
+                raise ClaimError(f"lost the race to reclaim expired task {task_id!r}") from None
             return confirmed
 
     def active_claim(self, task_id: str) -> Claim | None:

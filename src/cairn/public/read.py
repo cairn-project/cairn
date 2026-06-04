@@ -32,7 +32,6 @@ from ..cause import CauseRegistry
 from ..ledger import Ledger, LogVerification, TransparencyLog, verify_log
 from ..vetting import FindingVetQueue
 
-
 # --- public projection views (redaction by construction) ---------------------
 
 

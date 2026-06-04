@@ -115,7 +115,8 @@ def dispatch_routable_finding(
         route_reason=decision.reason.value,
     )
     ack = recipient.channel.deliver(
-        dispatch, acknowledged_at=ledger._clock.now()  # noqa: SLF001
+        dispatch,
+        acknowledged_at=ledger._clock.now(),  # noqa: SLF001
     )
 
     # 4. Record the action on the SAME transparency log — the routing event...

@@ -7,7 +7,7 @@ from cairn.cause.model import FRAME_KEYS
 
 
 def test_all_five_frames_addressed_is_complete():
-    result = five_frame_gate_check({k: True for k in FRAME_KEYS})
+    result = five_frame_gate_check(dict.fromkeys(FRAME_KEYS, True))
     assert result.complete is True
     assert result.all_frames_present is True
     assert result.all_passed is True
@@ -18,7 +18,7 @@ def test_all_five_frames_addressed_is_complete():
 
 def test_omitting_a_frame_is_incomplete():
     # Skip one frame → structure NOT satisfied (the decider can't silently skip).
-    verdicts = {k: True for k in list(FRAME_KEYS)[:-1]}
+    verdicts = dict.fromkeys(list(FRAME_KEYS)[:-1], True)
     result = five_frame_gate_check(verdicts)
     assert result.complete is False
     assert result.all_frames_present is False
@@ -36,7 +36,7 @@ def test_passed_failed_partition():
 
 def test_unknown_frame_keys_are_ignored_for_completeness():
     # An extra non-frame key cannot substitute for a missing real frame.
-    verdicts = {k: True for k in list(FRAME_KEYS)[:-1]}
+    verdicts = dict.fromkeys(list(FRAME_KEYS)[:-1], True)
     verdicts["not_a_frame"] = True
     result = five_frame_gate_check(verdicts)
     assert result.complete is False

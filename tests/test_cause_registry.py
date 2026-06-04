@@ -32,14 +32,12 @@ def _draft(name="Benign cause", by="req"):
         "output_schema_ref": "result_v0",
         "partner_of_record_posture": "maintainer is actor-of-record",
         "created_by": by,
-        "five_frame": {
-            k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS
-        },
+        "five_frame": {k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS},
     }
 
 
 def _complete_gate(all_pass=True):
-    return five_frame_gate_check({k: all_pass for k in FRAME_KEYS})
+    return five_frame_gate_check(dict.fromkeys(FRAME_KEYS, all_pass))
 
 
 def _kinds(registry):
@@ -102,7 +100,10 @@ def test_decision_requires_nonempty_reason(tmp_path):
     cause = reg.submit_cause_request(_draft())
     with pytest.raises(CauseError, match="non-empty reason"):
         reg.decide_cause(
-            cause.cause_id, approve=True, reason="   ", decider="anchor",
+            cause.cause_id,
+            approve=True,
+            reason="   ",
+            decider="anchor",
             gate_result=_complete_gate(),
         )
 
@@ -110,10 +111,13 @@ def test_decision_requires_nonempty_reason(tmp_path):
 def test_decision_requires_complete_gate_check(tmp_path):
     reg = _registry(tmp_path)
     cause = reg.submit_cause_request(_draft())
-    incomplete = five_frame_gate_check({k: True for k in list(FRAME_KEYS)[:-1]})
+    incomplete = five_frame_gate_check(dict.fromkeys(list(FRAME_KEYS)[:-1], True))
     with pytest.raises(CauseError, match="incomplete"):
         reg.decide_cause(
-            cause.cause_id, approve=True, reason="looks fine", decider="anchor",
+            cause.cause_id,
+            approve=True,
+            reason="looks fine",
+            decider="anchor",
             gate_result=incomplete,
         )
 
@@ -132,10 +136,16 @@ def test_transparency_log_over_cause_entries_verifies(tmp_path):
     reg = _registry(tmp_path)
     c1 = reg.submit_cause_request(_draft(name="A"))
     c2 = reg.submit_cause_request(_draft(name="B"))
-    reg.decide_cause(c1.cause_id, approve=True, reason="ok", decider="anchor",
-                     gate_result=_complete_gate())
-    reg.decide_cause(c2.cause_id, approve=False, reason="no", decider="anchor",
-                     gate_result=_complete_gate(all_pass=False))
+    reg.decide_cause(
+        c1.cause_id, approve=True, reason="ok", decider="anchor", gate_result=_complete_gate()
+    )
+    reg.decide_cause(
+        c2.cause_id,
+        approve=False,
+        reason="no",
+        decider="anchor",
+        gate_result=_complete_gate(all_pass=False),
+    )
     # No silent rejection: the whole chain (incl. cause entries) verifies.
     v = reg.verify_transparency()
     assert v.ok is True
@@ -148,8 +158,10 @@ def test_outcome_altitude_request_decide_list_e2e(tmp_path):
     cause = reg.submit_cause_request(_draft(name="link-rot audit"))
     assert reg.list_causes() == []  # not listable before decision (the gate)
     reg.decide_cause(
-        cause.cause_id, approve=True,
-        reason="benign; passes all five frames", decider="anchor",
+        cause.cause_id,
+        approve=True,
+        reason="benign; passes all five frames",
+        decider="anchor",
         gate_result=_complete_gate(),
     )
     listed = reg.list_causes()

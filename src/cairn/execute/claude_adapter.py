@@ -29,8 +29,10 @@ from __future__ import annotations
 import json
 import subprocess
 import tempfile
+from collections.abc import Callable
+from datetime import UTC
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any
 
 from ..types import WorkUnit
 from .adapter import Adapter
@@ -49,7 +51,7 @@ _DEFAULT_TIMEOUT = 120.0
 
 #: the empty MCP-servers config written next to every spawn — strict + empty
 #: means NO MCP servers / plugins load (the spawn-isolation guarantee).
-_EMPTY_MCP_CONFIG = {"mcpServers": {}}
+_EMPTY_MCP_CONFIG: dict[str, Any] = {"mcpServers": {}}
 
 #: the strict isolation flag the regression test asserts is always present.
 _STRICT_MCP_FLAG = "--strict-mcp-config"
@@ -72,9 +74,9 @@ ClockFn = Callable[[], str]
 
 def _default_clock() -> str:
     """Wall-clock ISO-8601 UTC timestamp (the real-provenance default)."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _build_claude_argv(
@@ -104,7 +106,7 @@ def _build_claude_argv(
     ]
 
 
-def _extract_result_text(stdout: str) -> tuple[str, Optional[str]]:
+def _extract_result_text(stdout: str) -> tuple[str, str | None]:
     """Pull (result_text, model_id) from a ``--output-format json`` envelope.
 
     Best-effort: the ``claude -p --output-format json`` envelope is a JSON object
@@ -158,16 +160,14 @@ def _real_claude_print(
             raise ClaudeCliError(f"could not spawn claude: {exc}") from exc
 
         if proc.returncode != 0:
-            raise ClaudeCliError(
-                f"claude -p exited {proc.returncode}: {proc.stderr.strip()[:400]}"
-            )
+            raise ClaudeCliError(f"claude -p exited {proc.returncode}: {proc.stderr.strip()[:400]}")
         result_text, _model_id = _extract_result_text(proc.stdout)
         if not result_text or not result_text.strip():
             raise ClaudeCliError("claude -p returned empty output")
         return result_text
 
 
-def _extract_json(text: str) -> Optional[dict[str, Any]]:
+def _extract_json(text: str) -> dict[str, Any] | None:
     """Tolerantly extract a single JSON object from a model response.
 
     Strategies, in order: (1) parse the whole string; (2) strip a ```json ... ```
@@ -185,7 +185,9 @@ def _extract_json(text: str) -> Optional[dict[str, Any]]:
             # drop a leading language tag line (e.g. "json")
             if "\n" in fenced:
                 first_line, rest = fenced.split("\n", 1)
-                if first_line.strip().lower() in ("json", "") or not first_line.strip().startswith("{"):
+                if first_line.strip().lower() in ("json", "") or not first_line.strip().startswith(
+                    "{"
+                ):
                     fenced = rest
             candidates.append(fenced.strip())
 
@@ -212,9 +214,7 @@ def _build_prompt(payload: RenderedPayload) -> str:
     appends a strict JSON-only instruction. We still parse tolerantly downstream.
     """
     return (
-        payload.prompt
-        + "\n"
-        + "Return ONLY a single JSON object conforming to the schema above. "
+        payload.prompt + "\n" + "Return ONLY a single JSON object conforming to the schema above. "
         "Do not include any prose, explanation, or markdown code fences — "
         "output the raw JSON object and nothing else.\n"
     )
@@ -237,11 +237,11 @@ class ClaudeCliAdapter(Adapter):
     def __init__(
         self,
         *,
-        transcript_fn: Optional[TranscriptFn] = None,
-        clock_fn: Optional[ClockFn] = None,
+        transcript_fn: TranscriptFn | None = None,
+        clock_fn: ClockFn | None = None,
         model: str = _DEFAULT_MODEL,
         timeout: float = _DEFAULT_TIMEOUT,
-        capabilities: Optional[Capabilities] = None,
+        capabilities: Capabilities | None = None,
     ) -> None:
         self._model = model
         self._timeout = timeout

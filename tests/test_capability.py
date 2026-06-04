@@ -28,27 +28,21 @@ def test_node_meeting_all_dimensions_qualifies():
 
 
 def test_short_context_window_rejected():
-    caps = Capabilities(
-        context_window=4096, tools=["web_fetch"], modalities=["text"]
-    )
+    caps = Capabilities(context_window=4096, tools=["web_fetch"], modalities=["text"])
     check = meets_floor(caps, _FLOOR)
     assert not check.qualifies
     assert any("context_window" in r for r in check.reasons)
 
 
 def test_missing_tool_rejected():
-    caps = Capabilities(
-        context_window=32768, tools=[], modalities=["text"]
-    )
+    caps = Capabilities(context_window=32768, tools=[], modalities=["text"])
     check = meets_floor(caps, _FLOOR)
     assert not check.qualifies
     assert any("web_fetch" in r for r in check.reasons)
 
 
 def test_missing_modality_rejected():
-    caps = Capabilities(
-        context_window=32768, tools=["web_fetch"], modalities=["image"]
-    )
+    caps = Capabilities(context_window=32768, tools=["web_fetch"], modalities=["image"])
     check = meets_floor(caps, _FLOOR)
     assert not check.qualifies
     assert any("text" in r for r in check.reasons)

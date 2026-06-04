@@ -102,9 +102,7 @@ class MockAdapter(Adapter):
             return [self._synthesize(items, objective) for _ in range(count)]
         return self._scalar(json_type, schema, field_name="value")
 
-    def _synthesize_property(
-        self, name: str, schema: dict[str, Any], objective: str
-    ) -> Any:
+    def _synthesize_property(self, name: str, schema: dict[str, Any], objective: str) -> Any:
         enum = schema.get("enum")
         if enum:
             return enum[0]
@@ -113,9 +111,7 @@ class MockAdapter(Adapter):
             return self._synthesize(schema, objective)
         return self._scalar(json_type, schema, field_name=name)
 
-    def _scalar(
-        self, json_type: str | None, schema: dict[str, Any], field_name: str
-    ) -> Any:
+    def _scalar(self, json_type: str | None, schema: dict[str, Any], field_name: str) -> Any:
         if json_type == "boolean":
             return True
         if json_type == "integer":
@@ -154,7 +150,5 @@ class MockAdapter(Adapter):
         """
         import json
 
-        payload = json.dumps(
-            {"task_id": task_id, "output": output}, sort_keys=True
-        ).encode("utf-8")
+        payload = json.dumps({"task_id": task_id, "output": output}, sort_keys=True).encode("utf-8")
         return "mock-sig:" + hashlib.sha256(payload).hexdigest()

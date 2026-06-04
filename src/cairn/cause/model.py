@@ -17,8 +17,8 @@ single source of that rule (status ∈ {APPROVED, LIVE}).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Optional
+from enum import StrEnum
+from typing import Any
 
 from ..ledger.blobstore import canonical_json, content_key
 
@@ -33,7 +33,7 @@ FRAME_KEYS: tuple[str, ...] = (
 )
 
 
-class CauseStatus(str, Enum):
+class CauseStatus(StrEnum):
     """Lifecycle status of a cause."""
 
     REQUESTED = "requested"
@@ -66,7 +66,7 @@ class FrameVerdict:
         return {"frame": self.frame, "claim": self.claim, "passes": self.passes}
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "FrameVerdict":
+    def from_dict(cls, d: dict[str, Any]) -> FrameVerdict:
         return cls(frame=d["frame"], claim=d["claim"], passes=bool(d["passes"]))
 
 
@@ -91,7 +91,7 @@ class FiveFrameAssessment:
         return {k: v.to_dict() for k, v in sorted(self.verdicts.items())}
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "FiveFrameAssessment":
+    def from_dict(cls, d: dict[str, Any]) -> FiveFrameAssessment:
         return cls(
             verdicts={
                 k: FrameVerdict.from_dict(
@@ -123,9 +123,9 @@ class Cause:
     partner_of_record_posture: str
     created_at: float
     created_by: str
-    decided_at: Optional[float] = None
-    decided_by: Optional[str] = None
-    decision_reason: Optional[str] = None
+    decided_at: float | None = None
+    decided_by: str | None = None
+    decision_reason: str | None = None
 
     @property
     def is_publicly_listable(self) -> bool:
@@ -170,7 +170,7 @@ class Cause:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Cause":
+    def from_dict(cls, d: dict[str, Any]) -> Cause:
         return cls(
             cause_id=d["cause_id"],
             name=d["name"],

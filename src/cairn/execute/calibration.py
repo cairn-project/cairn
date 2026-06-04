@@ -66,13 +66,9 @@ class TrivialCalibrationProbe(CalibrationProbe):
     def verify(self, capabilities: Capabilities) -> CalibrationResult:
         reasons: list[str] = []
         if capabilities.context_window < 0:
-            reasons.append(
-                f"context_window {capabilities.context_window} is negative"
-            )
+            reasons.append(f"context_window {capabilities.context_window} is negative")
         if capabilities.model_family_tier < 0:
-            reasons.append(
-                f"model_family_tier {capabilities.model_family_tier} is negative"
-            )
+            reasons.append(f"model_family_tier {capabilities.model_family_tier} is negative")
         unknown = [m for m in capabilities.modalities if m not in KNOWN_MODALITIES]
         if unknown:
             reasons.append(f"unknown modalities: {unknown}")

@@ -56,9 +56,7 @@ def test_define_claim_execute_store_verify_log(tmp_path):
     # 5. VERIFY — trust decision over the stored candidates. The ledger does
     #    NOT decide truth; verify_unit does.
     policy = RedundancyPolicy.from_dict(unit_dict["redundancy_policy"])
-    verdict = verify_unit(
-        candidates, policy, reputation=ledger.reputation, unit_task_id=task_id
-    )
+    verdict = verify_unit(candidates, policy, reputation=ledger.reputation, unit_task_id=task_id)
     assert verdict.accepted  # 2 agreeing distinct families -> ACCEPTED
 
     # 6. RECORD the verdict in the transparency log.

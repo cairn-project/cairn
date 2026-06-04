@@ -37,9 +37,7 @@ class ValidationResult:
 def _schema() -> dict[str, Any]:
     """Load the canonical work-unit JSON Schema (cached)."""
     text = (
-        resources.files("cairn.spec")
-        .joinpath("work_unit.schema.json")
-        .read_text(encoding="utf-8")
+        resources.files("cairn.spec").joinpath("work_unit.schema.json").read_text(encoding="utf-8")
     )
     return json.loads(text)
 

@@ -60,9 +60,7 @@ def test_most_specific_match_wins_over_less_specific():
     reg.add(_recipient("broad", {"region-a"}, {"kind-x"}))
     reg.add(_recipient("specific", {"region-a", "region-b"}, {"kind-x", "kind-y"}))
     reg.set_fallback(_recipient("fallback", set(), set()))
-    d = RoutingPolicy().route(
-        _attrs({"region-a", "region-b"}, {"kind-x", "kind-y"}), reg
-    )
+    d = RoutingPolicy().route(_attrs({"region-a", "region-b"}, {"kind-x", "kind-y"}), reg)
     assert d.reason is RouteReason.MATCHED
     assert d.recipient.recipient_id == "specific"
     assert d.overlap == 4

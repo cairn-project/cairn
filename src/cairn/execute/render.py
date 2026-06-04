@@ -49,14 +49,11 @@ def _contract_to_dict(contract: Any) -> dict[str, Any]:
     if isinstance(contract, dict):
         return contract
     raise TypeError(
-        "acceptance_contract must be a dict or AcceptanceContract, got "
-        f"{type(contract).__name__}"
+        f"acceptance_contract must be a dict or AcceptanceContract, got {type(contract).__name__}"
     )
 
 
-def _neutral_prompt(
-    objective: str, inputs: dict[str, Any], output_schema: dict[str, Any]
-) -> str:
+def _neutral_prompt(objective: str, inputs: dict[str, Any], output_schema: dict[str, Any]) -> str:
     """A vendor-neutral textual rendering of the task.
 
     Mentions the objective, the inputs, and the required output shape. A live

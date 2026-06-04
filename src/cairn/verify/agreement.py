@@ -21,8 +21,9 @@ from __future__ import annotations
 import json
 import re
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any
 
 from ..execute.result import CandidateResult
 from .judge import Judge
@@ -91,8 +92,8 @@ class ObjectiveAgreement(AgreementFunction):
 
     def __init__(
         self,
-        key_fn: Optional[Callable[[CandidateResult], Any]] = None,
-        field: Optional[str] = None,
+        key_fn: Callable[[CandidateResult], Any] | None = None,
+        field: str | None = None,
         normalize: bool = True,
     ) -> None:
         self._key_fn = key_fn

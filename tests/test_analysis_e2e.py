@@ -143,23 +143,17 @@ def test_capture_to_verify_to_flag_to_vet_to_route_end_to_end(tmp_path):
     channel = InMemoryRecipientChannel()
     registry = RecipientRegistry()
     registry.add(
-        Recipient.create(
-            "recipient-a", locality={"region-a"}, domain={"kind-x"}, channel=channel
-        )
+        Recipient.create("recipient-a", locality={"region-a"}, domain={"kind-x"}, channel=channel)
     )
     registry.set_fallback(
-        Recipient.create(
-            "escalation-default", locality=set(), domain=set(), channel=channel
-        )
+        Recipient.create("escalation-default", locality=set(), domain=set(), channel=channel)
     )
     record = dispatch_routable_finding(
         finding.finding_hash,
         ledger=ledger,
         finding_queue=queue,
         registry=registry,
-        attributes=FindingRoutingAttributes.of(
-            locality={"region-a"}, domain={"kind-x"}
-        ),
+        attributes=FindingRoutingAttributes.of(locality={"region-a"}, domain={"kind-x"}),
     )
     assert record.recipient_id == "recipient-a"
     assert record.ack.accepted is True

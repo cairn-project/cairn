@@ -64,11 +64,7 @@ class StaticDocumentCapturePort:
     """
 
     def __init__(self, fixture_name: str = _DEFAULT_FIXTURE) -> None:
-        text = (
-            resources.files("cairn.fixtures")
-            .joinpath(fixture_name)
-            .read_text(encoding="utf-8")
-        )
+        text = resources.files("cairn.fixtures").joinpath(fixture_name).read_text(encoding="utf-8")
         self._doc = json.loads(text)
         # The OPAQUE target reference — a fixture-scoped id, NEVER a live URL.
         self.target_ref: str = self._doc["target_ref"]
@@ -77,13 +73,9 @@ class StaticDocumentCapturePort:
     def capture(self) -> tuple[Observation, ...]:
         """Emit the inert observations recorded for the synthetic document."""
         observations: list[Observation] = [
-            Observation.create(
-                OBS_RENDERED_TEXT, {"text": self._doc["rendered_text"]}
-            ),
+            Observation.create(OBS_RENDERED_TEXT, {"text": self._doc["rendered_text"]}),
             Observation.create(OBS_DOM_TEXT, {"text": self._doc["dom_text"]}),
-            Observation.create(
-                OBS_RESPONSE_HEADERS, dict(self._doc["response_headers"])
-            ),
+            Observation.create(OBS_RESPONSE_HEADERS, dict(self._doc["response_headers"])),
             Observation.create(
                 OBS_REGISTRATION_METADATA,
                 dict(self._doc["registration_metadata"]),

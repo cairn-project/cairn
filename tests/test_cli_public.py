@@ -30,18 +30,19 @@ def _populate(ledger_dir):
         "output_schema_ref": "result_v0",
         "partner_of_record_posture": "maintainer is actor-of-record",
         "created_by": "req",
-        "five_frame": {
-            k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS
-        },
+        "five_frame": {k: {"frame": k, "claim": f"{k} ok", "passes": True} for k in FRAME_KEYS},
     }
     cause = reg.submit_cause_request(draft)
-    reg.decide_cause(cause.cause_id, approve=True, reason="ok", decider="anchor",
-                     gate_result=five_frame_gate_check({k: True for k in FRAME_KEYS}))
+    reg.decide_cause(
+        cause.cause_id,
+        approve=True,
+        reason="ok",
+        decider="anchor",
+        gate_result=five_frame_gate_check(dict.fromkeys(FRAME_KEYS, True)),
+    )
     av = AutomatedVerdict(flag_label="flagged", confidence=0.9)
-    finding = queue.flag(packet_hash="ab" * 32, automated_verdict=av,
-                         flagged_by="node-1")
-    queue.record_verdict(finding.finding_hash, routable=True, reason="ok",
-                         reviewer_id="rev-1")
+    finding = queue.flag(packet_hash="ab" * 32, automated_verdict=av, flagged_by="node-1")
+    queue.record_verdict(finding.finding_hash, routable=True, reason="ok", reviewer_id="rev-1")
     return ledger
 
 
@@ -62,7 +63,11 @@ def test_public_outcomes_cli_redacted(tmp_path, capsys):
     rows = json.loads(capsys.readouterr().out)
     assert len(rows) == 1
     assert set(rows[0]) == {
-        "packet_hash", "flag_label", "verdict", "reviewer_of_record", "decided_at",
+        "packet_hash",
+        "flag_label",
+        "verdict",
+        "reviewer_of_record",
+        "decided_at",
     }
     assert rows[0]["verdict"] == "routable"
 

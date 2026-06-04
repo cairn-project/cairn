@@ -33,9 +33,7 @@ def test_mock_output_passes_acceptance(name):
     unit = WorkUnit.from_dict(load_fixture(name))
     candidate = MockAdapter().produce(unit)
     verdict = evaluate_acceptance(candidate.output, unit.acceptance_contract)
-    assert verdict.passed, [
-        (r.kind, r.detail) for r in verdict.results if not r.passed
-    ]
+    assert verdict.passed, [(r.kind, r.detail) for r in verdict.results if not r.passed]
 
 
 def test_mock_is_deterministic():

@@ -21,10 +21,8 @@ inject a fake ``transcript_fn`` to exercise this path offline + deterministicall
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import Optional
 
-from ..execute.claude_adapter import ClockFn, TranscriptFn
-from ..execute.claude_adapter import ClaudeCliAdapter
+from ..execute.claude_adapter import ClaudeCliAdapter, ClockFn, TranscriptFn
 from ..execute.flow import run_work_unit
 from ..execute.result import CandidateResult
 from ..ledger.ledger import Ledger
@@ -52,8 +50,8 @@ REFERENCE_FAMILY = "reference"
 def live_smoke(
     ledger: Ledger,
     *,
-    transcript_fn: Optional[TranscriptFn] = None,
-    clock_fn: Optional[ClockFn] = None,
+    transcript_fn: TranscriptFn | None = None,
+    clock_fn: ClockFn | None = None,
     model: str = "sonnet",
     timeout: float = 120.0,
 ) -> PilotRunSummary:
@@ -100,9 +98,7 @@ def live_smoke(
 
         candidates: list[CandidateResult] = []
         for _family, node_id, adapter in nodes:
-            claim = ledger.claim_task(
-                task_id, node_id=node_id, lease_seconds=_LEASE_SECONDS
-            )
+            claim = ledger.claim_task(task_id, node_id=node_id, lease_seconds=_LEASE_SECONDS)
             outcome = run_work_unit(unit_dict, adapter)
             # The live adapter fails closed (empty output) rather than returning
             # None, so a candidate always exists; it may fail acceptance/verify.
@@ -139,8 +135,7 @@ def live_smoke(
         )
 
     reputation = {
-        subject: ledger.reputation.score(subject)
-        for subject in ledger.reputation.known_subjects()
+        subject: ledger.reputation.score(subject) for subject in ledger.reputation.known_subjects()
     }
     kinds = [e.kind for e in ledger.translog.entries()]
 

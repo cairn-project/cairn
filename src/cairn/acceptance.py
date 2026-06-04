@@ -13,8 +13,9 @@ non_empty, min_items, regex_match. An unknown kind fails closed (raises).
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 _MISSING = object()
 
@@ -187,7 +188,7 @@ def evaluate_acceptance(result: Any, acceptance_contract: Any) -> AcceptanceResu
     per: list[PredicateResult] = []
     all_passed = True
     for pred in predicates:
-        kind = pred.get("kind")
+        kind = str(pred.get("kind", ""))
         checker = _CHECKERS.get(kind)
         if checker is None:
             raise UnknownPredicateError(f"unknown acceptance predicate kind: {kind!r}")

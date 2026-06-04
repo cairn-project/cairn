@@ -25,6 +25,7 @@ from .calibration import (
     TrivialCalibrationProbe,
 )
 from .capability import Capabilities, CapabilityCheck, meets_floor
+from .claude_adapter import ClaudeCliAdapter, ClaudeCliError
 from .flow import (
     STATUS_ACCEPTED,
     STATUS_ACCEPTED_ACCEPTANCE_FAILED,
@@ -34,7 +35,6 @@ from .flow import (
     ExecuteOutcome,
     run_work_unit,
 )
-from .claude_adapter import ClaudeCliAdapter, ClaudeCliError
 from .mock_adapter import MockAdapter
 from .render import RenderedPayload, render_payload
 from .result import CandidateResult
@@ -42,7 +42,7 @@ from .result import CandidateResult
 __all__ = [
     # seam + reference adapter
     "Adapter",
-    "ClaudeCliAdapter", # — first live adapter
+    "ClaudeCliAdapter",  # — first live adapter
     "ClaudeCliError",
     "MockAdapter",
     # render

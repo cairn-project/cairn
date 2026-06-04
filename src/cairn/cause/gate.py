@@ -12,8 +12,8 @@ The decider's per-frame pass/fail verdicts are recorded for the transparency log
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Mapping
 
 from .model import FRAME_KEYS
 
