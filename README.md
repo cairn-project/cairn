@@ -1,4 +1,4 @@
-# cairn — distributed cause-coordination engine (Layer A)
+# cairn — a cause-coordination engine built to be distributed (Layer A)
 
 > *Cuiridh mi clach air do chàrn.*
 > — "I'll put a stone on your cairn." A Scottish Gaelic blessing; it means *I'll not forget you.*
@@ -42,9 +42,14 @@ that run on it are chosen, and vetted, by people.
 > **Name.** `cairn` is mission-neutral by design — the engine is general and
 > multi-cause, not tied to any one mission.
 
-cairn is a decentralized, model-agnostic distributed-detection-and-analysis
-force-multiplier that runs N causes on one protocol. Volunteers lend their own AI
-to collectively notice harm and route it to the institutions that can act. It is
+cairn is a model-agnostic detection-and-analysis force-multiplier that runs N
+causes on one protocol. **What it's being built to become:** a decentralized,
+distributed network where volunteers lend their own AI to collectively notice
+harm and route it to the institutions that can act — many hands, one protocol.
+**Where it is today:** that decentralized, volunteer-powered network is the
+target, not the current state — the engine runs as a single-operator, offline
+pilot right now (see Maturity). The distributed, multi-volunteer deployment is a
+deliberately deferred, independently-reviewed phase, not an abandoned one. It is
 **mission-neutral** — the protocol runs many causes; the conduct a cause targets
 is a per-cause property, not baked into the engine.
 

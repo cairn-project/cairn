@@ -1,9 +1,11 @@
 # Contributing to Cairn
 
-Thank you for considering a contribution. Cairn is a decentralized,
-model-agnostic distributed-detection-and-analysis force-multiplier, and it is
-explicitly a **trust-requiring** project: it exists to feed credible evidence
-to institutions that have authority to act. That means the bar for transparency,
+Thank you for considering a contribution. Cairn is a model-agnostic
+detection-and-analysis force-multiplier being built to become a decentralized,
+distributed, volunteer-powered network — that decentralized network is the
+target the project is working toward, while today it runs as a single-operator,
+offline pilot. It is explicitly a **trust-requiring** project: it exists to feed
+credible evidence to institutions that have authority to act. That means the bar for transparency,
 auditability, and honest limitations is high, and contributions are reviewed
 against that bar.
 
