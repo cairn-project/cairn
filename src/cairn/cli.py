@@ -28,7 +28,13 @@ The ``pilot`` / ``verify-log`` / ``inspect`` commands are offline, stdlib-only
 reproducible; the HMAC signing key is a fixed non-secret CLI parameter (never a
 checked-in production secret).
 
-The cause-layer commands compose on the same CLI:
+The cause-layer commands compose on the same CLI. Unlike ``pilot`` /
+``live-smoke`` (one-shot demos that mint a fresh temp ledger each run), these
+commands coordinate state across calls, so when ``--ledger`` is omitted they
+share a single PERSISTED default ledger (``$CAIRN_LEDGER`` →
+``$XDG_DATA_HOME/cairn/ledger`` → ``~/.local/share/cairn/ledger``). A
+multi-step cause flow therefore works without threading ``--ledger`` through
+every command; pass ``--ledger DIR`` to use an explicit ledger instead.
 
   cairn causes [--ledger DIR] [--status S] [--json]
       List the PUBLIC cause list (approved/live only) — or, with --status, the
@@ -59,6 +65,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -81,6 +88,40 @@ from .public import PublicTransparency
 # Fixed, NON-SECRET signing key for the offline pilot/CLI demo. This is NOT a
 # production secret — it is a public demo key so the attestation seam is exercised.
 _DEMO_KEY = b"cairn-pilot-demo-key-not-secret"
+
+
+def resolve_ledger_dir(ledger_arg: Optional[str]) -> Path:
+    """Resolve the ledger directory for a cause-flow command, persisting a stable
+    default so a multi-step flow works WITHOUT threading ``--ledger`` through
+    every call.
+
+    Resolution order:
+      1. explicit ``--ledger`` arg              -> returned verbatim
+      2. ``$CAIRN_LEDGER`` env var              -> that path
+      3. ``$XDG_DATA_HOME/cairn/ledger``        -> if XDG_DATA_HOME is set
+      4. ``~/.local/share/cairn/ledger``        -> final fallback
+
+    Unlike the one-shot ``pilot`` / ``live-smoke`` demos (which intentionally mint
+    a fresh temp ledger per run), the cause-flow commands (``causes`` /
+    ``cause-request`` / ``cause-decide`` / ``contribute``) coordinate state across
+    invocations, so they need a *persisted* default. The chosen directory is
+    created if missing; the same environment resolves to the same path on every
+    call (the persistence property the flow depends on). An explicit ``--ledger``
+    is returned as given — the ``Ledger`` constructor creates its own structure.
+    """
+    if ledger_arg:
+        return Path(ledger_arg)
+
+    env = os.environ.get("CAIRN_LEDGER")
+    if env:
+        target = Path(env)
+    else:
+        xdg = os.environ.get("XDG_DATA_HOME")
+        base = Path(xdg) if xdg else Path.home() / ".local" / "share"
+        target = base / "cairn" / "ledger"
+
+    target.mkdir(parents=True, exist_ok=True)
+    return target
 
 
 def _cmd_pilot(args: argparse.Namespace) -> int:
@@ -125,12 +166,13 @@ def _cmd_live_smoke(args: argparse.Namespace) -> int:
 
 
 def _open_registry(ledger_arg: Optional[str]) -> CauseRegistry:
-    """Open a CauseRegistry over a real ledger (offline, FixedClock, demo key)."""
-    ledger_dir = (
-        Path(ledger_arg)
-        if ledger_arg
-        else Path(tempfile.mkdtemp(prefix="cairn-cause-"))
-    )
+    """Open a CauseRegistry over a real ledger (offline, FixedClock, demo key).
+
+    With no ``--ledger`` the persisted default ledger is used (see
+    ``resolve_ledger_dir``), so a multi-step cause flow coordinates on one
+    ledger without the caller threading ``--ledger`` through every command.
+    """
+    ledger_dir = resolve_ledger_dir(ledger_arg)
     ledger = Ledger(ledger_dir, FixedClock(start=0.0), signing_key=_DEMO_KEY)
     return CauseRegistry(ledger)
 
@@ -225,11 +267,7 @@ def _cmd_contribute(args: argparse.Namespace) -> int:
         )
         return 2
 
-    ledger_dir = (
-        Path(args.ledger)
-        if args.ledger
-        else Path(tempfile.mkdtemp(prefix="cairn-contribute-"))
-    )
+    ledger_dir = resolve_ledger_dir(args.ledger)
     ledger = Ledger(ledger_dir, FixedClock(start=0.0), signing_key=_DEMO_KEY)
     cause_registry = CauseRegistry(ledger)
     optin_registry = OptInRegistry(ledger, cause_registry)
@@ -457,7 +495,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_causes = sub.add_parser(
         "causes", help="list public causes (approved/live), or a status history view"
     )
-    p_causes.add_argument("--ledger", default=None, help="ledger directory")
+    p_causes.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
     p_causes.add_argument(
         "--status",
         default=None,
@@ -471,7 +509,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "cause-request", help="submit a cause draft (records a CAUSE_REQUEST)"
     )
     p_creq.add_argument("file", help="path to the cause draft JSON file")
-    p_creq.add_argument("--ledger", default=None, help="ledger directory")
+    p_creq.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
     p_creq.add_argument("--by", default=None, help="requester id (created_by)")
     p_creq.add_argument("--json", action="store_true", help="emit JSON summary")
     p_creq.set_defaults(func=_cmd_cause_request)
@@ -497,7 +535,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help=f"a frame the decider passes (repeatable); all of {list(FRAME_KEYS)} "
         "must be addressed for a complete gate-check",
     )
-    p_cdec.add_argument("--ledger", default=None, help="ledger directory")
+    p_cdec.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
     p_cdec.add_argument("--json", action="store_true", help="emit JSON summary")
     p_cdec.set_defaults(func=_cmd_cause_decide)
 
@@ -520,7 +558,7 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
         help="run this model family as a faulty node on the honeypot unit",
     )
-    p_contrib.add_argument("--ledger", default=None, help="ledger directory")
+    p_contrib.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
     p_contrib.add_argument("--json", action="store_true", help="emit JSON summary")
     p_contrib.set_defaults(func=_cmd_contribute)
 
