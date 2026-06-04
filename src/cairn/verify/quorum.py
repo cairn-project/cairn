@@ -16,9 +16,11 @@ work unit and decides a quorum status against the unit's ``RedundancyPolicy``:
 
 Model-diversity requirement: read from ``RedundancyPolicy.model_diversity``.
 The anti-collusion floor mandates ≥2 distinct families. The field defaults to 0
-(unset); a value <= 1 is treated as "unset" and the safe
-default of 2 is applied so the anti-collusion primitive is ON by default. An
-explicit ``model_diversity = 1`` (deliberately configured) disables it for a benign cause.
+(unset); any value ``<= 0`` is treated as "unset" and the safe default of 2 is
+applied, so the anti-collusion primitive is ON by default. An explicit
+``model_diversity = 1`` (deliberately configured) sets the requirement to one
+family, which any single cluster satisfies — i.e. it disables the gate for a
+benign cause. Values ``>= 2`` are honored as-is.
 """
 
 from __future__ import annotations
@@ -33,16 +35,17 @@ STATUS_NO_QUORUM = "NO_QUORUM"
 STATUS_DISPUTED = "DISPUTED"
 STATUS_INSUFFICIENT_DIVERSITY = "INSUFFICIENT_DIVERSITY"
 
-# Safe default applied when the policy leaves model_diversity unset (<= 1).
+# Safe default applied when the policy leaves model_diversity unset (<= 0).
 DEFAULT_MODEL_DIVERSITY = 2
 
 
 def required_diversity(policy: RedundancyPolicy) -> int:
     """Resolve the effective model-diversity requirement for a policy.
 
-    A policy value <= 1 means "unset" -> apply the safe anti-collusion default of
-    2 distinct families. An explicit value >= 2 is
-    honored as-is. An explicit ``1`` (deliberately configured) disables diversity.
+    A policy value ``<= 0`` (the unset default) applies the safe anti-collusion
+    default of 2 distinct families. An explicit ``1`` requires a single family,
+    which any cluster satisfies, so it disables the diversity gate. Values
+    ``>= 2`` are honored as-is.
     """
     declared = policy.model_diversity
     if declared <= 0:

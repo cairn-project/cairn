@@ -58,7 +58,8 @@ is a per-cause property, not baked into the engine.
 - **Pre-1.0 (`0.x`), unreleased.** No version is tagged or published yet; the
   CHANGELOG sits at `[Unreleased]`. While `0.x`, minor versions may break.
 - **Complete and runnable, pilot-stage.** The full Layer-A engine is built and
-  exercised by **291 passing tests**. `cairn pilot` runs the benign pilot
+  exercised by a broad passing test suite (`pytest -q` reports the current
+  count). `cairn pilot` runs the benign pilot
   end-to-end on a fresh ledger, and the append-only transparency log it writes
   independently verifies (`cairn verify-log`). This is a working engine, not a
   skeleton.
@@ -201,6 +202,13 @@ here:
   `RecipientChannel` seam ships only an in-memory channel.
 - **Served read API** — an HTTP/HTML rendering of the public-transparency
   surfaces (today: library-level views only).
+- **Reputation-aware gating** — the reputation subsystem earns, persists, and
+  surfaces per-node / per-model-family reliability scores, but no gating
+  decision consumes them yet: quorum, tiebreak, and claim do not read
+  `.score()`. Letting reputation weight acceptance / tiebreak / eligibility is a
+  security-sensitive change (it adds a gameable surface), so it is deferred to a
+  separate, independently reviewed phase. Today reputation is an observability
+  signal, not a control input.
 - **CI/release automation** — see [RELEASING.md](RELEASING.md) (proposed) and
   [CONTRIBUTING.md](CONTRIBUTING.md).
 

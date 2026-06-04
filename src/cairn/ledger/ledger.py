@@ -62,6 +62,22 @@ class Ledger:
         self._results_dir = self._root / "results"
         self._results_dir.mkdir(parents=True, exist_ok=True)
 
+    # --- public accessors ----------------------------------------------------
+    # Composing components (cause/vetting/capture/contribute/public/routing)
+    # need the ledger root and clock to lay out their own index dirs. Expose
+    # them read-only so collaborators compose on a public API instead of
+    # reaching into private attributes.
+
+    @property
+    def root(self) -> Path:
+        """The ledger root directory (read-only)."""
+        return self._root
+
+    @property
+    def clock(self) -> Clock:
+        """The injected clock the ledger and its collaborators share (read-only)."""
+        return self._clock
+
     # --- tasks ---------------------------------------------------------------
 
     def define_task(self, unit_dict: dict[str, Any]) -> str:

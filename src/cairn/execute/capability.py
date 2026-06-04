@@ -7,7 +7,8 @@ only if it ``meets_floor`` — Contract-Net self-selection. Self-declared
 capability is an untrusted claim validated by a calibration probe on join
 (``calibration.py``).
 
- scope: the declaration + the floor check. No probing execution here.
+This module covers the capability declaration and the floor check only; it runs
+no probing execution (that lives in ``calibration.py``).
 """
 
 from __future__ import annotations

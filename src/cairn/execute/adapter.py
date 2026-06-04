@@ -8,8 +8,9 @@ ollama / generic-OpenAI-compatible adapter is just a subclass overriding
 ``produce`` and declaring its real ``capabilities``. Adding a runtime = writing
 one adapter, never changing the work-unit format.
 
- ships the abstract base + the offline ``MockAdapter`` (mock_adapter.py).
-Live network adapters are a follow-on increment — none are implemented here.
+This module provides the abstract base plus the offline ``MockAdapter``
+(``mock_adapter.py``). Live network adapters are a follow-on increment — none
+are implemented here.
 """
 
 from __future__ import annotations

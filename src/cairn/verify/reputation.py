@@ -15,6 +15,14 @@ module sets the prior + the in-memory accumulation. Scores are bounded to [0, 1]
 Subjects are namespaced strings: a bare node id (``adapter_name`` this release) or
 ``family:<model_family>`` for the per-family aggregate. The verify aggregator
 emits one delta per node AND one per family so both views accumulate.
+
+DEFERRED PHASE — consumption by gating is NOT wired yet. Scores are earned and
+recorded (and surfaced in run summaries), but no gating decision currently reads
+them: quorum, tiebreak, and claim do not consult ``.score()``. Letting
+reputation weight acceptance/tiebreak/eligibility is a deliberate later phase —
+a reputation-aware gate is a security-sensitive change (it creates a new
+gameable surface) and is held until after launch. Today reputation is an
+observability signal, not a control input.
 """
 
 from __future__ import annotations

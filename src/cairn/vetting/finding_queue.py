@@ -24,9 +24,9 @@ come from the ledger's injected clock. Forks nothing.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
+from ..ledger.indexed_store import IndexedBlobStore
 from ..ledger.ledger import Ledger
 from ..ledger.translog import (
     KIND_FINDING_FLAGGED,
@@ -83,9 +83,10 @@ class FindingVetQueue:
 
     def __init__(self, ledger: Ledger) -> None:
         self._ledger = ledger
-        self._clock = ledger._clock  # noqa: SLF001
-        self._index_dir = Path(ledger._root) / "finding_vet_queue"  # noqa: SLF001
-        self._index_dir.mkdir(parents=True, exist_ok=True)
+        self._clock = ledger.clock
+        self._store: IndexedBlobStore[PendingFindingReview] = IndexedBlobStore(
+            ledger, "finding_vet_queue", PendingFindingReview.from_dict
+        )
 
     # --- flag/enqueue ---------------------------------------------
 
@@ -255,18 +256,10 @@ class FindingVetQueue:
         return item
 
     def _all(self) -> list[PendingFindingReview]:
-        return [self._read(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()]
+        return self._store.all()
 
     def _load(self, finding_hash: str) -> PendingFindingReview | None:
-        ref = self._index_dir / finding_hash
-        if not ref.exists():
-            return None
-        return self._read(ref)
-
-    def _read(self, ref: Path) -> PendingFindingReview:
-        blob_key = ref.read_text().strip()
-        return PendingFindingReview.from_dict(self._ledger.blobs.get_json(blob_key))
+        return self._store.load(finding_hash)
 
     def _persist(self, item: PendingFindingReview) -> None:
-        blob_key = self._ledger.blobs.put_json(item.to_dict())
-        (self._index_dir / item.finding_hash).write_text(blob_key)
+        self._store.persist(item.finding_hash, item.to_dict())

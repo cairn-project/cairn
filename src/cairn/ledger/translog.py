@@ -154,6 +154,11 @@ class TransparencyLog:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._clock = clock
 
+    @property
+    def path(self) -> Path:
+        """The JSONL file backing this log (read-only)."""
+        return self._path
+
     def entries(self) -> list[LogEntry]:
         if not self._path.exists():
             return []

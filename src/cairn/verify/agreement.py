@@ -25,6 +25,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+from .._pathutil import resolve_dotted
 from ..execute.result import CandidateResult
 from .judge import Judge
 
@@ -101,19 +102,9 @@ class ObjectiveAgreement(AgreementFunction):
         self._normalize = normalize
 
     def _resolve_field(self, output: Any, dotted: str) -> Any:
-        cur = output
-        for part in dotted.split("."):
-            if isinstance(cur, dict) and part in cur:
-                cur = cur[part]
-            elif isinstance(cur, list) and part.lstrip("-").isdigit():
-                idx = int(part)
-                if -len(cur) <= idx < len(cur):
-                    cur = cur[idx]
-                else:
-                    return None
-            else:
-                return None
-        return cur
+        # Shared dotted-path resolver; this layer treats a miss as None so the
+        # canonical key folds absent fields together.
+        return resolve_dotted(output, dotted, missing=None)
 
     def _canonical(self, value: Any) -> Any:
         if not self._normalize:

@@ -14,9 +14,8 @@ extended to consent). It forks nothing.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from ..cause.registry import CauseRegistry
+from ..ledger.indexed_store import IndexedBlobStore
 from ..ledger.ledger import Ledger
 from ..ledger.translog import KIND_CONSENT_RECORDED, KIND_CONSENT_REVOKED
 from .model import ConsentRecord
@@ -36,9 +35,10 @@ class OptInRegistry:
     def __init__(self, ledger: Ledger, cause_registry: CauseRegistry) -> None:
         self._ledger = ledger
         self._causes = cause_registry
-        self._clock = ledger._clock  # noqa: SLF001
-        self._index_dir = Path(ledger._root) / "consents"  # noqa: SLF001
-        self._index_dir.mkdir(parents=True, exist_ok=True)
+        self._clock = ledger.clock
+        self._store: IndexedBlobStore[ConsentRecord] = IndexedBlobStore(
+            ledger, "consents", ConsentRecord.from_dict
+        )
 
     # --- opt in --------------------------------------------------------------
 
@@ -109,11 +109,7 @@ class OptInRegistry:
         return record is not None and record.active
 
     def get_consent(self, node_id: str, cause_id: str) -> ConsentRecord | None:
-        ref = self._index_dir / self._key(node_id, cause_id)
-        if not ref.exists():
-            return None
-        blob_key = ref.read_text().strip()
-        return ConsentRecord.from_dict(self._ledger.blobs.get_json(blob_key))
+        return self._store.load(self._key(node_id, cause_id))
 
     # --- persistence helpers -------------------------------------------------
 
@@ -124,5 +120,4 @@ class OptInRegistry:
         return f"{safe(node_id)}__{safe(cause_id)}"
 
     def _persist(self, record: ConsentRecord) -> None:
-        blob_key = self._ledger.blobs.put_json(record.to_dict())
-        (self._index_dir / self._key(record.node_id, record.cause_id)).write_text(blob_key)
+        self._store.persist(self._key(record.node_id, record.cause_id), record.to_dict())

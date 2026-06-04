@@ -18,8 +18,7 @@ five-frame gate-check (structure enforced — ``gate.py``).
 
 from __future__ import annotations
 
-from pathlib import Path
-
+from ..ledger.indexed_store import IndexedBlobStore
 from ..ledger.ledger import Ledger
 from ..ledger.translog import (
     KIND_CAUSE_DECISION,
@@ -39,9 +38,8 @@ class CauseRegistry:
 
     def __init__(self, ledger: Ledger) -> None:
         self._ledger = ledger
-        self._index_dir = Path(ledger._root) / "causes"  # noqa: SLF001
-        self._index_dir.mkdir(parents=True, exist_ok=True)
-        self._clock = ledger._clock  # noqa: SLF001
+        self._store: IndexedBlobStore[Cause] = IndexedBlobStore(ledger, "causes", Cause.from_dict)
+        self._clock = ledger.clock
 
     # --- intake --------------------------------------------------------------
 
@@ -154,16 +152,16 @@ class CauseRegistry:
         request/decision history view for that status (visible, but a REQUESTED
         or REJECTED cause is NOT "accepting compute").
         """
-        causes = [self._load(p) for p in sorted(self._index_dir.iterdir()) if p.is_file()]
+        causes = self._store.all()
         if status_filter is None:
             return [c for c in causes if c.is_publicly_listable]
         return [c for c in causes if c.status == status_filter]
 
     def get_cause(self, cause_id: str) -> Cause:
-        ref = self._index_dir / cause_id
-        if not ref.exists():
+        cause = self._store.load(cause_id)
+        if cause is None:
             raise CauseError(f"unknown cause_id: {cause_id}")
-        return self._load(ref)
+        return cause
 
     # --- transparency --------------------------------------------------------
 
@@ -174,7 +172,7 @@ class CauseRegistry:
         holds over cause requests + decisions exactly as it does over detection
         entries (the SAME chain).
         """
-        return verify_log(self._ledger.translog._path)  # noqa: SLF001
+        return verify_log(self._ledger.translog.path)
 
     # --- persistence helpers -------------------------------------------------
 
@@ -182,9 +180,4 @@ class CauseRegistry:
         return self._ledger.blobs.put_json(cause.to_dict())
 
     def _persist(self, cause: Cause) -> None:
-        blob_key = self._ledger.blobs.put_json(cause.to_dict())
-        (self._index_dir / cause.cause_id).write_text(blob_key)
-
-    def _load(self, ref: Path) -> Cause:
-        blob_key = ref.read_text().strip()
-        return Cause.from_dict(self._ledger.blobs.get_json(blob_key))
+        self._store.persist(cause.cause_id, cause.to_dict())
