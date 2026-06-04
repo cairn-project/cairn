@@ -73,7 +73,7 @@ from .verify import (
     verify_unit,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 # Spec version of the work-unit + acceptance-contract interface (SPEC.md).
 SPEC_VERSION = "1.0.0"
 
