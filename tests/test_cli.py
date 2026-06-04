@@ -33,6 +33,40 @@ def _run_cli(args, env_extra=None):
     )
 
 
+def test_cli_version_flag_exits_0_and_prints_package_version():
+    # OUTCOME-ALTITUDE: real CLI entry, no pre-arranged state. `cairn --version`
+    # is the literal first thing a curious dev types; it must succeed (exit 0)
+    # and print the SAME version the installed package reports, not an argparse
+    # "required: command" error.
+    from importlib.metadata import version as _pkg_version
+
+    expected = _pkg_version("cairn")
+    proc = _run_cli(["--version"])
+    assert proc.returncode == 0, proc.stderr
+    assert expected in proc.stdout
+
+
+def test_cli_short_version_flag_exits_0():
+    proc = _run_cli(["-V"])
+    assert proc.returncode == 0, proc.stderr
+    from importlib.metadata import version as _pkg_version
+
+    assert _pkg_version("cairn") in proc.stdout
+
+
+def test_cli_no_args_prints_help_and_exits_0():
+    # OUTCOME-ALTITUDE: bare `cairn` (no subcommand) is the friendly-CLI
+    # convention — it prints top-level help and exits 0, instead of the
+    # argparse "required: command" usage error (exit 2).
+    proc = _run_cli([])
+    assert proc.returncode == 0, proc.stderr
+    out = proc.stdout + proc.stderr
+    assert "usage: cairn" in out
+    # Help lists the subcommands a new user is looking for.
+    assert "pilot" in out
+    assert "verify-log" in out
+
+
 def test_cli_pilot_runs_end_to_end_fresh(tmp_path):
     # OUTCOME-ALTITUDE: real CLI entry, fresh ledger dir, no pre-arranged state.
     ledger_dir = tmp_path / "ledger"
