@@ -1,11 +1,11 @@
 # Contributing to Cairn
 
 Thank you for considering a contribution. Cairn is a model-agnostic
-detection-and-analysis force-multiplier being built to become a decentralized,
-distributed, volunteer-powered network — that decentralized network is the
-target the project is working toward, while today it runs as a single-operator,
-offline pilot. It is explicitly a **trust-requiring** project: it exists to feed
-credible evidence to institutions that have authority to act. That means the bar for transparency,
+detection-and-analysis engine being built to become a decentralized, distributed,
+volunteer-powered network. That decentralized network is the target the project
+is working toward; today it runs as a single-operator, offline pilot. It is
+explicitly a **trust-requiring** project: it exists to feed credible evidence to
+institutions that have authority to act. That means the bar for transparency,
 auditability, and honest limitations is high, and contributions are reviewed
 against that bar.
 
@@ -34,10 +34,9 @@ project's [MIT License](LICENSE), and you agree to abide by our
   names are **aspirational, not yet verified properties**: `court_grade_auditable`
   today means a tamper-evident, append-only audit log (identity-authentication,
   external anchoring, and non-repudiation are deferred phases), and
-  `human_verified` means a recorded
-  human verdict exists (the human is unauthenticated free-text). See
-  [SECURITY.md](SECURITY.md) → "What the human gate does — and does NOT —
-  guarantee today" for the precise boundary.
+  `human_verified` means a recorded human verdict exists (the human is
+  unauthenticated free-text). See [SECURITY.md](SECURITY.md) → "What the human
+  gate does — and does NOT — guarantee today" for the precise boundary.
 
 ---
 

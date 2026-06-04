@@ -145,8 +145,8 @@ public causes: 1
 
 A node opts in to the approved cause and runs its bound benign work units
 end-to-end (define → claim → run → verify → record), offline via the mock
-adapter. Opt-in is **refused** for a cause that is not publicly listable — so
-this step only works *after* approval (the gate, no silent enlistment).
+adapter. Opt-in is **refused** for a cause that is not publicly listable, so this
+step only works *after* approval — the gate enforces no silent enlistment.
 
 ```sh
 .venv/bin/cairn contribute "$CID" \

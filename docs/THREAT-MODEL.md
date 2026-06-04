@@ -18,7 +18,7 @@
 
 ## 1. Scope & assets
 
-Cairn is a cause-coordination engine built to be distributed: it runs N causes
+Cairn is a cause-coordination engine built to be distributed: it runs many causes
 on one protocol, with the aim of coordinating distributed detection-and-analysis
 work and turning human-signed-off outcomes into recorded action. (Today it runs
 single-operator and offline; the distributed deployment is a deferred phase — see
