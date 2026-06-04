@@ -67,6 +67,28 @@ the assessment said.
 - **Optional A7 (static HTML render) / A8 (concurrency-safe translog):** SKIP —
   both are scaling, not launch-blocking, and non-trivial. Note as deferred.
 
+## A5 — branch-hygiene findings (verify-and-document; non-destructive)
+
+Verified against `origin` (fetched). `main` is the canonical public state.
+Squash-merge means merged feature branches are NOT git-ancestors of `main`;
+verified by content-diff instead:
+
+- `origin/chore/scrub-and-polish` — **fully merged** (zero diff vs `main`).
+  Safe to delete.
+- `origin/feat/analysis-finding-bridge` — **behind `main`** (1 unique tip commit,
+  the pre-squash version; `main` is 3 commits ahead and evolved those files).
+  Stale; its work is in `main`. Safe to delete.
+- `origin/feat/oss-docs-onboarding` — **behind `main`** (11 pre-squash commits;
+  `main` is 3 ahead). Stale; its work is in `main`. Safe to delete.
+- `origin/docs/bucket-b-governance-policy-drafts` — **a parallel agent's
+  in-flight branch (Bucket B). DO NOT TOUCH.**
+
+**Recommendation (owner/repo-admin action, NOT done here):** delete the three
+stale remote branches above via the GitHub UI or
+`git push origin --delete <branch>`. Left undone deliberately — deleting remote
+branches is repo-admin hygiene and a parallel agent is active on this repo;
+pruning is owner's call, not a code change to PR.
+
 ## Sequence
 1. A2 test (red) → A2 code (green) → full suite.
 2. A1 + A3 + A4 + A6 docs/examples (no src race).
