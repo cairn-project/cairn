@@ -17,74 +17,56 @@ Most of what's said about AI right now is that it extracts: it takes from
 creators, burns resources, and concentrates the gains. cairn is built to be the
 opposite. It's a use of AI a person could actually rally behind. Many volunteers
 lend their own AI to *collectively notice harm* and route human-verified findings
-to the institutions that can act. The AI does patient, repetitive coordination
-work that no group of humans could keep up by hand, while humans stay in control
-of every judgment that matters. The AI does the tireless watching and
-cross-checking; people decide what's worth watching, and a human signs off before
-anything leaves the system.
+to the institutions that can act. The AI does the patient, tireless watching and
+cross-checking that no group of humans could keep up by hand; people decide
+what's worth watching, and a human signs off before anything leaves the system.
 
-The mission of the **platform** is distinct from the mission of any **cause** it
-runs. cairn itself is **mission-neutral**: it's the coordination engine, not an
-opinion about any one target. Each cause defines the conduct it watches for as
-its own configuration; the engine hard-codes none of it. That is deliberate. The
-platform earns trust by being a fair, auditable mechanism, and the causes that
-run on it are chosen and vetted by people.
+Technically, cairn is a **model-agnostic detection-and-analysis engine that runs
+many causes on one protocol.** The mission of the **platform** is distinct from
+the mission of any **cause** it runs: cairn itself is **mission-neutral** — the
+coordination engine, not an opinion about any one target. Each cause defines the
+conduct it watches for as its own configuration, and the engine hard-codes none
+of it. That is deliberate: the platform earns trust by being a fair, auditable
+mechanism, and the causes that run on it are chosen and vetted by people. (This
+is also why it's named `cairn` — a general, multi-cause engine, not a name tied
+to any one mission.)
 
-> **Honest boundary (read the maturity block below before believing any of
-> this is "done").** The engine is complete and runnable today. But its entire
-> safety story currently rests on a *single human sign-off gate whose "human" is
-> an unauthenticated free-text string*, and the real-world network pieces (live
-> capture, external delivery) are deliberately not built yet. cairn is something
-> to rally behind *because* it's being built carefully and in the open, not
-> because it's finished. The next section says exactly what it does and does not
-> guarantee.
+**What it's being built to become** is a decentralized, distributed network —
+many hands, one protocol. **Where it is today** is a single-operator, offline
+pilot; the distributed, multi-volunteer deployment is among the pieces not yet
+built (see "Maturity & honest boundaries" for exactly what is and isn't).
 
-> **Name.** `cairn` is mission-neutral by design — the engine is general and
-> multi-cause, not tied to any one mission.
+## Maturity & honest boundaries
 
-cairn is a model-agnostic detection-and-analysis engine that runs many causes on
-one protocol. **What it's being built to become:** a decentralized, distributed
-network where volunteers lend their own AI to collectively notice harm and route
-it to the institutions that can act — many hands, one protocol. **Where it is
-today:** that volunteer-powered network is the target, not the current state. The
-engine runs as a single-operator, offline pilot right now (see Maturity). The
-distributed, multi-volunteer deployment is a deliberately deferred,
-independently-reviewed phase, not an abandoned one. The engine is
-**mission-neutral**: the protocol runs many causes, and the conduct a cause
-targets is a per-cause property, not baked into the engine.
+cairn is something to rally behind *because* it's being built carefully and in
+the open, not because it's finished. The engine is complete and runnable today;
+its safety story rests on a single human sign-off gate whose "human" is currently
+an unauthenticated free-text string, and the real-world network pieces are not
+built yet. The limits and the deferred work below are **owned design boundaries,
+not discovered defects.**
 
-## Maturity — read this first
+**Status.** Pre-1.0 (`0.x`), unreleased: no version is tagged or published yet,
+the CHANGELOG sits at `[Unreleased]`, and while `0.x` minor versions may break.
+**License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
+dependency is `jsonschema`.
 
-- **Pre-1.0 (`0.x`), unreleased.** No version is tagged or published yet; the
-  CHANGELOG sits at `[Unreleased]`. While `0.x`, minor versions may break.
-- **Complete and runnable, pilot-stage.** The full Layer-A engine is built and
-  exercised by a broad passing test suite (`pytest -q` reports the current
-  count). `cairn pilot` runs the benign pilot
-  end-to-end on a fresh ledger, and the append-only transparency log it writes
-  independently verifies (`cairn verify-log`). This is a working engine, not a
-  skeleton.
-- **The shipped pilot cause is deliberately benign.** The runnable cause is an
-  OSS-license-classification pilot — a mission-neutral exercise of the full
-  detect → verify → human-vet → route path with no sensitive logic. Real-world
-  capture (headless browser / network egress) and real external-recipient
-  delivery are **deliberately deferred to separate, independently
-  security-reviewed phases.** Today's capture and delivery seams ship only
-  offline, deterministic, in-memory implementations.
-- **License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
-  dependency is `jsonschema`.
+**What genuinely works today.** The full Layer-A engine is built and exercised
+by a broad passing test suite (`pytest -q` reports the current count) — a working
+engine, not a skeleton. `cairn pilot` runs the benign pilot end-to-end on a fresh
+ledger, and the append-only transparency log it writes independently verifies
+(`cairn verify-log`). The shipped cause is an OSS-license-classification pilot: a
+mission-neutral exercise of the full detect → verify → human-vet → route path
+with no sensitive logic.
 
-## What the human gate does — and does NOT — guarantee (read this too)
-
-The engine's safety story rests on a **human sign-off gate** before any cause
-becomes listable and before any finding becomes routable. That gate is real and
-fail-closed. But be precise about what it does today, because we would rather you
-read this than discover it:
+**What the human gate does — and does NOT — guarantee.** A fail-closed human
+sign-off gate stands before any cause becomes listable and before any finding
+becomes routable. The gate is real, but be precise about its limits today:
 
 - **The "human" is unauthenticated free-text.** `reviewer_id`, `granted_by`,
   `created_by`, `decider`, and `node_id` are caller-supplied strings with **no
   authentication anywhere in the engine**. A recorded "human verdict" proves *a
   string was present with a reason* — not that a real, independent, or qualified
-  human acted. Identity-authentication is a **deliberately deferred phase**.
+  human acted.
 - **There is one gate, and no enforced separation of duties.** Nothing in the
   code prevents the same actor from requesting a cause, "reviewing" it under a
   second name, and dispatching an action. The five-frame gate-check enforces
@@ -93,43 +75,35 @@ read this than discover it:
 - **The audit log proves integrity, not truth.** The append-only hash-chained
   transparency log (`cairn verify-log`) proves no entry was edited, removed, or
   reordered. It does **not** prove a finding was correct, a reviewer was real, or
-  a target was actually engaged in the conduct. A wrongful action is recorded as
+  a target was actually engaged in the conduct — a wrongful action is recorded as
   faithfully as a correct one. The log also has **no external anchoring** yet: an
   operator who holds the file could in principle rewrite the whole chain from
   genesis, and the rewrite would be undetectable to anyone holding only that
   operator's copy.
 - **The attestation seam is HMAC (symmetric).** It proves "someone holding the
   key signed," which for a single operator is "the operator signed its own work"
-  — integrity to a key-holder, **not** third-party non-repudiation. Asymmetric
-  signing is a deferred phase.
-- **The engine is mission-neutral and general.** The conduct a cause targets is
-  free-text the requester fills in; the engine hard-codes no limit on what
-  conduct or whom a cause may target. The only barrier today is the
-  (unauthenticated, single-actor-capable) human cause-vetter. The engine is
-  therefore general enough to be pointed at a real person. **The current shipped
-  scope is the benign OSS-license-classification pilot, which exercises none of
-  that surface — but the general engine's misuse surface is real, and it is named
-  here on purpose.**
+  — integrity to a key-holder, **not** third-party non-repudiation.
+- **The engine is mission-neutral and general — so its misuse surface is real.**
+  The conduct a cause targets is free-text the requester fills in; the engine
+  hard-codes no limit on what conduct or whom a cause may target. The only barrier
+  today is the (unauthenticated, single-actor-capable) human cause-vetter, so the
+  engine is general enough to be pointed at a real person. The current shipped
+  scope — the benign OSS-license-classification pilot — exercises none of that
+  surface, but the general engine's misuse surface is named here on purpose.
 
-These are **owned design boundaries, not discovered defects.** See
-[docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) for the full invariant register
-(including the explicit `[PLACEHOLDER]` invariants), and "Known, deferred gaps"
-below.
+**Deferred, not hidden.** These are deliberately deferred to separate,
+independently-reviewed phases, not abandoned — listed so an outside reviewer sees
+them as already on the radar, not as discoveries. The first four are the gate
+limits above, named with their threat-model invariant refs:
 
-## Known, deferred gaps (named, not hidden)
-
-These are known to the maintainer and **deliberately deferred to later,
-independently reviewed phases** — listed so an outside reviewer sees them as
-already on the radar rather than as discoveries:
-
-- **Authenticated identity + separation of duties** — every actor is currently
-  unauthenticated free-text (THREAT-MODEL INV-Z5). No asymmetric signing yet.
-- **Target-protection / misuse-against-a-legitimate-party** — there is no
-  code-level mechanism preventing the gates from being driven against an
-  innocent party (THREAT-MODEL INV-Z6); only the human vetter stands in the way.
-- **External transparency-log anchoring** — no published head hashes / third-party
-  witness, so a single operator's rewrite is undetectable to anyone holding only
-  that operator's copy (THREAT-MODEL INV-U3).
+- **Authenticated identity + separation of duties** (THREAT-MODEL INV-Z5) — no
+  asymmetric signing yet.
+- **Target-protection / misuse-against-a-legitimate-party** (THREAT-MODEL INV-Z6)
+  — no code-level mechanism keeps the gates from being driven against an innocent
+  party; only the human vetter stands in the way.
+- **External transparency-log anchoring** (THREAT-MODEL INV-U3) — no published
+  head hashes / third-party witness.
+- **Asymmetric (non-repudiable) attestation** — replaces the symmetric HMAC seam.
 - **Multi-operator / compromised-operator trust** — the trust model assumes one
   honest operator; recruiting multiple operators is exactly the assumption this
   does not yet cover.
@@ -139,10 +113,14 @@ already on the radar rather than as discoveries:
 - **Anti-abuse at intake (rate-limiting / coordination-detection)** —
   THREAT-MODEL INV-A3 is a placeholder; nothing yet prevents coordinated mass-flagging.
 
-An **acceptable-cause / prohibited-target policy** — what conduct may be
-targeted and what targets are categorically off-limits — is a **governance
-decision the owner has not yet made.** See [GOVERNANCE.md](GOVERNANCE.md) for the
-flagged-open stub.
+The real-world *implementation seams* (live capture, external delivery, served
+API, reputation gating) are deferred too and itemized under "Deliberately
+deferred" below. See [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) for the full
+invariant register (including the explicit `[PLACEHOLDER]` invariants). An
+**acceptable-cause / prohibited-target policy** — what conduct may be targeted
+and what targets are categorically off-limits — is a **governance decision the
+owner has not yet made**; see [GOVERNANCE.md](GOVERNANCE.md) for the flagged-open
+stub.
 
 ## What's in this repo
 
@@ -192,10 +170,11 @@ section of [CHANGELOG.md](CHANGELOG.md) for the authoritative per-layer detail):
   not assure.) Ships only an offline `InMemoryRecipientChannel`.
   `src/cairn/routing/`.
 
-## Deliberately deferred (later, independently reviewed phases)
+## Deliberately deferred (implementation seams)
 
 The seams exist; their real-world implementations are intentionally not built
-here:
+here (these are the implementation counterparts to the trust/security gaps under
+"Maturity & honest boundaries"):
 
 - **Real capture** — a headless-browser / IP-masked capture port (today:
   offline local-fixture port only).
@@ -208,9 +187,8 @@ here:
   surfaces per-node / per-model-family reliability scores, but no gating
   decision consumes them yet: quorum, tiebreak, and claim do not read
   `.score()`. Letting reputation weight acceptance / tiebreak / eligibility is a
-  security-sensitive change (it adds a gameable surface), so it is deferred to a
-  separate, independently reviewed phase. Today reputation is an observability
-  signal, not a control input.
+  security-sensitive change (it adds a gameable surface). Today reputation is an
+  observability signal, not a control input.
 - **CI/release automation** — see [RELEASING.md](RELEASING.md) (proposed) and
   [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -227,12 +205,10 @@ here:
   [cause request](.github/ISSUE_TEMPLATE/cause_request.md); an approved cause is
   recorded on-ledger and decided through the five-frame gate.
 
-## Requirements
-
-Python 3.11+. Standard-library-first; the only runtime dependency is
-`jsonschema`.
-
 ## Setup & test
+
+Python 3.11+, standard-library-first (the only runtime dependency is
+`jsonschema`):
 
 ```sh
 python3.13 -m venv .venv          # any python >= 3.11

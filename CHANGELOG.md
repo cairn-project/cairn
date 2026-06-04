@@ -7,6 +7,22 @@ versions may include breaking changes; patch versions are fixes.
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-06-04
+
+### Changed
+- **Documentation structure / de-duplication pass (no behavior change).** A
+  content-structure edit that consolidates ideas restated across sections so each
+  point is made once, in its logical home: the README intro's threefold
+  vision/mission-neutral/vision-vs-today statement is collapsed to a single
+  statement of each (the standalone "Name" note is folded into the mission
+  paragraph; the duplicated Requirements section is folded into "Setup & test");
+  the "Known, deferred gaps" list now references the gate limits detailed above by
+  their threat-model invariant refs instead of re-explaining them; and SECURITY.md's
+  routing-seam paragraph drops its within-paragraph restatement of the deferred
+  network egress. Every distinct fact, technical claim, command, path, link, and
+  every honesty/boundary statement is preserved — only genuine repeats of the same
+  idea were collapsed.
+
 ## [0.3.1] - 2026-06-04
 
 ### Changed
