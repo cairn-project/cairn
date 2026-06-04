@@ -59,13 +59,13 @@ a report of any way to route/deliver/record an action for a PENDING or REJECTED
 finding is in scope; and (2) **no silent drop** — every routable finding routes to a
 matched recipient OR an explicitly-recorded fallback escalation, never nowhere; a
 report of any way to make a routable finding vanish without a recorded routing event
-(or a misconfigured registry that drops rather than raising) is in scope. The
-`RecipientChannel` seam is the place where, in a later phase, real network egress will
-live — and is therefore a deliberately scoped trust boundary worth naming: the ONLY
+(or a misconfigured registry that drops rather than raising) is in scope. The ONLY
 channel shipped today is the deterministic, OFFLINE `InMemoryRecipientChannel` (no
-network, no real recipient, no randomness). Real external-recipient integration /
-network egress (Safe Browsing / abuse.ch / registrars / partner endpoints) is a
-deferred, independently security-reviewed phase and is NOT yet in this repository.
+network, no real recipient, no randomness). The `RecipientChannel` seam is the
+deliberately scoped trust boundary where, in a later phase, real external-recipient
+integration / network egress (Safe Browsing / abuse.ch / registrars / partner
+endpoints) will live — that phase is independently security-reviewed and is NOT yet
+in this repository.
 
 Out of scope here: third-party runtimes a contributor chooses to run, and the
 operational deployment of any specific cause (those carry their own policies).

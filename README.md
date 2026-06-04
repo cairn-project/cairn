@@ -17,18 +17,24 @@ Most of what's said about AI right now is that it extracts: it takes from
 creators, burns resources, and concentrates the gains. cairn is built to be the
 opposite. It's a use of AI a person could actually rally behind. Many volunteers
 lend their own AI to *collectively notice harm* and route human-verified findings
-to the institutions that can act. The AI does patient, repetitive coordination
-work that no group of humans could keep up by hand, while humans stay in control
-of every judgment that matters. The AI does the tireless watching and
-cross-checking; people decide what's worth watching, and a human signs off before
-anything leaves the system.
+to the institutions that can act. The AI does the patient, tireless watching and
+cross-checking that no group of humans could keep up by hand; people decide
+what's worth watching, and a human signs off before anything leaves the system.
 
-The mission of the **platform** is distinct from the mission of any **cause** it
-runs. cairn itself is **mission-neutral**: it's the coordination engine, not an
-opinion about any one target. Each cause defines the conduct it watches for as
-its own configuration; the engine hard-codes none of it. That is deliberate. The
-platform earns trust by being a fair, auditable mechanism, and the causes that
-run on it are chosen and vetted by people.
+Technically, cairn is a **model-agnostic detection-and-analysis engine that runs
+many causes on one protocol.** The mission of the **platform** is distinct from
+the mission of any **cause** it runs: cairn itself is **mission-neutral** — the
+coordination engine, not an opinion about any one target. Each cause defines the
+conduct it watches for as its own configuration, and the engine hard-codes none
+of it. That is deliberate: the platform earns trust by being a fair, auditable
+mechanism, and the causes that run on it are chosen and vetted by people. (This
+is also why it's named `cairn` — a general, multi-cause engine, not a name tied
+to any one mission.)
+
+**What it's being built to become** is a decentralized, distributed network —
+many hands, one protocol. **Where it is today** is a single-operator, offline
+pilot (see Maturity). The distributed, multi-volunteer deployment is a
+deliberately deferred, independently-reviewed phase, not an abandoned one.
 
 > **Honest boundary (read the maturity block below before believing any of
 > this is "done").** The engine is complete and runnable today. But its entire
@@ -38,20 +44,6 @@ run on it are chosen and vetted by people.
 > to rally behind *because* it's being built carefully and in the open, not
 > because it's finished. The next section says exactly what it does and does not
 > guarantee.
-
-> **Name.** `cairn` is mission-neutral by design — the engine is general and
-> multi-cause, not tied to any one mission.
-
-cairn is a model-agnostic detection-and-analysis engine that runs many causes on
-one protocol. **What it's being built to become:** a decentralized, distributed
-network where volunteers lend their own AI to collectively notice harm and route
-it to the institutions that can act — many hands, one protocol. **Where it is
-today:** that volunteer-powered network is the target, not the current state. The
-engine runs as a single-operator, offline pilot right now (see Maturity). The
-distributed, multi-volunteer deployment is a deliberately deferred,
-independently-reviewed phase, not an abandoned one. The engine is
-**mission-neutral**: the protocol runs many causes, and the conduct a cause
-targets is a per-cause property, not baked into the engine.
 
 ## Maturity — read this first
 
@@ -65,11 +57,11 @@ targets is a per-cause property, not baked into the engine.
   skeleton.
 - **The shipped pilot cause is deliberately benign.** The runnable cause is an
   OSS-license-classification pilot — a mission-neutral exercise of the full
-  detect → verify → human-vet → route path with no sensitive logic. Real-world
-  capture (headless browser / network egress) and real external-recipient
-  delivery are **deliberately deferred to separate, independently
-  security-reviewed phases.** Today's capture and delivery seams ship only
-  offline, deterministic, in-memory implementations.
+  detect → verify → human-vet → route path with no sensitive logic. The
+  real-world network pieces are **deliberately deferred to separate,
+  independently security-reviewed phases**; today's capture and delivery seams
+  ship only offline, deterministic, in-memory implementations (itemized under
+  "Deliberately deferred" below).
 - **License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
   dependency is `jsonschema`.
 
@@ -120,16 +112,17 @@ below.
 
 These are known to the maintainer and **deliberately deferred to later,
 independently reviewed phases** — listed so an outside reviewer sees them as
-already on the radar rather than as discoveries:
+already on the radar rather than as discoveries. The first three are the gate
+limits detailed above, named here with their threat-model invariant refs; the
+rest are not covered above:
 
-- **Authenticated identity + separation of duties** — every actor is currently
-  unauthenticated free-text (THREAT-MODEL INV-Z5). No asymmetric signing yet.
-- **Target-protection / misuse-against-a-legitimate-party** — there is no
-  code-level mechanism preventing the gates from being driven against an
-  innocent party (THREAT-MODEL INV-Z6); only the human vetter stands in the way.
-- **External transparency-log anchoring** — no published head hashes / third-party
-  witness, so a single operator's rewrite is undetectable to anyone holding only
-  that operator's copy (THREAT-MODEL INV-U3).
+- **Authenticated identity + separation of duties** (THREAT-MODEL INV-Z5) — no
+  asymmetric signing yet.
+- **Target-protection / misuse-against-a-legitimate-party** (THREAT-MODEL INV-Z6)
+  — no code-level mechanism keeps the gates from being driven against an innocent
+  party; only the human vetter stands in the way.
+- **External transparency-log anchoring** (THREAT-MODEL INV-U3) — no published
+  head hashes / third-party witness.
 - **Multi-operator / compromised-operator trust** — the trust model assumes one
   honest operator; recruiting multiple operators is exactly the assumption this
   does not yet cover.
@@ -227,12 +220,10 @@ here:
   [cause request](.github/ISSUE_TEMPLATE/cause_request.md); an approved cause is
   recorded on-ledger and decided through the five-frame gate.
 
-## Requirements
-
-Python 3.11+. Standard-library-first; the only runtime dependency is
-`jsonschema`.
-
 ## Setup & test
+
+Python 3.11+, standard-library-first (the only runtime dependency is
+`jsonschema`):
 
 ```sh
 python3.13 -m venv .venv          # any python >= 3.11
