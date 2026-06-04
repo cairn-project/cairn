@@ -39,16 +39,16 @@ real headless-browser / network-egress capture port is a deferred, independently
 security-reviewed phase and is NOT yet in this repository.
 
 It also includes the **human-in-the-loop two-gate vetting queue** (`cairn.vetting`):
-the two fail-closed human-review gates (the cause-vetting gate `CauseVetQueue` whose
+the two fail-closed human-review gates (the cause-vetting gate `CauseVetQueue`, whose
 `apply_cause_verdict` is the only path feeding the existing cause decision, and the
-finding-vetting gate `FindingVetQueue` whose `is_routable` is true only after a
+finding-vetting gate `FindingVetQueue`, whose `is_routable` is true only after a
 recorded human verdict). The load-bearing trust property here is the *absence of an
 advance-path*: a report of any way to make a cause publicly listable, or a finding
 routable, WITHOUT a recorded human verdict (or any way to record a silent rejection
 with no reason) is in scope. Note that onward routing of a routable finding to real
-external recipients is NOT in this repository — it is a deferred,
-network-touching, independently security-reviewed phase; this gate only produces
-the human-verified ROUTABLE/REJECTED state.
+external recipients is NOT in this repository — it is a deferred, network-touching,
+independently security-reviewed phase. This gate only produces the human-verified
+ROUTABLE/REJECTED state.
 
 It also includes the **routing / action spine** (`cairn.routing`): the
 `RecipientChannel` delivery seam, the locality-aware routing policy, and the

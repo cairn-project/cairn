@@ -14,44 +14,44 @@ worth doing, with humans deciding what's worth doing and signing off before
 anything acts.**
 
 Most of what's said about AI right now is that it extracts: it takes from
-creators, burns resources, and concentrates the gains. cairn is a deliberate
-counter-shape. It's a use of AI a person could actually rally behind — many
-volunteers lending their own AI to *collectively notice harm* and route
-human-verified findings to the institutions that can act, doing patient,
-repetitive coordination work no group of humans could keep up by hand, while
-humans stay in control of every judgment that matters. The AI does the tireless
-watching and cross-checking; people decide what's worth watching, and a human
-signs off before anything leaves the system.
+creators, burns resources, and concentrates the gains. cairn is built to be the
+opposite. It's a use of AI a person could actually rally behind. Many volunteers
+lend their own AI to *collectively notice harm* and route human-verified findings
+to the institutions that can act. The AI does patient, repetitive coordination
+work that no group of humans could keep up by hand, while humans stay in control
+of every judgment that matters. The AI does the tireless watching and
+cross-checking; people decide what's worth watching, and a human signs off before
+anything leaves the system.
 
 The mission of the **platform** is distinct from the mission of any **cause** it
 runs. cairn itself is **mission-neutral**: it's the coordination engine, not an
-opinion about any one target. Each cause defines its own conduct-to-watch-for as
-per-cause configuration; the engine hard-codes none of it. That's deliberate —
-the platform earns trust by being a fair, auditable mechanism, and the causes
-that run on it are chosen, and vetted, by people.
+opinion about any one target. Each cause defines the conduct it watches for as
+its own configuration; the engine hard-codes none of it. That is deliberate. The
+platform earns trust by being a fair, auditable mechanism, and the causes that
+run on it are chosen and vetted by people.
 
 > **Honest boundary (read the maturity block below before believing any of
-> this is "done").** The engine is complete and runnable today, but its entire
+> this is "done").** The engine is complete and runnable today. But its entire
 > safety story currently rests on a *single human sign-off gate whose "human" is
 > an unauthenticated free-text string*, and the real-world network pieces (live
 > capture, external delivery) are deliberately not built yet. cairn is something
-> to rally behind *because* it's being built carefully and in the open — not
+> to rally behind *because* it's being built carefully and in the open, not
 > because it's finished. The next section says exactly what it does and does not
 > guarantee.
 
 > **Name.** `cairn` is mission-neutral by design — the engine is general and
 > multi-cause, not tied to any one mission.
 
-cairn is a model-agnostic detection-and-analysis force-multiplier that runs N
-causes on one protocol. **What it's being built to become:** a decentralized,
-distributed network where volunteers lend their own AI to collectively notice
-harm and route it to the institutions that can act — many hands, one protocol.
-**Where it is today:** that decentralized, volunteer-powered network is the
-target, not the current state — the engine runs as a single-operator, offline
-pilot right now (see Maturity). The distributed, multi-volunteer deployment is a
-deliberately deferred, independently-reviewed phase, not an abandoned one. It is
-**mission-neutral** — the protocol runs many causes; the conduct a cause targets
-is a per-cause property, not baked into the engine.
+cairn is a model-agnostic detection-and-analysis engine that runs many causes on
+one protocol. **What it's being built to become:** a decentralized, distributed
+network where volunteers lend their own AI to collectively notice harm and route
+it to the institutions that can act — many hands, one protocol. **Where it is
+today:** that volunteer-powered network is the target, not the current state. The
+engine runs as a single-operator, offline pilot right now (see Maturity). The
+distributed, multi-volunteer deployment is a deliberately deferred,
+independently-reviewed phase, not an abandoned one. The engine is
+**mission-neutral**: the protocol runs many causes, and the conduct a cause
+targets is a per-cause property, not baked into the engine.
 
 ## Maturity — read this first
 
@@ -68,7 +68,7 @@ is a per-cause property, not baked into the engine.
   detect → verify → human-vet → route path with no sensitive logic. Real-world
   capture (headless browser / network egress) and real external-recipient
   delivery are **deliberately deferred to separate, independently
-  security-reviewed phases**; today's capture and delivery seams ship only
+  security-reviewed phases.** Today's capture and delivery seams ship only
   offline, deterministic, in-memory implementations.
 - **License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
   dependency is `jsonschema`.
@@ -77,8 +77,8 @@ is a per-cause property, not baked into the engine.
 
 The engine's safety story rests on a **human sign-off gate** before any cause
 becomes listable and before any finding becomes routable. That gate is real and
-fail-closed — but be precise about what it does today, because we would rather
-you read this than discover it:
+fail-closed. But be precise about what it does today, because we would rather you
+read this than discover it:
 
 - **The "human" is unauthenticated free-text.** `reviewer_id`, `granted_by`,
   `created_by`, `decider`, and `node_id` are caller-supplied strings with **no
@@ -94,20 +94,22 @@ you read this than discover it:
   transparency log (`cairn verify-log`) proves no entry was edited, removed, or
   reordered. It does **not** prove a finding was correct, a reviewer was real, or
   a target was actually engaged in the conduct. A wrongful action is recorded as
-  faithfully as a correct one. The log has **no external anchoring** yet, so an
+  faithfully as a correct one. The log also has **no external anchoring** yet: an
   operator who holds the file could in principle rewrite the whole chain from
-  genesis undetectably to anyone holding only that operator's copy.
+  genesis, and the rewrite would be undetectable to anyone holding only that
+  operator's copy.
 - **The attestation seam is HMAC (symmetric).** It proves "someone holding the
   key signed," which for a single operator is "the operator signed its own work"
   — integrity to a key-holder, **not** third-party non-repudiation. Asymmetric
   signing is a deferred phase.
 - **The engine is mission-neutral and general.** The conduct a cause targets is
-  free-text the requester fills; the engine hard-codes no limit on what conduct
-  or whom a cause may target. The only barrier today is the (unauthenticated,
-  single-actor-capable) human cause-vetter. The engine is therefore general
-  enough to be pointed at a real person — **the current shipped scope is the
-  benign OSS-license-classification pilot, which exercises none of that surface,
-  but the general engine's misuse surface is real and is named here on purpose.**
+  free-text the requester fills in; the engine hard-codes no limit on what
+  conduct or whom a cause may target. The only barrier today is the
+  (unauthenticated, single-actor-capable) human cause-vetter. The engine is
+  therefore general enough to be pointed at a real person. **The current shipped
+  scope is the benign OSS-license-classification pilot, which exercises none of
+  that surface — but the general engine's misuse surface is real, and it is named
+  here on purpose.**
 
 These are **owned design boundaries, not discovered defects.** See
 [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) for the full invariant register
@@ -139,7 +141,7 @@ already on the radar rather than as discoveries:
 
 An **acceptable-cause / prohibited-target policy** — what conduct may be
 targeted and what targets are categorically off-limits — is a **governance
-decision the owner has not yet made**; see [GOVERNANCE.md](GOVERNANCE.md) for the
+decision the owner has not yet made.** See [GOVERNANCE.md](GOVERNANCE.md) for the
 flagged-open stub.
 
 ## What's in this repo
@@ -182,13 +184,13 @@ section of [CHANGELOG.md](CHANGELOG.md) for the authoritative per-layer detail):
 - **Public transparency surfaces** — redacted-by-construction read-only views of
   causes, vetted outcomes, and the hash-chain skeleton, plus public log
   verification reusing `verify_log` verbatim. `src/cairn/public/`.
-- **Routing / action spine** — turns a human-signed-off ROUTABLE finding (a
-  recorded human verdict — see the gate-guarantee note above for what that does
-  and does not assure) into a RECORDED ACTION dispatched to the best-fit recipient
-  (locality + domain tags,
-  with fail-closed escalation so a routable finding is never silently dropped),
-  recorded on the same transparency log. Ships only an offline
-  `InMemoryRecipientChannel`. `src/cairn/routing/`.
+- **Routing / action spine** — turns a human-signed-off ROUTABLE finding into a
+  RECORDED ACTION dispatched to the best-fit recipient by locality + domain tags,
+  with fail-closed escalation so a routable finding is never silently dropped, and
+  records it on the same transparency log. ("Human-signed-off" means a recorded
+  human verdict — see the gate-guarantee note above for what that does and does
+  not assure.) Ships only an offline `InMemoryRecipientChannel`.
+  `src/cairn/routing/`.
 
 ## Deliberately deferred (later, independently reviewed phases)
 

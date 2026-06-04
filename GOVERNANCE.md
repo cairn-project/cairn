@@ -1,6 +1,6 @@
 # Governance
 
-cairn is maintained by a single maintainer — [@lukeivers](https://github.com/lukeivers) — who holds final authority over the project's direction, design, releases, and which contributions are accepted.
+cairn is maintained by a single maintainer, [@lukeivers](https://github.com/lukeivers), who holds final authority over the project's direction, design, releases, and which contributions are accepted.
 
 ## Decisions
 For a project of this size, decisions are made directly by the maintainer, who reviews issues and pull requests and decides on them. There is no formal committee or voting process.

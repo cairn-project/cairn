@@ -7,6 +7,17 @@ versions may include breaking changes; patch versions are fixes.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-06-04
+
+### Changed
+- **Documentation copy-edit pass (prose quality only, no behavior change).** A
+  language-quality edit across the README and every other prose document
+  (QUICKSTART, WALKTHROUGH, THREAT-MODEL, CONTRIBUTING, SECURITY, GOVERNANCE):
+  split run-on sentences, removed comma splices, untangled nested
+  parentheticals, and replaced filler phrasing with plain wording. Every
+  technical claim, command, path, and the honest "vision-vs-today" positioning
+  is unchanged; only the prose was reflowed.
+
 ## [0.3.0] - 2026-06-04
 
 ### Added

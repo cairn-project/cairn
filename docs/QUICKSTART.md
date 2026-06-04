@@ -1,8 +1,8 @@
 # cairn — Quickstart
 
-`cairn` is a model-agnostic detection-and-analysis force-multiplier that runs N
-causes on one protocol. It is being built to become a decentralized,
-distributed, volunteer-powered network — that's the target; today it runs as a
+`cairn` is a model-agnostic detection-and-analysis engine that runs many causes
+on one protocol. It is being built to become a decentralized, distributed,
+volunteer-powered network. That's the target; today it runs as a
 **single-operator, offline pilot**, with the distributed, multi-volunteer
 deployment a deliberately deferred phase. It is standard-library-first; the only
 runtime dependency is `jsonschema`.
@@ -18,7 +18,7 @@ running the tests. For the field-by-field work-unit spec see
 > recipient delivery (egress to a real institution) are deliberately deferred,
 > offline-by-design waves: the capture and routing seams ship only their
 > local/in-memory adapters, with **no network egress**. So `cairn` coordinates a
-> *worked example* end-to-end today, not live causes — see the maturity block in
+> *worked example* end-to-end today, not live causes. See the maturity block in
 > `README.md` and `docs/THREAT-MODEL.md` for the full deferral list.
 
 ## Requirements
@@ -123,11 +123,11 @@ human-review packet per finding instead of sending anything:
 
 Every dumped artefact (`packet.md` / `packet.json` / `provenance.txt`) carries a
 `FOR REVIEW — NOT SENT — demonstration scenario, not a live cause` banner. The
-scenario has **no egress code path** — it resolves the real public reporting org
+scenario has **no egress code path**: it resolves the real public reporting org
 (e.g. the documented Data.gov `DataGovHelp@gsa.gov` fallback), builds an evidence
 packet, routes through the real human gate, and **sends nothing**. The
-reporting-org finder fails closed on an unresolvable contact rather than guess a
-recipient.
+reporting-org finder fails closed on an unresolvable contact rather than guessing
+a recipient.
 
 ## Run the tests
 
