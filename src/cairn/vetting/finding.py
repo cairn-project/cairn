@@ -20,13 +20,13 @@ solely from a recorded human verdict in ``finding_queue.py`` (fail-closed). A
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any, Optional
+from enum import StrEnum
+from typing import Any
 
 from ..ledger.blobstore import canonical_json, content_key
 
 
-class FindingState(str, Enum):
+class FindingState(StrEnum):
     """The human-verified routing-eligibility state of a finding (Gate 2 output).
 
     Fail-closed default is PENDING. ROUTABLE / REJECTED are reached ONLY via a
@@ -56,7 +56,7 @@ class AutomatedVerdict:
         return {"flag_label": self.flag_label, "confidence": self.confidence}
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "AutomatedVerdict":
+    def from_dict(cls, d: dict[str, Any]) -> AutomatedVerdict:
         return cls(flag_label=d["flag_label"], confidence=float(d["confidence"]))
 
 
@@ -66,7 +66,7 @@ def _finding_material(
     automated_verdict: AutomatedVerdict,
     flagged_at: float,
     flagged_by: str,
-    cause_id: Optional[str],
+    cause_id: str | None,
 ) -> dict[str, Any]:
     """The immutable fields the ``finding_hash`` commits to (deterministic order)."""
     return {
@@ -92,7 +92,7 @@ class Finding:
     automated_verdict: AutomatedVerdict
     flagged_at: float
     flagged_by: str
-    cause_id: Optional[str]
+    cause_id: str | None
     finding_hash: str
 
     @staticmethod
@@ -102,8 +102,8 @@ class Finding:
         automated_verdict: AutomatedVerdict,
         flagged_at: float,
         flagged_by: str,
-        cause_id: Optional[str] = None,
-    ) -> "Finding":
+        cause_id: str | None = None,
+    ) -> Finding:
         material = _finding_material(
             packet_hash=packet_hash,
             automated_verdict=automated_verdict,
@@ -140,7 +140,7 @@ class Finding:
         return d
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Finding":
+    def from_dict(cls, d: dict[str, Any]) -> Finding:
         """Reconstruct, RE-DERIVING ``finding_hash`` from the material.
 
         Accepts either the stored MATERIAL form (no ``finding_hash`` key) or the full

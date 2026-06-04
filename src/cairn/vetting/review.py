@@ -19,7 +19,7 @@ These primitives are mission-neutral and carry no domain content.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
@@ -28,7 +28,7 @@ class VettingError(Exception):
     silent rejection, double decision)."""
 
 
-class ReviewStatus(str, Enum):
+class ReviewStatus(StrEnum):
     """Lifecycle of a queue item awaiting human review.
 
     The item is enqueued AWAITING_REVIEW, moves to UNDER_REVIEW once a reviewer is
@@ -66,7 +66,7 @@ class ReviewVerdict:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "ReviewVerdict":
+    def from_dict(cls, d: dict[str, Any]) -> ReviewVerdict:
         return cls(
             reviewer_id=d["reviewer_id"],
             decision=d["decision"],
@@ -84,9 +84,7 @@ def require_reason_on_reject(is_reject: bool, reason: str) -> str:
     """
     cleaned = (reason or "").strip()
     if is_reject and not cleaned:
-        raise VettingError(
-            "a rejection requires a non-empty reason (no silent rejection)"
-        )
+        raise VettingError("a rejection requires a non-empty reason (no silent rejection)")
     if not cleaned:
         raise VettingError("a review verdict requires a non-empty reason")
     return cleaned

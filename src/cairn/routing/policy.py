@@ -16,12 +16,12 @@ mission-neutral generic tags, NOT detection logic.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from .recipient import Recipient, RecipientRegistry, RoutingError
 
 
-class RouteReason(str, Enum):
+class RouteReason(StrEnum):
     """Why a recipient was chosen — recorded on the transparency log (auditable).
 
     MATCHED: a recipient's locality AND domain tags both intersect the finding's.
@@ -49,10 +49,8 @@ class FindingRoutingAttributes:
         *,
         locality: set[str] | frozenset[str] | list[str],
         domain: set[str] | frozenset[str] | list[str],
-    ) -> "FindingRoutingAttributes":
-        return FindingRoutingAttributes(
-            locality=frozenset(locality), domain=frozenset(domain)
-        )
+    ) -> FindingRoutingAttributes:
+        return FindingRoutingAttributes(locality=frozenset(locality), domain=frozenset(domain))
 
 
 @dataclass(frozen=True)

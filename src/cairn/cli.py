@@ -21,12 +21,14 @@ function, prints, and maps to an exit code:
       isolated ``claude -p`` CLI. This is the ONLY command
       that touches a real model — every other command stays fully offline. The
       spawn is isolated (``--strict-mcp-config`` + empty ``--mcp-config``) so it
-      loads no MCP servers or plugins from the caller's environment. Exit 0 on a clean run.
+      loads no MCP servers or plugins from the caller's environment. Exit 0 on a
+      clean run.
 
 The ``pilot`` / ``verify-log`` / ``inspect`` commands are offline, stdlib-only
-(argparse); ``live-smoke`` additionally spawns the isolated ``claude`` subprocess. ``FixedClock`` is used for the pilot so output is
-reproducible; the HMAC signing key is a fixed non-secret CLI parameter (never a
-checked-in production secret).
+(argparse); ``live-smoke`` additionally spawns the isolated ``claude``
+subprocess. ``FixedClock`` is used for the pilot so output is reproducible; the
+HMAC signing key is a fixed non-secret CLI parameter (never a checked-in
+production secret).
 
 The cause-layer commands compose on the same CLI. Unlike ``pilot`` /
 ``live-smoke`` (one-shot demos that mint a fresh temp ledger each run), these
@@ -68,8 +70,8 @@ import json
 import os
 import sys
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional, Sequence
 
 from .cause import (
     CauseError,
@@ -89,8 +91,15 @@ from .public import PublicTransparency
 # production secret — it is a public demo key so the attestation seam is exercised.
 _DEMO_KEY = b"cairn-pilot-demo-key-not-secret"
 
+# Help text for the cause-flow ``--ledger`` flag (shared by every cause-layer
+# subparser so the persisted-default resolution order stays documented in one place).
+_LEDGER_HELP = (
+    "ledger directory (default: persisted $CAIRN_LEDGER / "
+    "$XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)"
+)
 
-def resolve_ledger_dir(ledger_arg: Optional[str]) -> Path:
+
+def resolve_ledger_dir(ledger_arg: str | None) -> Path:
     """Resolve the ledger directory for a cause-flow command, persisting a stable
     default so a multi-step flow works WITHOUT threading ``--ledger`` through
     every call.
@@ -143,9 +152,7 @@ def _cmd_pilot(args: argparse.Namespace) -> int:
 
 def _cmd_live_smoke(args: argparse.Namespace) -> int:
     ledger_dir = (
-        Path(args.ledger)
-        if args.ledger
-        else Path(tempfile.mkdtemp(prefix="cairn-live-smoke-"))
+        Path(args.ledger) if args.ledger else Path(tempfile.mkdtemp(prefix="cairn-live-smoke-"))
     )
     # FixedClock for reproducible lease/claim timing; the live adapter stamps its
     # own REAL produced_at (real provenance) via its default wall clock.
@@ -165,7 +172,7 @@ def _cmd_live_smoke(args: argparse.Namespace) -> int:
     return 0
 
 
-def _open_registry(ledger_arg: Optional[str]) -> CauseRegistry:
+def _open_registry(ledger_arg: str | None) -> CauseRegistry:
     """Open a CauseRegistry over a real ledger (offline, FixedClock, demo key).
 
     With no ``--ledger`` the persisted default ledger is used (see
@@ -196,7 +203,7 @@ def _cmd_causes(args: argparse.Namespace) -> int:
         label = "public causes" if status is None else f"causes [{status.value}]"
         print(f"{label}: {len(rows)}")
         for r in rows:
-            print(f"  {r['status']:9} {r['cause_id'][:12]}  {r['name']}")
+            print(f"  {str(r['status']):9} {str(r['cause_id'])[:12]}  {r['name']}")
     return 0
 
 
@@ -207,9 +214,17 @@ def _cmd_cause_request(args: argparse.Namespace) -> int:
     registry = _open_registry(args.ledger)
     cause = registry.submit_cause_request(draft)
     if args.json:
-        print(json.dumps({"cause_id": cause.cause_id, "status": cause.status.value,
-                          "listable": cause.is_publicly_listable}, indent=2,
-                         sort_keys=True))
+        print(
+            json.dumps(
+                {
+                    "cause_id": cause.cause_id,
+                    "status": cause.status.value,
+                    "listable": cause.is_publicly_listable,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
     else:
         print(f"REQUESTED cause_id={cause.cause_id}")
         print(f"  name: {cause.name}")
@@ -242,13 +257,20 @@ def _cmd_cause_decide(args: argparse.Namespace) -> int:
         return 1
 
     if args.json:
-        print(json.dumps(
-            {"cause_id": cause.cause_id, "status": cause.status.value,
-             "listable": cause.is_publicly_listable,
-             "decision_reason": cause.decision_reason,
-             "frames_passed": gate.frames_passed,
-             "frames_failed": gate.frames_failed},
-            indent=2, sort_keys=True))
+        print(
+            json.dumps(
+                {
+                    "cause_id": cause.cause_id,
+                    "status": cause.status.value,
+                    "listable": cause.is_publicly_listable,
+                    "decision_reason": cause.decision_reason,
+                    "frames_passed": gate.frames_passed,
+                    "frames_failed": gate.frames_failed,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
     else:
         verb = "APPROVED" if args.approve else "REJECTED"
         print(f"{verb} cause_id={cause.cause_id}")
@@ -311,7 +333,7 @@ def _cmd_contribute(args: argparse.Namespace) -> int:
     return 0
 
 
-def _open_public(ledger_arg: Optional[str]) -> Optional[PublicTransparency]:
+def _open_public(ledger_arg: str | None) -> PublicTransparency | None:
     """Open a read-only PublicTransparency over an EXISTING ledger dir.
 
     The public surfaces project over already-recorded state; a missing ledger dir
@@ -413,9 +435,7 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
 
     tasks = _count_files(root / "tasks")
     claims = _count_files(root / "claims")
-    results = sum(
-        _count_files(d) for d in (root / "results").glob("*") if d.is_dir()
-    )
+    results = sum(_count_files(d) for d in (root / "results").glob("*") if d.is_dir())
 
     log_path = root / "translog.jsonl"
     result_recorded = verdict_recorded = 0
@@ -438,8 +458,14 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
         print(json.dumps(counts, indent=2, sort_keys=True))
     else:
         print(f"ledger: {root}")
-        for k in ("tasks", "claims", "results", "log_entries",
-                  "result_recorded", "verdict_recorded"):
+        for k in (
+            "tasks",
+            "claims",
+            "results",
+            "log_entries",
+            "result_recorded",
+            "verdict_recorded",
+        ):
             print(f"  {k}: {counts[k]}")
     return 0
 
@@ -460,9 +486,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_pilot = sub.add_parser(
         "pilot", help="run the benign pilot cause end-to-end on a fresh ledger"
     )
-    p_pilot.add_argument(
-        "--ledger", default=None, help="ledger directory (default: a temp dir)"
-    )
+    p_pilot.add_argument("--ledger", default=None, help="ledger directory (default: a temp dir)")
     p_pilot.add_argument(
         "--bad-family",
         dest="bad_family",
@@ -476,12 +500,8 @@ def _build_parser() -> argparse.ArgumentParser:
         "live-smoke",
         help="run the benign pilot with one real Claude node (isolated claude -p)",
     )
-    p_live.add_argument(
-        "--ledger", default=None, help="ledger directory (default: a temp dir)"
-    )
-    p_live.add_argument(
-        "--model", default="sonnet", help="model tier (default: sonnet)"
-    )
+    p_live.add_argument("--ledger", default=None, help="ledger directory (default: a temp dir)")
+    p_live.add_argument("--model", default="sonnet", help="model tier (default: sonnet)")
     p_live.add_argument(
         "--timeout",
         type=float,
@@ -495,7 +515,11 @@ def _build_parser() -> argparse.ArgumentParser:
     p_causes = sub.add_parser(
         "causes", help="list public causes (approved/live), or a status history view"
     )
-    p_causes.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
+    p_causes.add_argument(
+        "--ledger",
+        default=None,
+        help=_LEDGER_HELP,
+    )
     p_causes.add_argument(
         "--status",
         default=None,
@@ -505,11 +529,13 @@ def _build_parser() -> argparse.ArgumentParser:
     p_causes.add_argument("--json", action="store_true", help="emit JSON rows")
     p_causes.set_defaults(func=_cmd_causes)
 
-    p_creq = sub.add_parser(
-        "cause-request", help="submit a cause draft (records a CAUSE_REQUEST)"
-    )
+    p_creq = sub.add_parser("cause-request", help="submit a cause draft (records a CAUSE_REQUEST)")
     p_creq.add_argument("file", help="path to the cause draft JSON file")
-    p_creq.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
+    p_creq.add_argument(
+        "--ledger",
+        default=None,
+        help=_LEDGER_HELP,
+    )
     p_creq.add_argument("--by", default=None, help="requester id (created_by)")
     p_creq.add_argument("--json", action="store_true", help="emit JSON summary")
     p_creq.set_defaults(func=_cmd_cause_request)
@@ -535,7 +561,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help=f"a frame the decider passes (repeatable); all of {list(FRAME_KEYS)} "
         "must be addressed for a complete gate-check",
     )
-    p_cdec.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
+    p_cdec.add_argument(
+        "--ledger",
+        default=None,
+        help=_LEDGER_HELP,
+    )
     p_cdec.add_argument("--json", action="store_true", help="emit JSON summary")
     p_cdec.set_defaults(func=_cmd_cause_decide)
 
@@ -549,16 +579,18 @@ def _build_parser() -> argparse.ArgumentParser:
         default="mock",
         help="execution adapter (only 'mock' supported in this release; offline)",
     )
-    p_contrib.add_argument(
-        "--node", default="contributor", help="the contributor node id"
-    )
+    p_contrib.add_argument("--node", default="contributor", help="the contributor node id")
     p_contrib.add_argument(
         "--bad-family",
         dest="bad_family",
         default=None,
         help="run this model family as a faulty node on the honeypot unit",
     )
-    p_contrib.add_argument("--ledger", default=None, help="ledger directory (default: persisted $CAIRN_LEDGER / $XDG_DATA_HOME/cairn/ledger / ~/.local/share/cairn/ledger)")
+    p_contrib.add_argument(
+        "--ledger",
+        default=None,
+        help=_LEDGER_HELP,
+    )
     p_contrib.add_argument("--json", action="store_true", help="emit JSON summary")
     p_contrib.set_defaults(func=_cmd_contribute)
 
@@ -599,9 +631,7 @@ def _build_parser() -> argparse.ArgumentParser:
     pub_log.add_argument("--json", action="store_true", help="emit JSON rows")
     pub_log.set_defaults(func=_cmd_public_log)
 
-    p_verify = sub.add_parser(
-        "verify-log", help="independently re-verify a transparency log"
-    )
+    p_verify = sub.add_parser("verify-log", help="independently re-verify a transparency log")
     p_verify.add_argument("path", help="path to the translog.jsonl file")
     p_verify.set_defaults(func=_cmd_verify_log)
 
@@ -615,7 +645,7 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
     return args.func(args)
