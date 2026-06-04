@@ -278,7 +278,15 @@ class ClaudeCliAdapter(Adapter):
             raw = self._transcript_fn(prompt)
         except ClaudeCliError:
             output = {}  # fail-closed: nonzero exit / timeout / spawn failure
-        except Exception:  # any unexpected transcript-fn failure also fails closed
+        except Exception:  # noqa: BLE001 - deliberate: see fail-closed rationale below
+            # ``_transcript_fn`` is an INJECTED callable that shells out to an
+            # external ``claude -p`` process; it can fail in ways we do not
+            # enumerate (OSError on spawn, arbitrary errors from a custom fn).
+            # The adapter's documented contract is fail-closed + "never raises":
+            # an untrusted runtime crash must degrade to an empty result the
+            # acceptance contract rejects, never propagate. The broad catch is
+            # therefore intentional, not lazy — narrowing it would let an
+            # unanticipated exception escape and break the boundary guarantee.
             output = {}
         else:
             parsed = _extract_json(raw)
