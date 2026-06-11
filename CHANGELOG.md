@@ -7,6 +7,29 @@ versions may include breaking changes; patch versions are fixes.
 
 ## [Unreleased]
 
+### Fixed
+- **The "Public API" example in README + QUICKSTART now passes as written.** It
+  fed `{"answer", "citations"}` to `benign_pilot`'s acceptance contract, which
+  requires `{"is_open_license", "license_id"}`, so the project's first
+  copy-paste sample raised `AssertionError`. A new test
+  (`tests/test_docs_examples.py`) executes every fenced python block in
+  README + QUICKSTART so doc examples can't silently rot again.
+- **`cairn scenario review` accepts the truncated finding hashes that
+  `scenario run` / `scenario list` print** — any unambiguous prefix of >= 8
+  chars, resolved fail-closed: no-match, ambiguous, and too-short prefixes are
+  all refused; a full-length hash is never prefix-matched; the verdict recorded
+  on the transparency log always carries the full hash. The documented
+  QUICKSTART flow previously dead-ended in `REVIEW REFUSED` because `review`
+  required the full 64-char hash its sibling commands never print.
+- **Release-status claims match reality.** The README status block claimed "no
+  version is tagged or published yet" (in a grammatically broken sentence)
+  while v0.2.0+ tags and GitHub Releases exist; it now points at the Releases
+  page + CHANGELOG and states plainly that the package is not on PyPI (the
+  `cairn` there is an unrelated project). RELEASING.md's "no git tags" header
+  note, the dead `[Unreleased]` CHANGELOG pointer in the README, and the
+  WALKTHROUGH `verify-log` sample output (`length=16`, not 15) were corrected
+  the same way.
+
 ## [0.3.2] - 2026-06-04
 
 ### Changed
