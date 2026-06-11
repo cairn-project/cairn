@@ -226,7 +226,7 @@ result = validate_work_unit(unit)
 assert result.valid
 
 contract = unit["acceptance_contract"]
-acc = evaluate_acceptance({"answer": "...", "citations": ["..."]}, contract)
+acc = evaluate_acceptance({"is_open_license": True, "license_id": "MIT"}, contract)
 assert acc.passed
 ```
 
