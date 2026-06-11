@@ -39,7 +39,9 @@ def test_documented_scenario_flow_with_the_hash_list_prints(tmp_path):
     review_dir = str(tmp_path / "review")
 
     # 1. `cairn scenario run --offline` (QUICKSTART verbatim, hermetic).
-    proc = _run_cli(["scenario", "run", "--offline", "--ledger", ledger, "--review-dir", review_dir])
+    proc = _run_cli(
+        ["scenario", "run", "--offline", "--ledger", ledger, "--review-dir", review_dir]
+    )
     assert proc.returncode == 0, proc.stderr
 
     # 2. `cairn scenario list` — take the truncated hash from the HUMAN output.
@@ -79,7 +81,9 @@ def test_documented_scenario_flow_with_the_hash_list_prints(tmp_path):
 
 def test_scenario_review_still_refuses_garbage_hash(tmp_path):
     ledger = str(tmp_path / "ledger")
-    proc = _run_cli(["scenario", "run", "--offline", "--ledger", ledger, "--review-dir", str(tmp_path / "r")])
+    proc = _run_cli(
+        ["scenario", "run", "--offline", "--ledger", ledger, "--review-dir", str(tmp_path / "r")]
+    )
     assert proc.returncode == 0, proc.stderr
 
     proc = _run_cli(
