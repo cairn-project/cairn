@@ -45,10 +45,13 @@ an unauthenticated free-text string, and the real-world network pieces are not
 built yet. The limits and the deferred work below are **owned design boundaries,
 not discovered defects.**
 
-**Status.** Pre-1.0 (`0.x`), unreleased: no version is tagged or published yet,
-the CHANGELOG sits at `[Unreleased]`, and while `0.x` minor versions may break.
-**License:** MIT. **Python:** 3.11+. Standard-library-first — the only runtime
-dependency is `jsonschema`.
+**Status.** Pre-1.0 (`0.x`): versions are tagged and released on GitHub — see
+the [Releases page](https://github.com/cairn-project/cairn/releases) and
+[CHANGELOG.md](CHANGELOG.md) for what each release contains. Per SemVer pre-1.0
+practice, `0.x` minor versions may include breaking changes. Not published to
+PyPI (the `cairn` package there is an unrelated project) — install from source
+per [docs/QUICKSTART.md](docs/QUICKSTART.md). **License:** MIT. **Python:**
+3.11+. Standard-library-first — the only runtime dependency is `jsonschema`.
 
 **What genuinely works today.** The full Layer-A engine is built and exercised
 by a broad passing test suite (`pytest -q` reports the current count) — a working
@@ -126,8 +129,8 @@ stub.
 
 The engine composes a single end-to-end loop —
 **spec → execute → verify → ledger/transparency → cause → contribute → capture →
-vet → publish → route** — every layer built and tested (see the `[Unreleased]`
-section of [CHANGELOG.md](CHANGELOG.md) for the authoritative per-layer detail):
+vet → publish → route** — every layer built and tested (see the `0.2.0` section
+of [CHANGELOG.md](CHANGELOG.md) for the authoritative per-layer detail):
 
 - **Spec** — a versioned JSON-Schema **work-unit + acceptance-contract** (the
   runtime-agnostic interface defining a unit of AI work and its machine-checkable
