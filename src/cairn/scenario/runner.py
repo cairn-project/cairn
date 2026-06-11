@@ -367,6 +367,39 @@ class ScenarioReviewResult:
         }
 
 
+# The scenario's own run/list output prints TRUNCATED finding hashes (12 and 16
+# chars) for human readability; review must accept what its sibling commands
+# print. Resolution rules (fail-closed): a full-length hash is passed through
+# UNCHANGED (never prefix-matched, so a full hash can never be silently rewritten
+# to a different finding); anything shorter must be >= _MIN_PREFIX_LEN chars and
+# match exactly ONE queued finding — no match and ambiguous both REFUSE. The
+# verdict recorded on the ledger always carries the resolved FULL hash, and the
+# ``FindingVetQueue`` gate itself still operates on full hashes only.
+_FULL_HASH_LEN = 64
+_MIN_PREFIX_LEN = 8
+
+
+def resolve_finding_prefix(candidates: list[str], hash_or_prefix: str) -> str:
+    """Resolve ``hash_or_prefix`` against the queued finding hashes (fail-closed)."""
+    if len(hash_or_prefix) >= _FULL_HASH_LEN:
+        return hash_or_prefix
+    if len(hash_or_prefix) < _MIN_PREFIX_LEN:
+        raise VettingError(
+            f"finding-hash prefix {hash_or_prefix!r} is too short: "
+            f"use at least {_MIN_PREFIX_LEN} characters or the full hash"
+        )
+    matches = sorted({c for c in candidates if c.startswith(hash_or_prefix)})
+    if not matches:
+        raise VettingError(f"finding {hash_or_prefix} is not in the finding-vet queue")
+    if len(matches) > 1:
+        shown = ", ".join(m[:16] for m in matches)
+        raise VettingError(
+            f"finding-hash prefix {hash_or_prefix} is ambiguous (matches: {shown}): "
+            "use more characters or the full hash"
+        )
+    return matches[0]
+
+
 def review_scenario(
     ledger: Ledger,
     finding_hash: str,
@@ -377,12 +410,17 @@ def review_scenario(
 ) -> ScenarioReviewResult:
     """Record the HUMAN Gate-2 verdict through the REAL ``FindingVetQueue``.
 
-    A finding becomes ROUTABLE only via a recorded human ROUTABLE verdict; a
-    ``routable=False`` (reject) with an empty reason is REFUSED by the real queue
-    (no silent rejection). STILL nothing is sent — a ROUTABLE verdict only changes
-    the gate state; onward delivery is the deferred real-channel phase.
+    ``finding_hash`` may be the full 64-char hash or an unambiguous prefix
+    (>= 8 chars) of one queued finding — the truncated hashes printed by
+    ``scenario run`` / ``scenario list`` work as-is. A finding becomes ROUTABLE
+    only via a recorded human ROUTABLE verdict; a ``routable=False`` (reject)
+    with an empty reason is REFUSED by the real queue (no silent rejection).
+    STILL nothing is sent — a ROUTABLE verdict only changes the gate state;
+    onward delivery is the deferred real-channel phase.
     """
     queue = FindingVetQueue(ledger)
+    queued = [it.finding_hash for it in queue.list_pending() + queue.list_reviewed()]
+    finding_hash = resolve_finding_prefix(queued, finding_hash)
     item = queue.record_verdict(finding_hash, routable, reason, reviewer_id)
     state = queue.finding_state(finding_hash)
     assert item.verdict is not None
