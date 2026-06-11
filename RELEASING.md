@@ -1,12 +1,11 @@
 # Releasing cairn
 
-> **Status: PROPOSED.** No formal release process exists in this repository
-> yet. As of this writing the project has **no git tags**, **no CI/CD release
-> workflow**, and **no published versions** — `git tag` returns nothing and
-> there are no version/release/bump commits in the history. This document
-> proposes a minimal, conventional process derived solely from
-> `pyproject.toml` and the git history. Adopt, amend, or replace it before
-> treating it as authoritative.
+> **Status: IN USE (manual).** Releases follow the bump → tag → build flow
+> below: `v`-prefixed annotated tags (`v0.2.0` onward) with matching GitHub
+> Releases and CHANGELOG sections. There is still **no CI/CD release
+> workflow** (the CI workflow runs tests only) and **no PyPI publication** —
+> the `cairn` name on PyPI belongs to an unrelated project, so step 5's
+> "publish" remains a decision to make, not a step performed today.
 
 ## What the build config tells us
 
@@ -49,8 +48,8 @@ git commit -m "release: v0.2.0"
 
 ### 3. Tag
 
-Use an annotated tag, `v`-prefixed, matching `project.version` exactly.
-(The repo has no tags today; this establishes the convention.)
+Use an annotated tag, `v`-prefixed, matching `project.version` exactly
+(the convention every existing tag follows).
 
 ```sh
 git tag -a v0.2.0 -m "cairn v0.2.0"
@@ -76,7 +75,9 @@ twine check dist/*
 
 No publish target is configured in the repo, so pick one explicitly:
 
-- **PyPI** (after confirming the `cairn` name is available on PyPI):
+- **PyPI** — **the `cairn` name is taken** by an unrelated project, so
+  publishing requires choosing a distribution name first (e.g.
+  `cairn-engine`):
 
   ```sh
   twine upload dist/*

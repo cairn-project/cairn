@@ -52,7 +52,7 @@ result = validate_work_unit(unit)
 assert result.valid
 
 contract = unit["acceptance_contract"]
-acc = evaluate_acceptance({"answer": "...", "citations": ["..."]}, contract)
+acc = evaluate_acceptance({"is_open_license": True, "license_id": "MIT"}, contract)
 assert acc.passed
 ```
 
@@ -115,7 +115,9 @@ human-review packet per finding instead of sending anything:
     --review-dir /tmp/cairn-demo-review
 
 # each finding is left PENDING in the REAL human-vetting gate; record the
-# human verdict (a finding is ROUTABLE only via a recorded human verdict)
+# human verdict (a finding is ROUTABLE only via a recorded human verdict).
+# <finding_hash> is the hash `scenario list` prints — the truncated form
+# works (any unambiguous prefix of >= 8 chars, or the full hash)
 .venv/bin/cairn scenario list --ledger /tmp/cairn-demo
 .venv/bin/cairn scenario review <finding_hash> --routable \
     --reason "verified benign" --by reviewer --ledger /tmp/cairn-demo

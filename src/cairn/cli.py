@@ -641,7 +641,12 @@ def _build_parser() -> argparse.ArgumentParser:
         "review",
         help="record the HUMAN Gate-2 verdict on a scenario finding (still sends nothing)",
     )
-    scn_rev.add_argument("finding_hash", help="the finding hash to record a verdict for")
+    scn_rev.add_argument(
+        "finding_hash",
+        help="the finding hash to record a verdict for — full hash or an "
+        "unambiguous prefix (>= 8 chars; the truncated hashes printed by "
+        "`scenario run` / `scenario list` work)",
+    )
     rev_grp = scn_rev.add_mutually_exclusive_group(required=True)
     rev_grp.add_argument("--routable", action="store_true", help="mark routable (human approve)")
     rev_grp.add_argument(

@@ -201,7 +201,7 @@ Independently re-verify the tamper-evident transparency log (re-runs the same
 ```
 
 ```
-OK length=15 head=0c4539f3...
+OK length=16 head=9b785670...
 ```
 
 The redacted public log skeleton (entry kinds + hashes, no payloads):

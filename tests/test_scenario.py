@@ -19,6 +19,10 @@ analysis nodes (no model, no network); the live-path AC injects a fake
             on an unresolvable record (no recipient; dump says so).
   AC.SCN.7  the live (non-offline) path drives analysis through the claude adapter
             (mocked transcript) + the real verify quorum.
+  AC.SCN.8  review accepts the truncated finding hashes the scenario's own
+            run/list output prints (any unambiguous prefix >= 8 chars); the
+            recorded verdict carries the FULL hash; too-short, unmatched, and
+            ambiguous prefixes are all REFUSED (fail-closed).
 """
 
 from __future__ import annotations
@@ -41,6 +45,7 @@ from cairn.scenario import (
     run_scenario,
 )
 from cairn.scenario.dump import finding_dir
+from cairn.scenario.runner import resolve_finding_prefix
 from cairn.scenario.seed import classify_defect as _seed_classify
 from cairn.vetting.review import VettingError
 
@@ -292,6 +297,71 @@ def test_scn_7_live_path_drives_claude_adapter(tmp_path):
     prov = (Path(summary.findings[0].dump_dir) / "provenance.txt").read_text()
     assert "live claude -p" in prov
     assert verify_log(tmp_path / "ledger" / "translog.jsonl").ok is True
+
+
+# --- AC.SCN.8 (review accepts the hashes its own output prints) --------------
+
+
+def test_scn_8_review_accepts_truncated_hashes_run_and_list_print(tmp_path):
+    ledger = _fresh_ledger(tmp_path)
+    summary = run_scenario(ledger, review_dir=tmp_path / "review", offline=True)
+    assert len(summary.findings) >= 2, "need two findings to cover both printed widths"
+    first, second = summary.findings[0], summary.findings[1]
+
+    # `scenario run` prints hash[:12]; `scenario list` prints hash[:16].
+    result = review_scenario(
+        ledger,
+        first.finding_hash[:12],
+        routable=True,
+        reason="verified benign",
+        reviewer_id="reviewer-1",
+    )
+    # the recorded verdict carries the FULL hash, never the prefix.
+    assert result.finding_hash == first.finding_hash
+    assert ledger_is_routable(ledger, first.finding_hash)
+
+    result = review_scenario(
+        ledger,
+        second.finding_hash[:16],
+        routable=True,
+        reason="verified benign",
+        reviewer_id="reviewer-1",
+    )
+    assert result.finding_hash == second.finding_hash
+    assert ledger_is_routable(ledger, second.finding_hash)
+
+
+def test_scn_8_unmatched_prefix_refused_and_nothing_recorded(tmp_path):
+    ledger = _fresh_ledger(tmp_path)
+    summary = run_scenario(ledger, review_dir=tmp_path / "review", offline=True)
+    with pytest.raises(VettingError, match="not in the finding-vet queue"):
+        review_scenario(
+            ledger,
+            "deadbeef0000",
+            routable=True,
+            reason="x",
+            reviewer_id="reviewer-1",
+        )
+    for f in summary.findings:  # every finding still PENDING — fail-closed.
+        assert not ledger_is_routable(ledger, f.finding_hash)
+
+
+def test_scn_8_prefix_resolution_fails_closed():
+    shared = "a1b2c3d4"
+    candidates = [shared + "0" * 56, shared + "f" * 56]
+
+    # ambiguous prefix → refused, both matches named.
+    with pytest.raises(VettingError, match="ambiguous"):
+        resolve_finding_prefix(candidates, shared)
+    # one more character disambiguates.
+    assert resolve_finding_prefix(candidates, shared + "0") == candidates[0]
+    # shorter than the 8-char floor → refused even if it would be unique.
+    with pytest.raises(VettingError, match="too short"):
+        resolve_finding_prefix(candidates, shared[:7])
+    # a full-length hash is passed through UNCHANGED (never prefix-matched),
+    # even when it matches nothing — existence stays the gate's decision.
+    unknown = "e" * 64
+    assert resolve_finding_prefix(candidates, unknown) == unknown
 
 
 # --- sanity on the shared rule ----------------------------------------------
