@@ -35,8 +35,9 @@ The full invariant register, including the explicit `[PLACEHOLDER]` invariants,
 is in [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md); the reviewer-facing summary
 of known, deferred gaps is in the [README](README.md).
 
-## Acceptable-cause / prohibited-target policy — OPEN (owner decision required)
-> **STATUS: NOT YET WRITTEN — flagged open, needs the maintainer's input.**
+## Acceptable-cause / prohibited-target policy — OPEN (owner ratification required)
+> **STATUS: STRAWMAN DRAFTED, NOT YET RATIFIED — needs the maintainer's
+> sign-off (and, where flagged, counsel).**
 >
 > Because the engine is mission-neutral and general (it can be pointed at any
 > target conduct a cause defines), it needs an explicit, written policy stating:
@@ -45,12 +46,14 @@ of known, deferred gaps is in the [README](README.md).
 > due-process posture, lawful activity), and (c) the acceptance bar a cause must
 > clear before any human vetter may approve it.
 >
-> This is a **governance decision, not code** — it is the maintainer's to make,
-> and it is **deliberately not drafted here** so it is not pre-decided by
-> tooling. Until it exists, the only barrier to an abusive cause is the
-> (unauthenticated, single-actor-capable) human cause-vetter. Writing this policy
-> is a prerequisite before any non-benign cause is accepted. **Owner: please
-> author this section.**
+> A **draft strawman** now exists at
+> [docs/policy/ACCEPTABLE_USE.draft.md](docs/policy/ACCEPTABLE_USE.draft.md). It
+> is clearly marked DRAFT and lists the explicit decisions the maintainer must
+> make to ratify it. It is **not yet adopted policy** — a starting point to
+> ratify, amend, or reject, not a pre-decision by tooling. Until the maintainer
+> ratifies it, the only barrier to an abusive cause remains the (unauthenticated,
+> single-actor-capable) human cause-vetter, and **no non-benign cause should be
+> accepted.** **Owner: review and ratify the draft.**
 
 ## Multi-operator / contributor-and-operator terms — OPEN (counsel + owner)
 This project is single-maintainer today, but recruits strangers to act as both
@@ -59,3 +62,11 @@ reviewer **authorization scope, qualification, offboarding, acceptable-use, and
 data-processing/indemnification terms** are not yet defined and need owner +
 legal-counsel input before a multi-operator deployment. Named here so the gap is
 visible, not discovered.
+
+A **contributor privacy & consent draft** —
+[docs/policy/CONTRIBUTOR_PRIVACY.draft.md](docs/policy/CONTRIBUTOR_PRIVACY.draft.md)
+— addresses the contributor (not operator) side: what data a contributor shares,
+how it is used, the append-only-log privacy tension, and a proposed structured-
+consent shape. It is a **DRAFT pending owner ratification + counsel review**, not
+adopted policy. The fuller multi-*operator* terms (authorization / offboarding /
+indemnification) remain genuinely counsel-gated and are not drafted here.
